@@ -13,12 +13,9 @@ import {
   Users,
   Grid,
   ChefHat,
-  Receipt,
   CalendarDays,
   ShieldCheck,
-  Settings,
   LogOut,
-  ChevronRight,
   Sparkles,
   Layers,
   History,
@@ -70,7 +67,6 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
           href: '/tables',
           icon: Grid,
           permission: 'tables.view',
-          badge: 'Phase 3',
         },
         {
           label: 'Kitchen KDS',
@@ -84,14 +80,12 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
           href: '/reservations',
           icon: CalendarDays,
           permission: 'reservations.view',
-          badge: 'Phase 7',
         },
         {
           label: 'Reports & Analytics',
           href: '/reports',
           icon: BarChart3,
           permission: 'dashboard.view',
-          badge: 'Phase 8',
         },
       ],
     },
@@ -103,58 +97,46 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
           href: '/restaurants',
           icon: Store,
           permission: 'restaurants.view',
-          badge: 'Phase 2',
         },
         {
           label: 'SaaS Subscription',
           href: '/subscription',
           icon: CreditCard,
           permission: 'settings.view',
-          badge: 'Phase 8',
         },
         {
           label: 'Menu Catalog',
           href: '/menu',
           icon: Layers,
           permission: 'menu.view',
-          badge: 'Phase 3',
         },
         {
           label: 'Inventory & Stock',
           href: '/inventory',
           icon: Boxes,
           permission: 'inventory.view',
-          badge: 'Phase 7',
         },
         {
           label: 'Staff & Roles',
           href: '/users',
           icon: Users,
           permission: 'users.view',
-          badge: 'Phase 2',
         },
         {
           label: 'Permissions Matrix',
           href: '/roles',
           icon: ShieldCheck,
           permission: 'roles.view',
-          badge: 'Phase 2',
         },
       ],
     },
     {
-      title: 'Auditing & System',
+      title: 'Auditing',
       items: [
         {
           label: 'Audit Trail',
           href: '/audit-logs',
           icon: History,
-          permission: 'settings.view',
-        },
-        {
-          label: 'System Settings',
-          href: '/settings',
-          icon: Settings,
           permission: 'settings.view',
         },
       ],
@@ -166,28 +148,28 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       {/* Mobile Backdrop */}
       {isOpen && (
         <div 
-          className="fixed inset-0 z-40 bg-[#292B28]/20 backdrop-blur-xs md:hidden"
+          className="fixed inset-0 z-40 bg-[#252525]/20 backdrop-blur-sm md:hidden"
           onClick={onClose}
         />
       )}
 
       <aside
         className={cn(
-          "fixed top-0 bottom-0 left-0 z-50 flex w-72 flex-col border-r border-[#EAE7E0] bg-[#FFFFFF] transition-transform duration-200 ease-in-out md:translate-x-0",
+          "fixed top-0 bottom-0 left-0 z-50 flex w-72 flex-col bg-white border-r border-black/[0.04] transition-transform duration-300 ease-in-out md:translate-x-0",
           isOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
         {/* Brand Header */}
-        <div className="flex h-18 items-center justify-between border-b border-[#EAE7E0] px-6">
+        <div className="flex h-20 items-center justify-between px-7 border-b border-black/[0.04]">
           <Link href="/dashboard" className="flex items-center gap-3 group">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#C76B4A] text-white shadow-xs group-hover:bg-[#AE593B] transition-colors">
+            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#C2B0DC] text-white shadow-[0_6px_20px_rgba(194,176,220,0.4)] group-hover:scale-105 transition-transform">
               <Sparkles className="h-5 w-5" />
             </div>
             <div>
-              <span className="font-serif text-lg font-semibold tracking-tight text-[#292B28] block leading-none">
+              <span className="font-baloo text-xl tracking-tight text-[#252525] block leading-none">
                 Restaurant OS
               </span>
-              <span className="text-[11px] font-medium tracking-wider text-[#777872] uppercase block mt-1">
+              <span className="text-[10px] font-semibold tracking-widest text-[#5A5D58] uppercase block mt-1">
                 Multi-Tenant SaaS
               </span>
             </div>
@@ -195,7 +177,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         </div>
 
         {/* Navigation list */}
-        <div className="flex-1 overflow-y-auto px-4 py-4 space-y-6">
+        <div className="flex-1 overflow-y-auto px-4 py-5 space-y-6">
           {navItems.map((group) => {
             const filteredItems = group.items.filter(
               (item) => isSuperAdmin || !item.permission || hasPermission(item.permission)
@@ -204,11 +186,11 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             if (filteredItems.length === 0) return null;
 
             return (
-              <div key={group.title} className="space-y-1">
-                <p className="px-3 text-[11px] font-semibold uppercase tracking-wider text-[#A2A29A]">
+              <div key={group.title} className="space-y-1.5">
+                <p className="px-3.5 text-[10px] font-bold uppercase tracking-widest text-[#8E928B]">
                   {group.title}
                 </p>
-                <div className="mt-1.5 space-y-0.5">
+                <div className="space-y-1">
                   {filteredItems.map((item) => {
                     const isActive = pathname === item.href;
                     const Icon = item.icon;
@@ -219,25 +201,26 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                         href={item.href}
                         onClick={onClose}
                         className={cn(
-                          "group flex items-center justify-between rounded-[10px] px-3 py-2 text-sm font-medium transition-all duration-150",
+                          "group flex items-center justify-between rounded-2xl px-3.5 py-2.5 text-sm font-medium transition-all duration-200",
                           isActive
-                            ? "bg-[#F8EAE3] text-[#AE593B]"
-                            : "text-[#777872] hover:bg-[#FAF8F4] hover:text-[#292B28]"
+                            ? "bg-[#C2B0DC] text-white font-semibold shadow-[0_6px_20px_rgba(194,176,220,0.35)]"
+                            : "text-[#5A5D58] hover:bg-[#F3DA8A]/25 hover:text-[#252525]"
                         )}
                       >
                         <div className="flex items-center gap-3">
                           <Icon className={cn(
                             "h-4 w-4 transition-colors",
-                            isActive ? "text-[#C76B4A]" : "text-[#777872] group-hover:text-[#292B28]"
+                            isActive ? "text-white" : "text-[#5A5D58] group-hover:text-[#252525]"
                           )} />
                           <span>{item.label}</span>
                         </div>
                         {item.badge ? (
-                          <span className="text-[10px] uppercase font-semibold tracking-wider text-[#A2A29A] bg-[#FAF8F4] border border-[#EAE7E0] px-1.5 py-0.5 rounded">
+                          <span className={cn(
+                            "text-[9px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full",
+                            isActive ? "bg-white/30 text-white" : "bg-[#B4D58A]/30 text-[#252525]"
+                          )}>
                             {item.badge}
                           </span>
-                        ) : isActive ? (
-                          <div className="h-1.5 w-1.5 rounded-full bg-[#C76B4A]" />
                         ) : null}
                       </Link>
                     );
@@ -249,17 +232,17 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         </div>
 
         {/* Footer User Info */}
-        <div className="border-t border-[#EAE7E0] p-4 bg-[#FAF8F4]/50">
-          <div className="flex items-center justify-between gap-3 p-2 rounded-xl bg-white border border-[#EAE7E0]">
-            <div className="flex items-center gap-2.5 min-w-0">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#F8EAE3] text-sm font-semibold text-[#C76B4A]">
+        <div className="p-4 border-t border-black/[0.04]">
+          <div className="flex items-center justify-between gap-3 p-3 rounded-2xl bg-[#F3DA8A]/20">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#C2B0DC] text-sm font-bold text-white shadow-xs">
                 {user?.name?.charAt(0) || 'U'}
               </div>
               <div className="min-w-0 flex-1">
-                <p className="truncate text-xs font-semibold text-[#292B28]">
+                <p className="truncate text-xs font-bold text-[#252525]">
                   {user?.name || 'Staff User'}
                 </p>
-                <p className="truncate text-[11px] text-[#777872]">
+                <p className="truncate text-[11px] text-[#5A5D58] font-medium">
                   {user?.roles?.[0] || 'User'}
                 </p>
               </div>
@@ -268,7 +251,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             <button
               onClick={() => logout()}
               title="Sign Out"
-              className="p-1.5 text-[#777872] hover:text-[#C84D4D] hover:bg-[#FDF0F0] rounded-lg transition-colors cursor-pointer"
+              className="p-2 text-[#5A5D58] hover:text-[#252525] hover:bg-white rounded-xl transition-all cursor-pointer"
             >
               <LogOut className="h-4 w-4" />
             </button>

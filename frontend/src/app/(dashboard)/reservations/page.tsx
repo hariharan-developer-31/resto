@@ -229,17 +229,17 @@ export default function ReservationsPage() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'confirmed':
-        return <Badge className="bg-[#EBF3FC] text-[#5185B8] border-[#CFE2F7]">Confirmed</Badge>;
+        return <Badge className="bg-[#C2B0DC]/20 text-[#C2B0DC] border-[#CFE2F7]">Confirmed</Badge>;
       case 'checked_in':
         return <Badge className="bg-[#F3E8FF] text-[#7C3AED] border-[#E9D5FF]">Checked In</Badge>;
       case 'seated':
-        return <Badge className="bg-[#EEF1E9] text-[#39845C] border-[#D6DFC9]">Seated</Badge>;
+        return <Badge className="bg-[#B4D58A]/25 text-[#B4D58A] border-[#D6DFC9]">Seated</Badge>;
       case 'completed':
-        return <Badge variant="outline" className="text-[#777872] border-[#EAE7E0]">Completed</Badge>;
+        return <Badge variant="outline" className="text-[#5A5D58] border-black/[0.06]">Completed</Badge>;
       case 'cancelled':
-        return <Badge className="bg-[#FDF2F2] text-[#C84D4D] border-[#F8D7DA]">Cancelled</Badge>;
+        return <Badge className="bg-[#FDF2F2] text-[#F2AFC0] border-[#F8D7DA]">Cancelled</Badge>;
       case 'no_show':
-        return <Badge className="bg-[#FEF7EC] text-[#D69A3A] border-[#FCE3BE]">No Show</Badge>;
+        return <Badge className="bg-[#FEF7EC] text-[#F3DA8A] border-[#FCE3BE]">No Show</Badge>;
       default:
         return <Badge variant="outline">{status}</Badge>;
     }
@@ -251,12 +251,12 @@ export default function ReservationsPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold tracking-tight text-[#292B28]">Table Reservations & Seating</h1>
-            <Badge variant="outline" className="text-[#C76B4A] border-[#F8EAE3] bg-[#FAF8F4]">
+            <h1 className="text-2xl font-bold tracking-tight text-[#252525]">Table Reservations & Seating</h1>
+            <Badge variant="outline" className="text-[#C2B0DC] border-[#C2B0DC]/20 bg-[#FAF9F6]">
               Phase 7
             </Badge>
           </div>
-          <p className="text-sm text-[#777872] mt-1">
+          <p className="text-sm text-[#5A5D58] mt-1">
             Manage table bookings, assign seating layouts, track guest arrivals, and prevent overlapping reservations.
           </p>
         </div>
@@ -267,7 +267,7 @@ export default function ReservationsPage() {
             size="sm"
             onClick={() => refetch()}
             disabled={isFetching}
-            className="border-[#EAE7E0] hover:bg-[#F3F1EB] text-[#292B28]"
+            className="border-black/[0.06] hover:bg-[#F3DA8A]/25 text-[#252525]"
           >
             <RefreshCw className={`w-4 h-4 mr-2 ${isFetching ? 'animate-spin' : ''}`} />
             Refresh
@@ -275,7 +275,7 @@ export default function ReservationsPage() {
 
           <Button
             onClick={() => setIsCreateModalOpen(true)}
-            className="bg-[#C76B4A] hover:bg-[#AE593B] text-white shadow-sm"
+            className="bg-[#C2B0DC] hover:bg-[#B19CCF] text-white shadow-sm"
           >
             <Plus className="w-4 h-4 mr-2" />
             New Reservation
@@ -285,49 +285,49 @@ export default function ReservationsPage() {
 
       {/* Metrics Row */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card className="border-[#EAE7E0] bg-white shadow-xs">
+        <Card className="border-black/[0.06] bg-white shadow-xs">
           <CardContent className="p-4 flex items-center justify-between">
             <div>
-              <p className="text-xs font-medium text-[#777872]">Today's Bookings</p>
-              <h3 className="text-2xl font-bold text-[#292B28] mt-1">{totalBookings}</h3>
+              <p className="text-xs font-medium text-[#5A5D58]">Today's Bookings</p>
+              <h3 className="text-2xl font-bold text-[#252525] mt-1">{totalBookings}</h3>
             </div>
-            <div className="w-10 h-10 rounded-full bg-[#FAF8F4] flex items-center justify-center text-[#C76B4A]">
+            <div className="w-10 h-10 rounded-full bg-[#FAF9F6] flex items-center justify-center text-[#C2B0DC]">
               <CalendarDays className="w-5 h-5" />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-[#EAE7E0] bg-white shadow-xs">
+        <Card className="border-black/[0.06] bg-white shadow-xs">
           <CardContent className="p-4 flex items-center justify-between">
             <div>
-              <p className="text-xs font-medium text-[#777872]">Confirmed / Upcoming</p>
-              <h3 className="text-2xl font-bold text-[#5185B8] mt-1">{confirmedBookings}</h3>
+              <p className="text-xs font-medium text-[#5A5D58]">Confirmed / Upcoming</p>
+              <h3 className="text-2xl font-bold text-[#C2B0DC] mt-1">{confirmedBookings}</h3>
             </div>
-            <div className="w-10 h-10 rounded-full bg-[#EBF3FC] flex items-center justify-center text-[#5185B8]">
+            <div className="w-10 h-10 rounded-full bg-[#C2B0DC]/20 flex items-center justify-center text-[#C2B0DC]">
               <Clock className="w-5 h-5" />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-[#EAE7E0] bg-white shadow-xs">
+        <Card className="border-black/[0.06] bg-white shadow-xs">
           <CardContent className="p-4 flex items-center justify-between">
             <div>
-              <p className="text-xs font-medium text-[#777872]">Currently Seated</p>
-              <h3 className="text-2xl font-bold text-[#39845C] mt-1">{seatedBookings}</h3>
+              <p className="text-xs font-medium text-[#5A5D58]">Currently Seated</p>
+              <h3 className="text-2xl font-bold text-[#B4D58A] mt-1">{seatedBookings}</h3>
             </div>
-            <div className="w-10 h-10 rounded-full bg-[#EEF1E9] flex items-center justify-center text-[#39845C]">
+            <div className="w-10 h-10 rounded-full bg-[#B4D58A]/25 flex items-center justify-center text-[#B4D58A]">
               <Armchair className="w-5 h-5" />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-[#EAE7E0] bg-white shadow-xs">
+        <Card className="border-black/[0.06] bg-white shadow-xs">
           <CardContent className="p-4 flex items-center justify-between">
             <div>
-              <p className="text-xs font-medium text-[#777872]">Expected Guests</p>
-              <h3 className="text-2xl font-bold text-[#292B28] mt-1">{totalGuests}</h3>
+              <p className="text-xs font-medium text-[#5A5D58]">Expected Guests</p>
+              <h3 className="text-2xl font-bold text-[#252525] mt-1">{totalGuests}</h3>
             </div>
-            <div className="w-10 h-10 rounded-full bg-[#FAF8F4] flex items-center justify-center text-[#66745B]">
+            <div className="w-10 h-10 rounded-full bg-[#FAF9F6] flex items-center justify-center text-[#B4D58A]">
               <Users className="w-5 h-5" />
             </div>
           </CardContent>
@@ -335,7 +335,7 @@ export default function ReservationsPage() {
       </div>
 
       {/* Filter Bar */}
-      <Card className="border-[#EAE7E0] bg-white shadow-xs">
+      <Card className="border-black/[0.06] bg-white shadow-xs">
         <CardContent className="p-4">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
@@ -345,8 +345,8 @@ export default function ReservationsPage() {
                   onClick={() => setStatusFilter(status)}
                   className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                     statusFilter === status
-                      ? 'bg-[#C76B4A] text-white'
-                      : 'bg-[#F3F1EB] text-[#777872] hover:bg-[#EAE7E0] hover:text-[#292B28]'
+                      ? 'bg-[#C2B0DC] text-white'
+                      : 'bg-[#F3DA8A]/25 text-[#5A5D58] hover:bg-black/[0.06] hover:text-[#252525]'
                   }`}
                 >
                   {status.charAt(0).toUpperCase() + status.slice(1).replace('_', ' ')}
@@ -360,17 +360,17 @@ export default function ReservationsPage() {
                   type="date"
                   value={selectedDate}
                   onChange={(e) => setSelectedDate(e.target.value)}
-                  className="text-xs h-9 border-[#EAE7E0] bg-[#FAF8F4]"
+                  className="text-xs h-9 border-black/[0.06] bg-[#FAF9F6]"
                 />
               </div>
 
               <div className="relative w-full md:w-64">
-                <Search className="w-4 h-4 absolute left-3 top-2.5 text-[#A2A29A]" />
+                <Search className="w-4 h-4 absolute left-3 top-2.5 text-[#8E928B]" />
                 <Input
                   placeholder="Search guest name or phone..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9 text-xs h-9 border-[#EAE7E0] bg-[#FAF8F4]"
+                  className="pl-9 text-xs h-9 border-black/[0.06] bg-[#FAF9F6]"
                 />
               </div>
             </div>
@@ -379,10 +379,10 @@ export default function ReservationsPage() {
       </Card>
 
       {/* Reservations List */}
-      <Card className="border-[#EAE7E0] bg-white shadow-xs overflow-hidden">
+      <Card className="border-black/[0.06] bg-white shadow-xs overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm text-[#292B28]">
-            <thead className="bg-[#FAF8F4] text-xs font-semibold text-[#777872] uppercase tracking-wider border-b border-[#EAE7E0]">
+          <table className="w-full text-left text-sm text-[#252525]">
+            <thead className="bg-[#FAF9F6] text-xs font-semibold text-[#5A5D58] uppercase tracking-wider border-b border-black/[0.06]">
               <tr>
                 <th className="px-6 py-3.5">Guest & Contact</th>
                 <th className="px-6 py-3.5">Schedule & Party</th>
@@ -392,56 +392,56 @@ export default function ReservationsPage() {
                 <th className="px-6 py-3.5 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#EAE7E0]">
+            <tbody className="divide-y divide-black/[0.06]">
               {isLoading ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center text-[#777872]">
-                    <RefreshCw className="w-6 h-6 animate-spin mx-auto text-[#C76B4A] mb-2" />
+                  <td colSpan={6} className="px-6 py-12 text-center text-[#5A5D58]">
+                    <RefreshCw className="w-6 h-6 animate-spin mx-auto text-[#C2B0DC] mb-2" />
                     Loading reservations...
                   </td>
                 </tr>
               ) : reservations.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center text-[#777872]">
-                    <CalendarDays className="w-8 h-8 mx-auto text-[#A2A29A] mb-2" />
+                  <td colSpan={6} className="px-6 py-12 text-center text-[#5A5D58]">
+                    <CalendarDays className="w-8 h-8 mx-auto text-[#8E928B] mb-2" />
                     No reservations found for the selected filters.
                   </td>
                 </tr>
               ) : (
                 reservations.map((res) => (
-                  <tr key={res.id} className="hover:bg-[#FAF8F4]/50 transition-colors">
+                  <tr key={res.id} className="hover:bg-[#FAF9F6]/50 transition-colors">
                     <td className="px-6 py-4">
-                      <div className="font-medium text-[#292B28]">{res.customer_name}</div>
-                      <div className="flex items-center gap-3 text-xs text-[#777872] mt-0.5">
+                      <div className="font-medium text-[#252525]">{res.customer_name}</div>
+                      <div className="flex items-center gap-3 text-xs text-[#5A5D58] mt-0.5">
                         <span className="flex items-center gap-1">
-                          <Phone className="w-3 h-3 text-[#A2A29A]" /> {res.customer_phone}
+                          <Phone className="w-3 h-3 text-[#8E928B]" /> {res.customer_phone}
                         </span>
                         {res.customer_email && (
                           <span className="flex items-center gap-1">
-                            <Mail className="w-3 h-3 text-[#A2A29A]" /> {res.customer_email}
+                            <Mail className="w-3 h-3 text-[#8E928B]" /> {res.customer_email}
                           </span>
                         )}
                       </div>
                     </td>
 
                     <td className="px-6 py-4">
-                      <div className="flex items-center gap-2 text-xs font-medium text-[#292B28]">
-                        <Clock className="w-3.5 h-3.5 text-[#C76B4A]" />
+                      <div className="flex items-center gap-2 text-xs font-medium text-[#252525]">
+                        <Clock className="w-3.5 h-3.5 text-[#C2B0DC]" />
                         <span>{res.reservation_time}</span>
-                        <span className="text-[#A2A29A]">({res.reservation_date})</span>
+                        <span className="text-[#8E928B]">({res.reservation_date})</span>
                       </div>
-                      <div className="flex items-center gap-1 text-xs text-[#777872] mt-1">
-                        <Users className="w-3 h-3 text-[#66745B]" />
+                      <div className="flex items-center gap-1 text-xs text-[#5A5D58] mt-1">
+                        <Users className="w-3 h-3 text-[#B4D58A]" />
                         <span>{res.guest_count} Guests</span>
                       </div>
                     </td>
 
                     <td className="px-6 py-4">
                       {res.table ? (
-                        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#EEF1E9] text-[#66745B] text-xs font-semibold">
+                        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#B4D58A]/25 text-[#B4D58A] text-xs font-semibold">
                           <Armchair className="w-3.5 h-3.5" />
                           <span>Table {res.table.table_number}</span>
-                          <span className="text-[10px] text-[#777872]">({res.table.location || 'Main'})</span>
+                          <span className="text-[10px] text-[#5A5D58]">({res.table.location || 'Main'})</span>
                         </div>
                       ) : (
                         <Button
@@ -451,7 +451,7 @@ export default function ReservationsPage() {
                             setActiveReservation(res);
                             setIsAssignTableModalOpen(true);
                           }}
-                          className="h-7 text-xs border-dashed border-[#C76B4A] text-[#C76B4A] hover:bg-[#F8EAE3]"
+                          className="h-7 text-xs border-dashed border-[#C2B0DC] text-[#C2B0DC] hover:bg-[#C2B0DC]/20"
                         >
                           <Plus className="w-3 h-3 mr-1" /> Assign Table
                         </Button>
@@ -462,11 +462,11 @@ export default function ReservationsPage() {
 
                     <td className="px-6 py-4 max-w-xs">
                       {res.special_requests ? (
-                        <span className="text-xs text-[#292B28] bg-[#FAF8F4] px-2 py-1 rounded border border-[#EAE7E0] inline-block truncate max-w-[200px]" title={res.special_requests}>
+                        <span className="text-xs text-[#252525] bg-[#FAF9F6] px-2 py-1 rounded border border-black/[0.06] inline-block truncate max-w-[200px]" title={res.special_requests}>
                           {res.special_requests}
                         </span>
                       ) : (
-                        <span className="text-xs text-[#A2A29A] italic">—</span>
+                        <span className="text-xs text-[#8E928B] italic">—</span>
                       )}
                     </td>
 
@@ -479,7 +479,7 @@ export default function ReservationsPage() {
                               size="sm"
                               variant="outline"
                               onClick={() => statusMutation.mutate({ id: res.id, status: 'checked_in' })}
-                              className="h-8 text-xs border-[#EAE7E0] text-[#7C3AED] hover:bg-[#F3E8FF]"
+                              className="h-8 text-xs border-black/[0.06] text-[#7C3AED] hover:bg-[#F3E8FF]"
                             >
                               Check In
                             </Button>
@@ -494,7 +494,7 @@ export default function ReservationsPage() {
                                   statusMutation.mutate({ id: res.id, status: 'seated', tableId: res.table_id });
                                 }
                               }}
-                              className="h-8 text-xs bg-[#39845C] hover:bg-[#2F6B4A] text-white"
+                              className="h-8 text-xs bg-[#B4D58A] hover:bg-[#2F6B4A] text-white"
                             >
                               <Armchair className="w-3 h-3 mr-1" /> Seat Guest
                             </Button>
@@ -512,7 +512,7 @@ export default function ReservationsPage() {
                                 statusMutation.mutate({ id: res.id, status: 'seated', tableId: res.table_id });
                               }
                             }}
-                            className="h-8 text-xs bg-[#39845C] hover:bg-[#2F6B4A] text-white"
+                            className="h-8 text-xs bg-[#B4D58A] hover:bg-[#2F6B4A] text-white"
                           >
                             <Armchair className="w-3 h-3 mr-1" /> Seat Guest
                           </Button>
@@ -523,7 +523,7 @@ export default function ReservationsPage() {
                             size="sm"
                             variant="outline"
                             onClick={() => statusMutation.mutate({ id: res.id, status: 'completed' })}
-                            className="h-8 text-xs border-[#EAE7E0] text-[#39845C] hover:bg-[#EEF1E9]"
+                            className="h-8 text-xs border-black/[0.06] text-[#B4D58A] hover:bg-[#B4D58A]/25"
                           >
                             <CheckCircle2 className="w-3 h-3 mr-1" /> Complete
                           </Button>
@@ -538,7 +538,7 @@ export default function ReservationsPage() {
                               setActiveReservation(res);
                               setIsAssignTableModalOpen(true);
                             }}
-                            className="h-8 text-xs text-[#777872] hover:text-[#292B28]"
+                            className="h-8 text-xs text-[#5A5D58] hover:text-[#252525]"
                           >
                             Change Table
                           </Button>
@@ -553,7 +553,7 @@ export default function ReservationsPage() {
                               setActiveReservation(res);
                               setIsCancelModalOpen(true);
                             }}
-                            className="h-8 text-xs text-[#C84D4D] hover:bg-[#FDF2F2]"
+                            className="h-8 text-xs text-[#F2AFC0] hover:bg-[#FDF2F2]"
                           >
                             Cancel
                           </Button>
@@ -571,18 +571,18 @@ export default function ReservationsPage() {
       {/* Modal 1: New Reservation Modal */}
       {isCreateModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-lg w-full p-6 border border-[#EAE7E0] animate-in fade-in-0 zoom-in-95">
-            <div className="flex items-center justify-between pb-4 border-b border-[#EAE7E0]">
+          <div className="bg-white rounded-xl shadow-xl max-w-lg w-full p-6 border border-black/[0.06] animate-in fade-in-0 zoom-in-95">
+            <div className="flex items-center justify-between pb-4 border-b border-black/[0.06]">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-[#F8EAE3] text-[#C76B4A] flex items-center justify-center">
+                <div className="w-8 h-8 rounded-lg bg-[#C2B0DC]/20 text-[#C2B0DC] flex items-center justify-center">
                   <CalendarDays className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-[#292B28]">Book Table Reservation</h3>
-                  <p className="text-xs text-[#777872]">Record manual guest reservation for {activeBranch?.name}</p>
+                  <h3 className="font-bold text-[#252525]">Book Table Reservation</h3>
+                  <p className="text-xs text-[#5A5D58]">Record manual guest reservation for {activeBranch?.name}</p>
                 </div>
               </div>
-              <button onClick={() => setIsCreateModalOpen(false)} className="text-[#A2A29A] hover:text-[#292B28]">
+              <button onClick={() => setIsCreateModalOpen(false)} className="text-[#8E928B] hover:text-[#252525]">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -590,7 +590,7 @@ export default function ReservationsPage() {
             <form onSubmit={handleCreateSubmit} className="space-y-4 pt-4">
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-[#292B28]">Customer Name *</label>
+                  <label className="text-xs font-semibold text-[#252525]">Customer Name *</label>
                   <Input
                     required
                     placeholder="e.g. Vikram Malhotra"
@@ -600,7 +600,7 @@ export default function ReservationsPage() {
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-[#292B28]">Phone Number *</label>
+                  <label className="text-xs font-semibold text-[#252525]">Phone Number *</label>
                   <Input
                     required
                     placeholder="+91 98765 43210"
@@ -613,7 +613,7 @@ export default function ReservationsPage() {
 
               <div className="grid grid-cols-3 gap-3">
                 <div className="space-y-1 col-span-2">
-                  <label className="text-xs font-semibold text-[#292B28]">Customer Email</label>
+                  <label className="text-xs font-semibold text-[#252525]">Customer Email</label>
                   <Input
                     type="email"
                     placeholder="guest@example.com"
@@ -623,7 +623,7 @@ export default function ReservationsPage() {
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-[#292B28]">Party Size *</label>
+                  <label className="text-xs font-semibold text-[#252525]">Party Size *</label>
                   <Input
                     type="number"
                     min="1"
@@ -638,7 +638,7 @@ export default function ReservationsPage() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-[#292B28]">Reservation Date *</label>
+                  <label className="text-xs font-semibold text-[#252525]">Reservation Date *</label>
                   <Input
                     type="date"
                     required
@@ -648,11 +648,11 @@ export default function ReservationsPage() {
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-[#292B28]">Time Slot *</label>
+                  <label className="text-xs font-semibold text-[#252525]">Time Slot *</label>
                   <select
                     value={resTime}
                     onChange={(e) => setResTime(e.target.value)}
-                    className="w-full h-9 px-3 rounded-md border border-[#EAE7E0] bg-white text-xs text-[#292B28] focus:outline-hidden focus:ring-1 focus:ring-[#C76B4A]"
+                    className="w-full h-9 px-3 rounded-md border border-black/[0.06] bg-white text-xs text-[#252525] focus:outline-hidden focus:ring-1 focus:ring-[#C2B0DC]"
                   >
                     <option value="12:30">12:30 PM (Lunch)</option>
                     <option value="13:00">01:00 PM (Lunch)</option>
@@ -669,11 +669,11 @@ export default function ReservationsPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-[#292B28]">Assign Table (Optional)</label>
+                <label className="text-xs font-semibold text-[#252525]">Assign Table (Optional)</label>
                 <select
                   value={selectedTableId}
                   onChange={(e) => setSelectedTableId(e.target.value)}
-                  className="w-full h-9 px-3 rounded-md border border-[#EAE7E0] bg-white text-xs text-[#292B28] focus:outline-hidden focus:ring-1 focus:ring-[#C76B4A]"
+                  className="w-full h-9 px-3 rounded-md border border-black/[0.06] bg-white text-xs text-[#252525] focus:outline-hidden focus:ring-1 focus:ring-[#C2B0DC]"
                 >
                   <option value="">Leave Unassigned (Assign at Door)</option>
                   {diningTables.map((t) => (
@@ -685,7 +685,7 @@ export default function ReservationsPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-[#292B28]">Special Requests / Notes</label>
+                <label className="text-xs font-semibold text-[#252525]">Special Requests / Notes</label>
                 <Input
                   placeholder="e.g. Anniversary celebration, high chair required, window booth"
                   value={specialRequests}
@@ -694,7 +694,7 @@ export default function ReservationsPage() {
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-4 border-t border-[#EAE7E0]">
+              <div className="flex items-center justify-end gap-2 pt-4 border-t border-black/[0.06]">
                 <Button
                   type="button"
                   variant="outline"
@@ -706,7 +706,7 @@ export default function ReservationsPage() {
                 <Button
                   type="submit"
                   disabled={createMutation.isPending}
-                  className="text-xs h-9 bg-[#C76B4A] hover:bg-[#AE593B] text-white"
+                  className="text-xs h-9 bg-[#C2B0DC] hover:bg-[#B19CCF] text-white"
                 >
                   {createMutation.isPending ? 'Confirming...' : 'Confirm Reservation'}
                 </Button>
@@ -719,22 +719,22 @@ export default function ReservationsPage() {
       {/* Modal 2: Assign Table Modal */}
       {isAssignTableModalOpen && activeReservation && (
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 border border-[#EAE7E0] animate-in fade-in-0 zoom-in-95">
-            <div className="flex items-center justify-between pb-3 border-b border-[#EAE7E0]">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 border border-black/[0.06] animate-in fade-in-0 zoom-in-95">
+            <div className="flex items-center justify-between pb-3 border-b border-black/[0.06]">
               <div>
-                <h3 className="font-bold text-[#292B28]">Assign Dining Table</h3>
-                <p className="text-xs text-[#777872]">
-                  For <span className="font-medium text-[#292B28]">{activeReservation.customer_name}</span> ({activeReservation.guest_count} Guests at {activeReservation.reservation_time})
+                <h3 className="font-bold text-[#252525]">Assign Dining Table</h3>
+                <p className="text-xs text-[#5A5D58]">
+                  For <span className="font-medium text-[#252525]">{activeReservation.customer_name}</span> ({activeReservation.guest_count} Guests at {activeReservation.reservation_time})
                 </p>
               </div>
-              <button onClick={() => setIsAssignTableModalOpen(false)} className="text-[#A2A29A] hover:text-[#292B28]">
+              <button onClick={() => setIsAssignTableModalOpen(false)} className="text-[#8E928B] hover:text-[#252525]">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <div className="space-y-2 py-4 max-h-72 overflow-y-auto">
               {diningTables.length === 0 ? (
-                <p className="text-xs text-[#777872] text-center py-4">No dining tables found for this branch.</p>
+                <p className="text-xs text-[#5A5D58] text-center py-4">No dining tables found for this branch.</p>
               ) : (
                 diningTables.map((t) => {
                   const isCapacityFit = t.seating_capacity >= activeReservation.guest_count;
@@ -743,25 +743,25 @@ export default function ReservationsPage() {
                       key={t.id}
                       onClick={() => assignTableMutation.mutate({ id: activeReservation.id, tableId: t.id })}
                       disabled={assignTableMutation.isPending}
-                      className="w-full flex items-center justify-between p-3 rounded-lg border border-[#EAE7E0] hover:border-[#C76B4A] hover:bg-[#FAF8F4] transition-all text-left"
+                      className="w-full flex items-center justify-between p-3 rounded-lg border border-black/[0.06] hover:border-[#C2B0DC] hover:bg-[#FAF9F6] transition-all text-left"
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-md bg-[#FAF8F4] text-[#C76B4A] font-bold text-xs flex items-center justify-center border border-[#F8EAE3]">
+                        <div className="w-9 h-9 rounded-md bg-[#FAF9F6] text-[#C2B0DC] font-bold text-xs flex items-center justify-center border border-[#C2B0DC]/20">
                           {t.table_number}
                         </div>
                         <div>
-                          <p className="text-xs font-semibold text-[#292B28]">{t.location || 'Dining Floor'}</p>
-                          <p className="text-[11px] text-[#777872]">Capacity: {t.seating_capacity} seats</p>
+                          <p className="text-xs font-semibold text-[#252525]">{t.location || 'Dining Floor'}</p>
+                          <p className="text-[11px] text-[#5A5D58]">Capacity: {t.seating_capacity} seats</p>
                         </div>
                       </div>
 
                       <div className="flex items-center gap-2">
                         {isCapacityFit ? (
-                          <Badge className="bg-[#EEF1E9] text-[#39845C] text-[10px] border-none">Fits Party</Badge>
+                          <Badge className="bg-[#B4D58A]/25 text-[#B4D58A] text-[10px] border-none">Fits Party</Badge>
                         ) : (
-                          <Badge variant="outline" className="text-[#D69A3A] border-[#D69A3A] text-[10px]">Small</Badge>
+                          <Badge variant="outline" className="text-[#F3DA8A] border-[#F3DA8A] text-[10px]">Small</Badge>
                         )}
-                        <ChevronRight className="w-4 h-4 text-[#A2A29A]" />
+                        <ChevronRight className="w-4 h-4 text-[#8E928B]" />
                       </div>
                     </button>
                   );
@@ -769,7 +769,7 @@ export default function ReservationsPage() {
               )}
             </div>
 
-            <div className="pt-3 border-t border-[#EAE7E0] flex justify-end">
+            <div className="pt-3 border-t border-black/[0.06] flex justify-end">
               <Button
                 variant="outline"
                 size="sm"
@@ -786,14 +786,14 @@ export default function ReservationsPage() {
       {/* Modal 3: Cancel Reservation Modal */}
       {isCancelModalOpen && activeReservation && (
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-sm w-full p-6 border border-[#EAE7E0] animate-in fade-in-0 zoom-in-95">
-            <h3 className="font-bold text-[#292B28]">Cancel Reservation</h3>
-            <p className="text-xs text-[#777872] mt-1">
-              Are you sure you want to cancel the booking for <span className="font-medium text-[#292B28]">{activeReservation.customer_name}</span>?
+          <div className="bg-white rounded-xl shadow-xl max-w-sm w-full p-6 border border-black/[0.06] animate-in fade-in-0 zoom-in-95">
+            <h3 className="font-bold text-[#252525]">Cancel Reservation</h3>
+            <p className="text-xs text-[#5A5D58] mt-1">
+              Are you sure you want to cancel the booking for <span className="font-medium text-[#252525]">{activeReservation.customer_name}</span>?
             </p>
 
             <div className="space-y-1 my-4">
-              <label className="text-xs font-semibold text-[#292B28]">Cancellation Reason</label>
+              <label className="text-xs font-semibold text-[#252525]">Cancellation Reason</label>
               <Input
                 value={cancelReason}
                 onChange={(e) => setCancelReason(e.target.value)}
@@ -818,7 +818,7 @@ export default function ReservationsPage() {
                   cancellationReason: cancelReason,
                 })}
                 disabled={statusMutation.isPending}
-                className="text-xs bg-[#C84D4D] hover:bg-[#A83D3D] text-white"
+                className="text-xs bg-[#F2AFC0] hover:bg-[#A83D3D] text-white"
               >
                 {statusMutation.isPending ? 'Cancelling...' : 'Confirm Cancellation'}
               </Button>

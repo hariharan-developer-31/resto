@@ -1,26 +1,26 @@
 import type { Metadata, Viewport } from "next";
-import { DM_Sans, DM_Serif_Display } from "next/font/google";
+import { Poppins, Baloo_2 } from "next/font/google";
 import "./globals.css";
 import { QueryProvider } from "@/components/providers/query-provider";
 import { Toaster } from "sonner";
 
-const dmSans = DM_Sans({
+const poppins = Poppins({
   subsets: ["latin"],
-  variable: "--font-dm-sans",
+  variable: "--font-poppins",
   weight: ["400", "500", "600", "700"],
   display: "swap",
 });
 
-const dmSerif = DM_Serif_Display({
+const baloo2 = Baloo_2({
   subsets: ["latin"],
-  variable: "--font-dm-serif",
-  weight: ["400"],
+  variable: "--font-baloo2",
+  weight: ["800"],
   display: "swap",
 });
 
 export const metadata: Metadata = {
   title: "Restaurant OS - Premium Multi-Restaurant Operating System",
-  description: "Next-generation multi-tenant platform for restaurant management, POS, kitchen operations, and QR ordering.",
+  description: "Creative, high-performance multi-tenant operating system for restaurants, POS, kitchen management, and customer ordering.",
   manifest: "/manifest.json",
   icons: {
     icon: "/favicon.ico",
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#C76B4A",
+  themeColor: "#C2B0DC",
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
@@ -40,8 +40,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${dmSans.variable} ${dmSerif.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col bg-[#FAF8F4] text-[#292B28]">
+    <html lang="en" className={`${poppins.variable} ${baloo2.variable} h-full antialiased`}>
+      <body className="min-h-full flex flex-col bg-white text-[#252525] font-poppins selection:bg-[#C2B0DC] selection:text-white">
         <QueryProvider>
           {children}
           <Toaster 
@@ -49,9 +49,10 @@ export default function RootLayout({
             richColors 
             toastOptions={{
               style: {
-                borderRadius: '12px',
-                border: '1px solid #EAE7E0',
-                fontFamily: 'var(--font-dm-sans)',
+                borderRadius: '16px',
+                border: 'none',
+                boxShadow: '0 12px 36px rgba(60, 40, 80, 0.22)',
+                fontFamily: 'var(--font-poppins)',
               },
             }}
           />

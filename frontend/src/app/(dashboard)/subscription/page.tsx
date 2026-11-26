@@ -112,12 +112,12 @@ export default function SubscriptionManagementPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold tracking-tight text-[#292B28]">SaaS Subscription & Plan Quotas</h1>
-            <Badge variant="outline" className="text-[#C76B4A] border-[#F8EAE3] bg-[#FAF8F4]">
+            <h1 className="text-2xl font-bold tracking-tight text-[#252525]">SaaS Subscription & Plan Quotas</h1>
+            <Badge variant="outline" className="text-[#C2B0DC] border-[#C2B0DC]/20 bg-[#FAF9F6]">
               Phase 8
             </Badge>
           </div>
-          <p className="text-sm text-[#777872] mt-1">
+          <p className="text-sm text-[#5A5D58] mt-1">
             Manage your restaurant tier, monitor capacity limits, and unlock multi-branch operating features.
           </p>
         </div>
@@ -126,7 +126,7 @@ export default function SubscriptionManagementPage() {
           variant="outline"
           size="sm"
           onClick={() => refetchCurrent()}
-          className="border-[#EAE7E0] hover:bg-[#F3F1EB] text-[#292B28]"
+          className="border-black/[0.06] hover:bg-[#F3DA8A]/25 text-[#252525]"
         >
           <RefreshCw className="w-4 h-4 mr-2" />
           Refresh Quotas
@@ -134,20 +134,20 @@ export default function SubscriptionManagementPage() {
       </div>
 
       {/* Active Subscription Overview Card */}
-      <Card className="border-[#EAE7E0] bg-white shadow-xs overflow-hidden">
-        <div className="bg-[#FAF8F4] p-6 border-b border-[#EAE7E0] flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <Card className="border-black/[0.06] bg-white shadow-xs overflow-hidden">
+        <div className="bg-[#FAF9F6] p-6 border-b border-black/[0.06] flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-[#F8EAE3] text-[#C76B4A] flex items-center justify-center font-bold">
+            <div className="w-12 h-12 rounded-xl bg-[#C2B0DC]/20 text-[#C2B0DC] flex items-center justify-center font-bold">
               <Zap className="w-6 h-6" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-lg font-bold text-[#292B28]">{currentPlan?.name || 'Growth Pro'}</h3>
-                <Badge className="bg-[#EEF1E9] text-[#39845C] border-[#D6DFC9] capitalize text-xs">
+                <h3 className="text-lg font-bold text-[#252525]">{currentPlan?.name || 'Growth Pro'}</h3>
+                <Badge className="bg-[#B4D58A]/25 text-[#B4D58A] border-[#D6DFC9] capitalize text-xs">
                   {currentData?.status || 'Active'}
                 </Badge>
               </div>
-              <p className="text-xs text-[#777872] mt-0.5">
+              <p className="text-xs text-[#5A5D58] mt-0.5">
                 Current cycle: <strong className="capitalize">{subDetails?.billing_cycle}</strong> | Renews on{' '}
                 <strong>{subDetails?.renews_at}</strong>
               </p>
@@ -155,83 +155,83 @@ export default function SubscriptionManagementPage() {
           </div>
 
           <div className="text-right">
-            <p className="text-xs text-[#777872]">Active Investment</p>
-            <h4 className="text-2xl font-bold text-[#292B28]">
+            <p className="text-xs text-[#5A5D58]">Active Investment</p>
+            <h4 className="text-2xl font-bold text-[#252525]">
               ₹{Number(subDetails?.amount_paid || 4999).toLocaleString()}{' '}
-              <span className="text-xs font-normal text-[#777872]">/{subDetails?.billing_cycle === 'annual' ? 'yr' : 'mo'}</span>
+              <span className="text-xs font-normal text-[#5A5D58]">/{subDetails?.billing_cycle === 'annual' ? 'yr' : 'mo'}</span>
             </h4>
           </div>
         </div>
 
         {/* Quota Meters */}
         <CardContent className="p-6">
-          <h4 className="text-xs font-bold uppercase tracking-wider text-[#777872] mb-4">Resource Capacity Meters</h4>
+          <h4 className="text-xs font-bold uppercase tracking-wider text-[#5A5D58] mb-4">Resource Capacity Meters</h4>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Branch Quota */}
-            <div className="p-4 rounded-xl border border-[#EAE7E0] bg-[#FAF8F4]">
+            <div className="p-4 rounded-xl border border-black/[0.06] bg-[#FAF9F6]">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-[#292B28] flex items-center gap-1.5">
-                  <Building2 className="w-4 h-4 text-[#C76B4A]" /> Branch Locations
+                <span className="text-xs font-semibold text-[#252525] flex items-center gap-1.5">
+                  <Building2 className="w-4 h-4 text-[#C2B0DC]" /> Branch Locations
                 </span>
-                <span className="text-xs font-bold text-[#292B28]">
+                <span className="text-xs font-bold text-[#252525]">
                   {quotas?.branches?.current || 1} / {quotas?.branches?.max || 3}
                 </span>
               </div>
-              <div className="w-full bg-[#EAE7E0] rounded-full h-2">
+              <div className="w-full bg-black/[0.06] rounded-full h-2">
                 <div
-                  className="bg-[#C76B4A] h-2 rounded-full transition-all"
+                  className="bg-[#C2B0DC] h-2 rounded-full transition-all"
                   style={{
                     width: `${Math.min(100, ((quotas?.branches?.current || 1) / (quotas?.branches?.max || 3)) * 100)}%`,
                   }}
                 />
               </div>
-              <p className="text-[11px] text-[#777872] mt-2">
+              <p className="text-[11px] text-[#5A5D58] mt-2">
                 {quotas?.branches?.remaining ?? 2} branch slots remaining
               </p>
             </div>
 
             {/* Table Quota */}
-            <div className="p-4 rounded-xl border border-[#EAE7E0] bg-[#FAF8F4]">
+            <div className="p-4 rounded-xl border border-black/[0.06] bg-[#FAF9F6]">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-[#292B28] flex items-center gap-1.5">
-                  <Grid className="w-4 h-4 text-[#5185B8]" /> Dining Tables
+                <span className="text-xs font-semibold text-[#252525] flex items-center gap-1.5">
+                  <Grid className="w-4 h-4 text-[#C2B0DC]" /> Dining Tables
                 </span>
-                <span className="text-xs font-bold text-[#292B28]">
+                <span className="text-xs font-bold text-[#252525]">
                   {quotas?.tables?.current || 6} / {quotas?.tables?.max || 30}
                 </span>
               </div>
-              <div className="w-full bg-[#EAE7E0] rounded-full h-2">
+              <div className="w-full bg-black/[0.06] rounded-full h-2">
                 <div
-                  className="bg-[#5185B8] h-2 rounded-full transition-all"
+                  className="bg-[#C2B0DC] h-2 rounded-full transition-all"
                   style={{
                     width: `${Math.min(100, ((quotas?.tables?.current || 6) / (quotas?.tables?.max || 30)) * 100)}%`,
                   }}
                 />
               </div>
-              <p className="text-[11px] text-[#777872] mt-2">
+              <p className="text-[11px] text-[#5A5D58] mt-2">
                 Up to {quotas?.tables?.max_per_branch ?? 30} tables per branch location
               </p>
             </div>
 
             {/* Staff Accounts Quota */}
-            <div className="p-4 rounded-xl border border-[#EAE7E0] bg-[#FAF8F4]">
+            <div className="p-4 rounded-xl border border-black/[0.06] bg-[#FAF9F6]">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-[#292B28] flex items-center gap-1.5">
-                  <Users className="w-4 h-4 text-[#39845C]" /> Team Members & Staff
+                <span className="text-xs font-semibold text-[#252525] flex items-center gap-1.5">
+                  <Users className="w-4 h-4 text-[#B4D58A]" /> Team Members & Staff
                 </span>
-                <span className="text-xs font-bold text-[#292B28]">
+                <span className="text-xs font-bold text-[#252525]">
                   {quotas?.staff?.current || 6} / {quotas?.staff?.max || 20}
                 </span>
               </div>
-              <div className="w-full bg-[#EAE7E0] rounded-full h-2">
+              <div className="w-full bg-black/[0.06] rounded-full h-2">
                 <div
-                  className="bg-[#39845C] h-2 rounded-full transition-all"
+                  className="bg-[#B4D58A] h-2 rounded-full transition-all"
                   style={{
                     width: `${Math.min(100, ((quotas?.staff?.current || 6) / (quotas?.staff?.max || 20)) * 100)}%`,
                   }}
                 />
               </div>
-              <p className="text-[11px] text-[#777872] mt-2">
+              <p className="text-[11px] text-[#5A5D58] mt-2">
                 Cashiers, managers, waiters, and kitchen chefs
               </p>
             </div>
@@ -241,16 +241,16 @@ export default function SubscriptionManagementPage() {
 
       {/* Plan Switcher & Billing Cycle Selector */}
       <div className="text-center space-y-3 pt-4">
-        <h2 className="text-xl font-bold text-[#292B28]">Scale Your Restaurant OS Experience</h2>
-        <p className="text-xs text-[#777872] max-w-lg mx-auto">
+        <h2 className="text-xl font-bold text-[#252525]">Scale Your Restaurant OS Experience</h2>
+        <p className="text-xs text-[#5A5D58] max-w-lg mx-auto">
           Choose a plan that fits your dining floor operations. Switch tiers anytime as your restaurant chain expands.
         </p>
 
-        <div className="inline-flex items-center gap-2 p-1 rounded-xl bg-[#FAF8F4] border border-[#EAE7E0]">
+        <div className="inline-flex items-center gap-2 p-1 rounded-xl bg-[#FAF9F6] border border-black/[0.06]">
           <button
             onClick={() => setBillingCycle('monthly')}
             className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-              billingCycle === 'monthly' ? 'bg-[#C76B4A] text-white shadow-xs' : 'text-[#777872] hover:text-[#292B28]'
+              billingCycle === 'monthly' ? 'bg-[#C2B0DC] text-white shadow-xs' : 'text-[#5A5D58] hover:text-[#252525]'
             }`}
           >
             Monthly Billing
@@ -258,11 +258,11 @@ export default function SubscriptionManagementPage() {
           <button
             onClick={() => setBillingCycle('annual')}
             className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
-              billingCycle === 'annual' ? 'bg-[#C76B4A] text-white shadow-xs' : 'text-[#777872] hover:text-[#292B28]'
+              billingCycle === 'annual' ? 'bg-[#C2B0DC] text-white shadow-xs' : 'text-[#5A5D58] hover:text-[#252525]'
             }`}
           >
             <span>Annual Billing</span>
-            <span className="bg-[#EEF1E9] text-[#39845C] text-[10px] px-1.5 py-0.5 rounded font-bold">2 Months Free</span>
+            <span className="bg-[#B4D58A]/25 text-[#B4D58A] text-[10px] px-1.5 py-0.5 rounded font-bold">2 Months Free</span>
           </button>
         </div>
       </div>
@@ -279,51 +279,51 @@ export default function SubscriptionManagementPage() {
               key={plan.id}
               className={`border transition-all relative flex flex-col justify-between ${
                 isPro
-                  ? 'border-[#C76B4A] shadow-md ring-1 ring-[#C76B4A]'
-                  : 'border-[#EAE7E0] bg-white shadow-xs hover:border-[#C76B4A]'
+                  ? 'border-[#C2B0DC] shadow-md ring-1 ring-[#C2B0DC]'
+                  : 'border-black/[0.06] bg-white shadow-xs hover:border-[#C2B0DC]'
               }`}
             >
               {isPro && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-[#C76B4A] text-white text-[11px] font-bold shadow-xs">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-[#C2B0DC] text-white text-[11px] font-bold shadow-xs">
                   Most Popular for Busy Restaurants
                 </div>
               )}
 
               <CardHeader className="pb-4">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg font-bold text-[#292B28]">{plan.name}</CardTitle>
+                  <CardTitle className="text-lg font-bold text-[#252525]">{plan.name}</CardTitle>
                   {isCurrent && (
-                    <Badge className="bg-[#EEF1E9] text-[#39845C] border-none text-[10px]">Current Plan</Badge>
+                    <Badge className="bg-[#B4D58A]/25 text-[#B4D58A] border-none text-[10px]">Current Plan</Badge>
                   )}
                 </div>
-                <CardDescription className="text-xs text-[#777872] min-h-[36px]">
+                <CardDescription className="text-xs text-[#5A5D58] min-h-[36px]">
                   {plan.description}
                 </CardDescription>
 
                 <div className="pt-4">
-                  <span className="text-3xl font-extrabold text-[#292B28]">₹{Number(price).toLocaleString()}</span>
-                  <span className="text-xs text-[#777872]">/{billingCycle === 'annual' ? 'year' : 'month'}</span>
+                  <span className="text-3xl font-extrabold text-[#252525]">₹{Number(price).toLocaleString()}</span>
+                  <span className="text-xs text-[#5A5D58]">/{billingCycle === 'annual' ? 'year' : 'month'}</span>
                 </div>
               </CardHeader>
 
               <CardContent className="space-y-4 pb-6">
-                <div className="pt-2 border-t border-[#EAE7E0] space-y-2 text-xs text-[#292B28]">
+                <div className="pt-2 border-t border-black/[0.06] space-y-2 text-xs text-[#252525]">
                   <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-[#39845C] shrink-0" />
+                    <CheckCircle2 className="w-4 h-4 text-[#B4D58A] shrink-0" />
                     <span>Up to <strong>{plan.max_branches}</strong> Branch Location{plan.max_branches > 1 ? 's' : ''}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-[#39845C] shrink-0" />
+                    <CheckCircle2 className="w-4 h-4 text-[#B4D58A] shrink-0" />
                     <span>Up to <strong>{plan.max_tables_per_branch}</strong> Tables per Branch</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-[#39845C] shrink-0" />
+                    <CheckCircle2 className="w-4 h-4 text-[#B4D58A] shrink-0" />
                     <span>Up to <strong>{plan.max_staff_members}</strong> Staff Member Accounts</span>
                   </div>
 
                   {plan.features?.map((feat, idx) => (
-                    <div key={idx} className="flex items-center gap-2 text-[#777872]">
-                      <CheckCircle2 className="w-4 h-4 text-[#39845C] shrink-0" />
+                    <div key={idx} className="flex items-center gap-2 text-[#5A5D58]">
+                      <CheckCircle2 className="w-4 h-4 text-[#B4D58A] shrink-0" />
                       <span className="capitalize">{feat.replace(/_/g, ' ')}</span>
                     </div>
                   ))}
@@ -331,7 +331,7 @@ export default function SubscriptionManagementPage() {
 
                 <div className="pt-4">
                   {isCurrent ? (
-                    <Button disabled variant="outline" className="w-full text-xs h-9 border-[#EAE7E0]">
+                    <Button disabled variant="outline" className="w-full text-xs h-9 border-black/[0.06]">
                       Active Tier
                     </Button>
                   ) : (
@@ -342,8 +342,8 @@ export default function SubscriptionManagementPage() {
                       }}
                       className={`w-full text-xs h-9 ${
                         isPro
-                          ? 'bg-[#C76B4A] hover:bg-[#AE593B] text-white shadow-xs'
-                          : 'bg-[#FAF8F4] text-[#292B28] hover:bg-[#F8EAE3] border border-[#EAE7E0]'
+                          ? 'bg-[#C2B0DC] hover:bg-[#B19CCF] text-white shadow-xs'
+                          : 'bg-[#FAF9F6] text-[#252525] hover:bg-[#C2B0DC]/20 border border-black/[0.06]'
                       }`}
                     >
                       <span>Upgrade to {plan.name}</span>
@@ -360,46 +360,46 @@ export default function SubscriptionManagementPage() {
       {/* Upgrade Modal */}
       {isUpgradeModalOpen && selectedPlanForUpgrade && (
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 border border-[#EAE7E0] animate-in fade-in-0 zoom-in-95">
-            <div className="flex items-center justify-between pb-3 border-b border-[#EAE7E0]">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 border border-black/[0.06] animate-in fade-in-0 zoom-in-95">
+            <div className="flex items-center justify-between pb-3 border-b border-black/[0.06]">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-[#F8EAE3] text-[#C76B4A] flex items-center justify-center">
+                <div className="w-8 h-8 rounded-lg bg-[#C2B0DC]/20 text-[#C2B0DC] flex items-center justify-center">
                   <Sparkles className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-[#292B28]">Confirm Plan Upgrade</h3>
-                  <p className="text-xs text-[#777872]">Switching to {selectedPlanForUpgrade.name}</p>
+                  <h3 className="font-bold text-[#252525]">Confirm Plan Upgrade</h3>
+                  <p className="text-xs text-[#5A5D58]">Switching to {selectedPlanForUpgrade.name}</p>
                 </div>
               </div>
-              <button onClick={() => setIsUpgradeModalOpen(false)} className="text-[#A2A29A] hover:text-[#292B28]">
+              <button onClick={() => setIsUpgradeModalOpen(false)} className="text-[#8E928B] hover:text-[#252525]">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <div className="py-4 space-y-3 text-xs">
-              <div className="p-3 rounded-lg bg-[#FAF8F4] border border-[#EAE7E0] space-y-1.5">
+              <div className="p-3 rounded-lg bg-[#FAF9F6] border border-black/[0.06] space-y-1.5">
                 <div className="flex justify-between">
-                  <span className="text-[#777872]">Target Tier:</span>
-                  <strong className="text-[#292B28]">{selectedPlanForUpgrade.name}</strong>
+                  <span className="text-[#5A5D58]">Target Tier:</span>
+                  <strong className="text-[#252525]">{selectedPlanForUpgrade.name}</strong>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-[#777872]">Billing Frequency:</span>
-                  <span className="capitalize font-semibold text-[#292B28]">{billingCycle}</span>
+                  <span className="text-[#5A5D58]">Billing Frequency:</span>
+                  <span className="capitalize font-semibold text-[#252525]">{billingCycle}</span>
                 </div>
-                <div className="flex justify-between text-sm pt-1 border-t border-[#EAE7E0]">
+                <div className="flex justify-between text-sm pt-1 border-t border-black/[0.06]">
                   <span className="font-bold">Total Investment:</span>
-                  <strong className="text-[#C76B4A] font-bold">
+                  <strong className="text-[#C2B0DC] font-bold">
                     ₹{Number(billingCycle === 'annual' ? selectedPlanForUpgrade.annual_price : selectedPlanForUpgrade.monthly_price).toLocaleString()}
                   </strong>
                 </div>
               </div>
 
-              <p className="text-[11px] text-[#777872]">
+              <p className="text-[11px] text-[#5A5D58]">
                 Your quotas will immediately expand to {selectedPlanForUpgrade.max_branches} branch locations and {selectedPlanForUpgrade.max_staff_members} staff accounts.
               </p>
             </div>
 
-            <div className="flex items-center justify-end gap-2 pt-3 border-t border-[#EAE7E0]">
+            <div className="flex items-center justify-end gap-2 pt-3 border-t border-black/[0.06]">
               <Button
                 variant="outline"
                 size="sm"
@@ -412,7 +412,7 @@ export default function SubscriptionManagementPage() {
                 size="sm"
                 onClick={handleUpgradeSubmit}
                 disabled={upgradeMutation.isPending}
-                className="text-xs bg-[#C76B4A] hover:bg-[#AE593B] text-white"
+                className="text-xs bg-[#C2B0DC] hover:bg-[#B19CCF] text-white"
               >
                 {upgradeMutation.isPending ? 'Processing...' : 'Confirm Upgrade'}
               </Button>

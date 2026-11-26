@@ -23,10 +23,10 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
 
   if (!isHydrated || !isAuthenticated) {
     return (
-      <div className="flex h-screen w-full items-center justify-center bg-[#FAF8F4]">
-        <div className="flex flex-col items-center gap-3">
-          <Loader2 className="h-8 w-8 animate-spin text-[#C76B4A]" />
-          <p className="text-xs font-medium uppercase tracking-wider text-[#777872]">
+      <div className="flex h-screen w-full items-center justify-center bg-[#C2B0DC]/20">
+        <div className="flex flex-col items-center gap-4 p-8 rounded-3xl bg-white shadow-[0_12px_36px_rgba(60,40,80,0.15)] animate-float-gentle">
+          <Loader2 className="h-10 w-10 animate-spin text-[#C2B0DC]" />
+          <p className="font-baloo text-lg text-[#252525]">
             Loading Restaurant OS...
           </p>
         </div>
@@ -35,15 +35,15 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen bg-[#FAF8F4] text-[#292B28]">
+    <div className="min-h-screen bg-[#FAF9F6] text-[#252525]">
       {/* Sidebar for Desktop & Mobile drawer */}
       <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
       {/* Main Content Area */}
-      <div className="flex flex-1 flex-col md:pl-72 transition-all duration-200">
+      <div className="flex flex-1 flex-col md:pl-72 transition-all duration-300">
         <Topbar onMenuClick={() => setIsSidebarOpen(true)} />
-        <main className="flex-1 p-4 sm:p-6 lg:p-8">
-          <div className="mx-auto max-w-7xl">
+        <main className="flex-1 p-5 sm:p-8 lg:p-10">
+          <div className="mx-auto max-w-7xl animate-fade-in">
             {children}
           </div>
         </main>

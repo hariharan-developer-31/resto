@@ -4,28 +4,42 @@ import { cn } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-[10px] text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C76B4A]/30 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98]",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-2xl text-sm font-semibold tracking-wide transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C2B0DC]/40 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98]",
   {
     variants: {
       variant: {
         default:
-          "bg-[#C76B4A] text-white hover:bg-[#AE593B] shadow-xs",
+          "bg-[#C2B0DC] text-white hover:brightness-105 shadow-[0_8px_24px_rgba(60,40,80,0.22)] uppercase tracking-wider",
+        lilac:
+          "bg-[#C2B0DC] text-white hover:brightness-105 shadow-[0_8px_24px_rgba(60,40,80,0.22)] uppercase tracking-wider",
+        mint:
+          "bg-[#B4D58A] text-[#252525] hover:brightness-105 shadow-[0_8px_24px_rgba(60,40,80,0.16)] uppercase tracking-wider",
+        butter:
+          "bg-[#F3DA8A] text-[#252525] hover:brightness-105 shadow-[0_8px_24px_rgba(60,40,80,0.16)] uppercase tracking-wider",
+        pink:
+          "bg-[#F2AFC0] text-white hover:brightness-105 shadow-[0_8px_24px_rgba(60,40,80,0.22)] uppercase tracking-wider",
+        white:
+          "bg-white text-[#252525] hover:bg-white/95 shadow-[0_8px_24px_rgba(60,40,80,0.16)] uppercase tracking-wider",
         secondary:
-          "bg-[#66745B] text-white hover:bg-[#525E49] shadow-xs",
+          "bg-[#B4D58A] text-[#252525] hover:brightness-105 shadow-[0_6px_20px_rgba(60,40,80,0.12)]",
         outline:
-          "border border-[#EAE7E0] bg-white text-[#292B28] hover:bg-[#FAF8F4] hover:border-[#D8D4CA]",
+          "border border-white/60 bg-white/20 backdrop-blur-md text-white hover:bg-white/30 transition-all",
+        outlineDark:
+          "border border-[#252525]/15 bg-white/60 text-[#252525] hover:bg-white transition-all",
         ghost:
-          "text-[#292B28] hover:bg-[#F3F1EB]",
+          "text-[#252525] hover:bg-black/5",
+        ghostWhite:
+          "text-white hover:bg-white/10",
         subtle:
-          "bg-[#F8EAE3] text-[#AE593B] hover:bg-[#F2DFD6]",
+          "bg-[#C2B0DC]/20 text-[#252525] hover:bg-[#C2B0DC]/30",
         danger:
-          "bg-[#C84D4D] text-white hover:bg-[#B33E3E] shadow-xs",
+          "bg-[#F2AFC0] text-white hover:brightness-95 shadow-[0_6px_20px_rgba(242,175,192,0.4)]",
       },
       size: {
-        default: "h-10 px-4 py-2",
-        sm: "h-8 rounded-[8px] px-3 text-xs",
-        lg: "h-11 rounded-[11px] px-6 text-base font-semibold",
-        icon: "h-9 w-9",
+        default: "h-11 px-5 py-2.5",
+        sm: "h-9 rounded-xl px-3.5 text-xs font-medium",
+        lg: "h-14 rounded-2xl px-8 text-base font-bold tracking-wider",
+        icon: "h-10 w-10 rounded-xl",
       },
     },
     defaultVariants: {

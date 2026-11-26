@@ -74,225 +74,219 @@ export default function ReservePage() {
   });
 
   return (
-    <div className="min-h-screen bg-[#FAF8F4] text-[#292B28] flex flex-col justify-between">
+    <div className="relative min-h-screen flex flex-col justify-between bg-[#B4D58A] font-poppins text-[#252525] overflow-hidden">
+      {/* Background blur spheres */}
+      <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-white/20 blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-32 -right-32 w-96 h-96 rounded-full bg-[#F3DA8A]/30 blur-3xl pointer-events-none" />
+
       {/* Header */}
-      <header className="border-b border-[#EAE7E0] bg-white">
-        <div className="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 text-xs font-semibold text-[#777872] hover:text-[#292B28]">
+      <header className="relative z-10 w-full px-6 sm:px-12 pt-7">
+        <div className="max-w-5xl mx-auto flex items-center justify-between">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#252525] bg-white/40 hover:bg-white px-4 py-2 rounded-2xl backdrop-blur-md transition-all shadow-xs"
+          >
             <ChevronLeft className="h-4 w-4" /> Back to Home
           </Link>
-          <span className="font-serif text-lg font-bold text-[#292B28]">The Grand Feast</span>
-          <div className="w-16" />
+          <span className="font-baloo text-2xl font-extrabold text-[#252525]">
+            The Grand Feast
+          </span>
+          <div className="w-24 hidden sm:block" />
         </div>
       </header>
 
       {/* Main Container */}
-      <main className="flex-1 max-w-xl w-full mx-auto p-4 sm:p-6 my-6">
+      <main className="relative z-10 flex-1 max-w-xl w-full mx-auto px-4 py-8 flex flex-col justify-center animate-slide-up">
         {bookingConfirmed ? (
-          <div className="bg-white rounded-3xl border border-[#EAE7E0] p-8 text-center space-y-6 shadow-sm">
-            <div className="h-16 w-16 bg-[#39845C]/10 text-[#39845C] rounded-full flex items-center justify-center mx-auto">
+          <div className="bg-white rounded-3xl p-8 sm:p-10 text-center space-y-6 shadow-[0_20px_60px_rgba(60,40,80,0.22)]">
+            <div className="h-16 w-16 bg-[#B4D58A] text-[#252525] rounded-full flex items-center justify-center mx-auto shadow-sm">
               <CheckCircle2 className="h-9 w-9" />
             </div>
 
             <div>
-              <span className="text-xs font-mono font-bold tracking-widest text-[#39845C] uppercase">
-                Booking Reference Confirmed
+              <span className="text-xs font-bold uppercase tracking-widest text-[#252525] bg-[#B4D58A]/30 px-3 py-1 rounded-full">
+                Booking Confirmed
               </span>
-              <h2 className="font-serif text-2xl font-bold text-[#292B28] mt-1">
-                We Expect Your Arrival, {bookingConfirmed.customer_name}
+              <h2 className="text-3xl font-bold text-[#252525] mt-3">
+                Your Table is Reserved!
               </h2>
-              <p className="text-xs text-[#777872] mt-1 max-w-sm mx-auto">
-                A table has been reserved for your party. An SMS confirmation has been dispatched to{' '}
-                <strong>{bookingConfirmed.customer_phone}</strong>.
+              <p className="text-xs text-[#5A5D58] mt-1 font-medium">
+                We have notified our host team. Please present your reference code on arrival.
               </p>
             </div>
 
-            <div className="bg-[#FAF8F4] p-4 rounded-2xl border border-[#EAE7E0] text-xs space-y-2 text-left">
-              <div className="flex justify-between">
-                <span className="text-[#777872]">Date & Time</span>
-                <span className="font-bold text-[#292B28]">
-                  {bookingConfirmed.reservation_date} at {bookingConfirmed.reservation_time}
+            <div className="p-5 bg-[#F3DA8A]/25 rounded-2xl text-left space-y-3 text-xs">
+              <div className="flex justify-between items-center pb-2 border-b border-black/[0.06]">
+                <span className="font-bold uppercase tracking-wider text-[#5A5D58]">
+                  Booking Reference
+                </span>
+                <span className="font-extrabold text-base text-[#252525]">
+                  {bookingConfirmed.booking_code || 'RES-10492'}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-[#777872]">Guests</span>
-                <span className="font-bold text-[#292B28]">{bookingConfirmed.guest_count} People</span>
+                <span className="text-[#5A5D58]">Guest Name</span>
+                <span className="font-bold text-[#252525]">{resName}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-[#777872]">Status</span>
-                <Badge variant="success" className="text-[10px] uppercase">
-                  {bookingConfirmed.status}
-                </Badge>
+                <span className="text-[#5A5D58]">Date & Time</span>
+                <span className="font-bold text-[#252525]">{resDate} at {resTime}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-[#5A5D58]">Party Size</span>
+                <span className="font-bold text-[#252525]">{resGuests} Guests</span>
               </div>
             </div>
 
-            <div className="flex gap-3">
-              <Link href="/" className="flex-1">
-                <Button variant="outline" className="w-full text-xs h-10 rounded-xl">
-                  Explore Menu
+            <div className="space-y-3">
+              <Link href="/">
+                <Button variant="mint" size="lg" className="w-full text-xs">
+                  Return to Home
                 </Button>
               </Link>
-              <Button
-                onClick={() => setBookingConfirmed(null)}
-                className="flex-1 bg-[#C76B4A] hover:bg-[#AE593B] text-white text-xs h-10 rounded-xl"
-              >
-                Book Another
-              </Button>
             </div>
           </div>
         ) : (
-          <div className="bg-white rounded-3xl border border-[#EAE7E0] p-6 sm:p-8 space-y-6 shadow-sm">
-            <div className="text-center space-y-1">
-              <span className="text-xs font-mono tracking-widest text-[#C76B4A] uppercase font-bold">
-                Table Reservations
-              </span>
-              <h1 className="font-serif text-2xl sm:text-3xl font-bold text-[#292B28]">
-                Book Your Dining Experience
+          <div className="bg-white rounded-3xl p-8 sm:p-10 shadow-[0_20px_60px_rgba(60,40,80,0.22)] space-y-6">
+            <div className="text-center space-y-2">
+              <Badge variant="mint" className="uppercase tracking-widest text-[10px] py-1 px-3">
+                Instant Table Reservation
+              </Badge>
+              <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-[#252525]">
+                RESERVE A TABLE
               </h1>
-              <p className="text-xs text-[#777872]">
-                Guaranteed table seating · Zero reservation fee · Instant confirmation
+              <p className="text-xs text-[#5A5D58] font-medium">
+                Experience royal dining at The Grand Feast. Zero booking charges.
               </p>
             </div>
 
             {resError && (
-              <div className="bg-[#FDF0F0] border border-[#F8DADA] p-3 rounded-xl text-xs text-[#C84D4D]">
+              <div className="bg-[#F2AFC0]/20 border border-[#F2AFC0] p-3 rounded-2xl text-xs text-[#252525] font-semibold">
                 {resError}
               </div>
             )}
 
-            <div className="space-y-4 text-xs">
-              {/* Branch Selector */}
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                reservationMutation.mutate();
+              }}
+              className="space-y-4 text-xs"
+            >
+              {/* Branch Selection */}
               <div>
-                <label className="font-semibold text-[#292B28] block mb-1.5">Select Branch</label>
+                <label className="font-bold uppercase tracking-wider text-[#5A5D58] block mb-1.5">
+                  Select Branch
+                </label>
                 <select
                   value={resBranchId}
                   onChange={(e) => setResBranchId(Number(e.target.value))}
-                  className="w-full h-10 px-3 rounded-xl border border-[#EAE7E0] bg-white text-xs text-[#292B28]"
+                  className="w-full h-12 px-4 rounded-2xl border border-black/[0.08] bg-white text-sm text-[#252525] outline-none focus:border-[#C2B0DC] focus:ring-4 focus:ring-[#C2B0DC]/20 font-medium"
                 >
                   {branches.map((b: any) => (
                     <option key={b.id} value={b.id}>
-                      {b.name} — {b.address}
+                      {b.name} ({b.city})
                     </option>
                   ))}
                 </select>
               </div>
 
               {/* Guest Details */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="font-semibold text-[#292B28] block mb-1">Your Full Name *</label>
-                  <Input
-                    required
-                    placeholder="Aditya Verma"
-                    value={resName}
-                    onChange={(e) => setResName(e.target.value)}
-                    className="h-10 text-xs"
-                  />
-                </div>
-                <div>
-                  <label className="font-semibold text-[#292B28] block mb-1">Mobile Phone *</label>
-                  <Input
-                    required
-                    placeholder="+91 99887 76655"
-                    value={resPhone}
-                    onChange={(e) => setResPhone(e.target.value)}
-                    className="h-10 text-xs"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="font-semibold text-[#292B28] block mb-1">Email Address</label>
+              <div className="grid grid-cols-2 gap-3">
                 <Input
-                  type="email"
-                  placeholder="aditya@example.com"
-                  value={resEmail}
-                  onChange={(e) => setResEmail(e.target.value)}
-                  className="h-10 text-xs"
+                  label="Guest Name *"
+                  required
+                  placeholder="Deepak Kumar"
+                  value={resName}
+                  onChange={(e) => setResName(e.target.value)}
+                />
+                <Input
+                  label="Contact Phone *"
+                  required
+                  placeholder="+91 98765 00000"
+                  value={resPhone}
+                  onChange={(e) => setResPhone(e.target.value)}
                 />
               </div>
 
-              {/* Party Size, Date, Time */}
-              <div className="grid grid-cols-3 gap-2">
+              {/* Party & Schedule */}
+              <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="font-semibold text-[#292B28] block mb-1">Party Size</label>
+                  <label className="font-bold uppercase tracking-wider text-[#5A5D58] block mb-1.5">
+                    Guests *
+                  </label>
                   <select
                     value={resGuests}
                     onChange={(e) => setResGuests(Number(e.target.value))}
-                    className="w-full h-10 px-2 rounded-xl border border-[#EAE7E0] bg-white text-xs text-[#292B28]"
+                    className="w-full h-12 px-4 rounded-2xl border border-black/[0.08] bg-white text-sm text-[#252525] outline-none focus:border-[#C2B0DC] focus:ring-4 focus:ring-[#C2B0DC]/20 font-medium"
                   >
-                    {[1, 2, 3, 4, 5, 6, 8, 10, 12].map((n) => (
-                      <option key={n} value={n}>
-                        {n} {n === 1 ? 'Guest' : 'Guests'}
+                    {[1, 2, 3, 4, 5, 6, 8, 10, 12].map((num) => (
+                      <option key={num} value={num}>
+                        {num} {num === 1 ? 'Guest' : 'Guests'}
                       </option>
                     ))}
                   </select>
                 </div>
-
                 <div>
-                  <label className="font-semibold text-[#292B28] block mb-1">Date</label>
-                  <Input
+                  <label className="font-bold uppercase tracking-wider text-[#5A5D58] block mb-1.5">
+                    Date *
+                  </label>
+                  <input
                     type="date"
+                    required
                     value={resDate}
                     onChange={(e) => setResDate(e.target.value)}
-                    className="h-10 text-xs"
+                    className="w-full h-12 px-4 rounded-2xl border border-black/[0.08] bg-white text-sm text-[#252525] outline-none focus:border-[#C2B0DC] focus:ring-4 focus:ring-[#C2B0DC]/20 font-medium"
                   />
                 </div>
-
-                <div>
-                  <label className="font-semibold text-[#292B28] block mb-1">Time Slot</label>
-                  <select
-                    value={resTime}
-                    onChange={(e) => setResTime(e.target.value)}
-                    className="w-full h-10 px-2 rounded-xl border border-[#EAE7E0] bg-white text-xs text-[#292B28]"
-                  >
-                    {[
-                      '12:30',
-                      '13:00',
-                      '13:30',
-                      '14:00',
-                      '19:00',
-                      '19:30',
-                      '20:00',
-                      '20:30',
-                      '21:00',
-                    ].map((t) => (
-                      <option key={t} value={t}>
-                        {t}
-                      </option>
-                    ))}
-                  </select>
-                </div>
               </div>
 
-              {/* Special Requests */}
+              {/* Time */}
               <div>
-                <label className="font-semibold text-[#292B28] block mb-1">
-                  Seating or Dietary Preferences
+                <label className="font-bold uppercase tracking-wider text-[#5A5D58] block mb-1.5">
+                  Dining Slot *
                 </label>
-                <Input
-                  placeholder="e.g. Window table, quiet corner, anniversary"
-                  value={resNotes}
-                  onChange={(e) => setResNotes(e.target.value)}
-                  className="h-10 text-xs"
-                />
+                <select
+                  value={resTime}
+                  onChange={(e) => setResTime(e.target.value)}
+                  className="w-full h-12 px-4 rounded-2xl border border-black/[0.08] bg-white text-sm text-[#252525] outline-none focus:border-[#C2B0DC] focus:ring-4 focus:ring-[#C2B0DC]/20 font-medium"
+                >
+                  {['12:00', '12:30', '13:00', '13:30', '14:00', '19:00', '19:30', '20:00', '20:30', '21:00', '21:30'].map(
+                    (slot) => (
+                      <option key={slot} value={slot}>
+                        {slot}
+                      </option>
+                    )
+                  )}
+                </select>
               </div>
-            </div>
 
-            <Button
-              disabled={!resName || !resPhone || reservationMutation.isPending}
-              onClick={() => reservationMutation.mutate()}
-              className="w-full bg-[#C76B4A] hover:bg-[#AE593B] text-white font-semibold text-xs h-11 rounded-xl shadow-xs"
-            >
-              {reservationMutation.isPending ? 'Confirming Table...' : 'Confirm Table Booking'}
-            </Button>
+              <Input
+                label="Special Requests (Optional)"
+                placeholder="Window seat, quiet corner, anniversary cake..."
+                value={resNotes}
+                onChange={(e) => setResNotes(e.target.value)}
+              />
+
+              <div className="pt-2">
+                <Button
+                  type="submit"
+                  variant="mint"
+                  size="lg"
+                  className="w-full font-bold"
+                  isLoading={reservationMutation.isPending}
+                >
+                  Book My Experience
+                </Button>
+              </div>
+            </form>
           </div>
         )}
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-[#EAE7E0] bg-white py-6 text-center text-xs text-[#777872]">
-        The Grand Feast · Powered by Restaurant OS
+      <footer className="relative z-10 text-center py-6 text-xs text-[#252525]/80 font-medium">
+        The Grand Feast · Table Reservation System
       </footer>
     </div>
   );

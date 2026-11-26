@@ -183,21 +183,21 @@ export default function RestaurantBranchesPage() {
       {/* Breadcrumb Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="space-y-1">
-          <div className="flex items-center gap-2 text-xs text-[#777872]">
-            <Link href="/restaurants" className="hover:text-[#292B28] flex items-center gap-1">
+          <div className="flex items-center gap-2 text-xs text-[#5A5D58]">
+            <Link href="/restaurants" className="hover:text-[#252525] flex items-center gap-1">
               <Store className="h-3.5 w-3.5" />
               Restaurants
             </Link>
             <span>/</span>
-            <span className="font-semibold text-[#292B28]">{restaurant?.name || 'Loading...'}</span>
+            <span className="font-semibold text-[#252525]">{restaurant?.name || 'Loading...'}</span>
             <span>/</span>
             <span>Branches</span>
           </div>
 
-          <h1 className="font-serif text-2xl sm:text-3xl font-semibold text-[#292B28]">
+          <h1 className="font-bold text-2xl sm:text-3xl font-semibold text-[#252525]">
             {restaurant?.name} — Branches
           </h1>
-          <p className="text-xs text-[#777872]">
+          <p className="text-xs text-[#5A5D58]">
             Manage physical dining locations, operating hours, local tax rates, and seating
           </p>
         </div>
@@ -216,14 +216,14 @@ export default function RestaurantBranchesPage() {
 
       {/* Branches List */}
       {isLoading ? (
-        <div className="py-16 text-center text-sm text-[#777872]">
+        <div className="py-16 text-center text-sm text-[#5A5D58]">
           Loading branches...
         </div>
       ) : branches.length === 0 ? (
-        <Card className="border-[#EAE7E0] p-12 text-center">
-          <GitBranch className="h-12 w-12 text-[#A2A29A] mx-auto mb-3" />
-          <h3 className="font-serif text-lg font-semibold text-[#292B28]">No Branches Provisioned</h3>
-          <p className="text-xs text-[#777872] mt-1">
+        <Card className="border-black/[0.06] p-12 text-center">
+          <GitBranch className="h-12 w-12 text-[#8E928B] mx-auto mb-3" />
+          <h3 className="font-bold text-lg font-semibold text-[#252525]">No Branches Provisioned</h3>
+          <p className="text-xs text-[#5A5D58] mt-1">
             Every restaurant requires at least one operating branch for tables, orders, and staff.
           </p>
           <Button onClick={openCreateModal} size="sm" className="mt-4 gap-2">
@@ -233,7 +233,7 @@ export default function RestaurantBranchesPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {branches.map((b: any) => (
-            <Card key={b.id} className="border-[#EAE7E0] hover:border-[#D8D4CA] transition-all flex flex-col justify-between">
+            <Card key={b.id} className="border-black/[0.06] hover:border-[#D8D4CA] transition-all flex flex-col justify-between">
               <div>
                 <CardHeader className="p-5 pb-3">
                   <div className="flex items-start justify-between gap-3">
@@ -244,7 +244,7 @@ export default function RestaurantBranchesPage() {
                           <Badge variant="secondary" className="text-[10px]">Main</Badge>
                         )}
                       </div>
-                      <span className="font-mono text-[11px] text-[#777872] block mt-0.5">
+                      <span className="font-mono text-[11px] text-[#5A5D58] block mt-0.5">
                         Code: {b.code}
                       </span>
                     </div>
@@ -256,45 +256,45 @@ export default function RestaurantBranchesPage() {
                 </CardHeader>
 
                 <CardContent className="p-5 pt-0 space-y-3">
-                  <div className="space-y-1.5 text-xs text-[#777872] pt-1">
+                  <div className="space-y-1.5 text-xs text-[#5A5D58] pt-1">
                     {b.address && (
                       <p className="flex items-start gap-1.5">
-                        <MapPin className="h-3.5 w-3.5 text-[#A2A29A] shrink-0 mt-0.5" />
+                        <MapPin className="h-3.5 w-3.5 text-[#8E928B] shrink-0 mt-0.5" />
                         <span>{b.address}, {b.city} {b.postal_code}</span>
                       </p>
                     )}
                     <p className="flex items-center gap-1.5">
-                      <Clock className="h-3.5 w-3.5 text-[#A2A29A] shrink-0" />
+                      <Clock className="h-3.5 w-3.5 text-[#8E928B] shrink-0" />
                       <span>Hours: {b.opening_time || '10:00'} – {b.closing_time || '23:00'}</span>
                     </p>
-                    <p className="flex items-center gap-1.5 font-medium text-[#292B28]">
-                      <Percent className="h-3.5 w-3.5 text-[#C76B4A] shrink-0" />
+                    <p className="flex items-center gap-1.5 font-medium text-[#252525]">
+                      <Percent className="h-3.5 w-3.5 text-[#C2B0DC] shrink-0" />
                       <span>Branch GST/Tax: {b.tax_rate}%</span>
                     </p>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-2 py-2 px-3 bg-[#FAF8F4] rounded-xl border border-[#F1EEE8] text-center text-xs">
+                  <div className="grid grid-cols-2 gap-2 py-2 px-3 bg-[#FAF9F6] rounded-xl border border-black/[0.04] text-center text-xs">
                     <div>
-                      <span className="text-[10px] uppercase font-semibold text-[#777872] block">Tables</span>
-                      <span className="font-semibold text-sm text-[#292B28]">{b.dining_tables_count ?? 0}</span>
+                      <span className="text-[10px] uppercase font-semibold text-[#5A5D58] block">Tables</span>
+                      <span className="font-semibold text-sm text-[#252525]">{b.dining_tables_count ?? 0}</span>
                     </div>
                     <div>
-                      <span className="text-[10px] uppercase font-semibold text-[#777872] block">Branch Staff</span>
-                      <span className="font-semibold text-sm text-[#292B28]">{b.users_count ?? 0}</span>
+                      <span className="text-[10px] uppercase font-semibold text-[#5A5D58] block">Branch Staff</span>
+                      <span className="font-semibold text-sm text-[#252525]">{b.users_count ?? 0}</span>
                     </div>
                   </div>
                 </CardContent>
               </div>
 
               {/* Footer */}
-              <div className="p-4 border-t border-[#F1EEE8] bg-[#FAF8F4]/50 flex items-center justify-end gap-1.5 rounded-b-2xl">
+              <div className="p-4 border-t border-black/[0.04] bg-[#FAF9F6]/50 flex items-center justify-end gap-1.5 rounded-b-2xl">
                 <button
                   onClick={() => toggleMutation.mutate(b.id)}
                   title={b.is_active ? 'Deactivate Branch' : 'Activate Branch'}
                   className={`p-1.5 rounded-lg border transition-colors ${
                     b.is_active 
-                      ? 'text-[#39845C] border-[#D5EAD9] bg-[#EBF5EF] hover:bg-[#D5EAD9]' 
-                      : 'text-[#A2A29A] border-[#EAE7E0] bg-white hover:bg-[#F3F1EB]'
+                      ? 'text-[#B4D58A] border-[#D5EAD9] bg-[#B4D58A]/20 hover:bg-[#D5EAD9]' 
+                      : 'text-[#8E928B] border-black/[0.06] bg-white hover:bg-[#F3DA8A]/25'
                   }`}
                 >
                   <Power className="h-3.5 w-3.5" />
@@ -302,7 +302,7 @@ export default function RestaurantBranchesPage() {
                 <button
                   onClick={() => openEditModal(b)}
                   title="Edit Branch"
-                  className="p-1.5 rounded-lg border border-[#EAE7E0] text-[#777872] hover:text-[#292B28] hover:bg-white transition-colors"
+                  className="p-1.5 rounded-lg border border-black/[0.06] text-[#5A5D58] hover:text-[#252525] hover:bg-white transition-colors"
                 >
                   <Edit className="h-3.5 w-3.5" />
                 </button>
@@ -313,7 +313,7 @@ export default function RestaurantBranchesPage() {
                     }
                   }}
                   title="Archive Branch"
-                  className="p-1.5 rounded-lg border border-[#EAE7E0] text-[#C84D4D] hover:bg-[#FDF0F0] hover:border-[#F8DADA] transition-colors"
+                  className="p-1.5 rounded-lg border border-black/[0.06] text-[#F2AFC0] hover:bg-[#F2AFC0]/20 hover:border-[#F8DADA] transition-colors"
                 >
                   <Trash2 className="h-3.5 w-3.5" />
                 </button>
@@ -325,15 +325,15 @@ export default function RestaurantBranchesPage() {
 
       {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#292B28]/40 backdrop-blur-xs p-4">
-          <div className="w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl bg-white border border-[#EAE7E0] shadow-xl p-6 space-y-5">
-            <div className="flex items-center justify-between pb-3 border-b border-[#EAE7E0]">
-              <h2 className="font-serif text-xl font-semibold text-[#292B28]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#252525]/40 backdrop-blur-xs p-4">
+          <div className="w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl bg-white border border-black/[0.06] shadow-xl p-6 space-y-5">
+            <div className="flex items-center justify-between pb-3 border-b border-black/[0.06]">
+              <h2 className="font-bold text-xl font-semibold text-[#252525]">
                 {editingBranch ? 'Edit Branch' : 'Create Branch'}
               </h2>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="p-1.5 text-[#777872] hover:text-[#292B28] rounded-lg hover:bg-[#FAF8F4]"
+                className="p-1.5 text-[#5A5D58] hover:text-[#252525] rounded-lg hover:bg-[#FAF9F6]"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -442,14 +442,14 @@ export default function RestaurantBranchesPage() {
                   id="mainBranchCheck"
                   checked={isMainBranch}
                   onChange={(e) => setIsMainBranch(e.target.checked)}
-                  className="rounded border-[#EAE7E0] text-[#C76B4A] focus:ring-[#C76B4A]"
+                  className="rounded border-black/[0.06] text-[#C2B0DC] focus:ring-[#C2B0DC]"
                 />
-                <label htmlFor="mainBranchCheck" className="text-xs font-medium text-[#292B28] cursor-pointer">
+                <label htmlFor="mainBranchCheck" className="text-xs font-medium text-[#252525] cursor-pointer">
                   Set as Main / Flagship Branch
                 </label>
               </div>
 
-              <div className="flex items-center justify-end gap-3 pt-3 border-t border-[#EAE7E0]">
+              <div className="flex items-center justify-end gap-3 pt-3 border-t border-black/[0.06]">
                 <Button
                   type="button"
                   variant="outline"

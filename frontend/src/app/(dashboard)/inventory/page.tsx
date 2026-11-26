@@ -324,11 +324,11 @@ export default function InventoryManagementPage() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'in_stock':
-        return <Badge className="bg-[#EEF1E9] text-[#39845C] border-[#D6DFC9]">In Stock</Badge>;
+        return <Badge className="bg-[#B4D58A]/25 text-[#B4D58A] border-[#D6DFC9]">In Stock</Badge>;
       case 'low_stock':
-        return <Badge className="bg-[#FEF7EC] text-[#D69A3A] border-[#FCE3BE]">Low Stock</Badge>;
+        return <Badge className="bg-[#FEF7EC] text-[#F3DA8A] border-[#FCE3BE]">Low Stock</Badge>;
       case 'out_of_stock':
-        return <Badge className="bg-[#FDF2F2] text-[#C84D4D] border-[#F8D7DA]">Depleted</Badge>;
+        return <Badge className="bg-[#FDF2F2] text-[#F2AFC0] border-[#F8D7DA]">Depleted</Badge>;
       default:
         return <Badge variant="outline">{status}</Badge>;
     }
@@ -340,12 +340,12 @@ export default function InventoryManagementPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold tracking-tight text-[#292B28]">Inventory & Supply Chain</h1>
-            <Badge variant="outline" className="text-[#C76B4A] border-[#F8EAE3] bg-[#FAF8F4]">
+            <h1 className="text-2xl font-bold tracking-tight text-[#252525]">Inventory & Supply Chain</h1>
+            <Badge variant="outline" className="text-[#C2B0DC] border-[#C2B0DC]/20 bg-[#FAF9F6]">
               Phase 7
             </Badge>
           </div>
-          <p className="text-sm text-[#777872] mt-1">
+          <p className="text-sm text-[#5A5D58] mt-1">
             Raw materials catalog, low stock replenishment alerts, supplier contacts, and purchase orders.
           </p>
         </div>
@@ -360,7 +360,7 @@ export default function InventoryManagementPage() {
               refetchPo();
             }}
             disabled={isInvFetching}
-            className="border-[#EAE7E0] hover:bg-[#F3F1EB] text-[#292B28]"
+            className="border-black/[0.06] hover:bg-[#F3DA8A]/25 text-[#252525]"
           >
             <RefreshCw className={`w-4 h-4 mr-2 ${isInvFetching ? 'animate-spin' : ''}`} />
             Refresh
@@ -369,7 +369,7 @@ export default function InventoryManagementPage() {
           {activeTab === 'stock' && (
             <Button
               onClick={() => setIsAddItemModalOpen(true)}
-              className="bg-[#C76B4A] hover:bg-[#AE593B] text-white shadow-sm"
+              className="bg-[#C2B0DC] hover:bg-[#B19CCF] text-white shadow-sm"
             >
               <Plus className="w-4 h-4 mr-2" /> Add Material
             </Button>
@@ -378,7 +378,7 @@ export default function InventoryManagementPage() {
           {activeTab === 'suppliers' && (
             <Button
               onClick={() => setIsAddSupplierModalOpen(true)}
-              className="bg-[#C76B4A] hover:bg-[#AE593B] text-white shadow-sm"
+              className="bg-[#C2B0DC] hover:bg-[#B19CCF] text-white shadow-sm"
             >
               <Plus className="w-4 h-4 mr-2" /> New Supplier
             </Button>
@@ -398,7 +398,7 @@ export default function InventoryManagementPage() {
                 }
                 setIsCreatePoModalOpen(true);
               }}
-              className="bg-[#C76B4A] hover:bg-[#AE593B] text-white shadow-sm"
+              className="bg-[#C2B0DC] hover:bg-[#B19CCF] text-white shadow-sm"
             >
               <Plus className="w-4 h-4 mr-2" /> Create PO
             </Button>
@@ -408,51 +408,51 @@ export default function InventoryManagementPage() {
 
       {/* Metrics Row */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card className="border-[#EAE7E0] bg-white shadow-xs">
+        <Card className="border-black/[0.06] bg-white shadow-xs">
           <CardContent className="p-4 flex items-center justify-between">
             <div>
-              <p className="text-xs font-medium text-[#777872]">Tracked Ingredients</p>
-              <h3 className="text-2xl font-bold text-[#292B28] mt-1">{totalItemCount}</h3>
+              <p className="text-xs font-medium text-[#5A5D58]">Tracked Ingredients</p>
+              <h3 className="text-2xl font-bold text-[#252525] mt-1">{totalItemCount}</h3>
             </div>
-            <div className="w-10 h-10 rounded-full bg-[#FAF8F4] flex items-center justify-center text-[#C76B4A]">
+            <div className="w-10 h-10 rounded-full bg-[#FAF9F6] flex items-center justify-center text-[#C2B0DC]">
               <Boxes className="w-5 h-5" />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-[#EAE7E0] bg-white shadow-xs">
+        <Card className="border-black/[0.06] bg-white shadow-xs">
           <CardContent className="p-4 flex items-center justify-between">
             <div>
-              <p className="text-xs font-medium text-[#777872]">Low Stock Alerts</p>
-              <h3 className={`text-2xl font-bold mt-1 ${lowStockCount > 0 ? 'text-[#C84D4D]' : 'text-[#39845C]'}`}>
+              <p className="text-xs font-medium text-[#5A5D58]">Low Stock Alerts</p>
+              <h3 className={`text-2xl font-bold mt-1 ${lowStockCount > 0 ? 'text-[#F2AFC0]' : 'text-[#B4D58A]'}`}>
                 {lowStockCount}
               </h3>
             </div>
-            <div className="w-10 h-10 rounded-full bg-[#FEF7EC] flex items-center justify-center text-[#D69A3A]">
+            <div className="w-10 h-10 rounded-full bg-[#FEF7EC] flex items-center justify-center text-[#F3DA8A]">
               <AlertTriangle className="w-5 h-5" />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-[#EAE7E0] bg-white shadow-xs">
+        <Card className="border-black/[0.06] bg-white shadow-xs">
           <CardContent className="p-4 flex items-center justify-between">
             <div>
-              <p className="text-xs font-medium text-[#777872]">Active Suppliers</p>
-              <h3 className="text-2xl font-bold text-[#5185B8] mt-1">{suppliers.length}</h3>
+              <p className="text-xs font-medium text-[#5A5D58]">Active Suppliers</p>
+              <h3 className="text-2xl font-bold text-[#C2B0DC] mt-1">{suppliers.length}</h3>
             </div>
-            <div className="w-10 h-10 rounded-full bg-[#EBF3FC] flex items-center justify-center text-[#5185B8]">
+            <div className="w-10 h-10 rounded-full bg-[#C2B0DC]/20 flex items-center justify-center text-[#C2B0DC]">
               <Truck className="w-5 h-5" />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-[#EAE7E0] bg-white shadow-xs">
+        <Card className="border-black/[0.06] bg-white shadow-xs">
           <CardContent className="p-4 flex items-center justify-between">
             <div>
-              <p className="text-xs font-medium text-[#777872]">Total Stock Value</p>
-              <h3 className="text-2xl font-bold text-[#292B28] mt-1">₹{totalInventoryValue.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</h3>
+              <p className="text-xs font-medium text-[#5A5D58]">Total Stock Value</p>
+              <h3 className="text-2xl font-bold text-[#252525] mt-1">₹{totalInventoryValue.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</h3>
             </div>
-            <div className="w-10 h-10 rounded-full bg-[#EEF1E9] flex items-center justify-center text-[#39845C]">
+            <div className="w-10 h-10 rounded-full bg-[#B4D58A]/25 flex items-center justify-center text-[#B4D58A]">
               <DollarSign className="w-5 h-5" />
             </div>
           </CardContent>
@@ -460,18 +460,18 @@ export default function InventoryManagementPage() {
       </div>
 
       {/* Tabs Navigation */}
-      <div className="border-b border-[#EAE7E0] flex items-center gap-6">
+      <div className="border-b border-black/[0.06] flex items-center gap-6">
         <button
           onClick={() => setActiveTab('stock')}
           className={`pb-3 text-sm font-semibold flex items-center gap-2 border-b-2 transition-colors ${
             activeTab === 'stock'
-              ? 'border-[#C76B4A] text-[#C76B4A]'
-              : 'border-transparent text-[#777872] hover:text-[#292B28]'
+              ? 'border-[#C2B0DC] text-[#C2B0DC]'
+              : 'border-transparent text-[#5A5D58] hover:text-[#252525]'
           }`}
         >
           <Boxes className="w-4 h-4" />
           <span>Raw Materials Catalog</span>
-          <span className="text-xs px-2 py-0.5 rounded-full bg-[#F3F1EB] text-[#292B28] font-medium">
+          <span className="text-xs px-2 py-0.5 rounded-full bg-[#F3DA8A]/25 text-[#252525] font-medium">
             {totalItemCount}
           </span>
         </button>
@@ -480,14 +480,14 @@ export default function InventoryManagementPage() {
           onClick={() => setActiveTab('alerts')}
           className={`pb-3 text-sm font-semibold flex items-center gap-2 border-b-2 transition-colors ${
             activeTab === 'alerts'
-              ? 'border-[#C76B4A] text-[#C76B4A]'
-              : 'border-transparent text-[#777872] hover:text-[#292B28]'
+              ? 'border-[#C2B0DC] text-[#C2B0DC]'
+              : 'border-transparent text-[#5A5D58] hover:text-[#252525]'
           }`}
         >
-          <AlertTriangle className="w-4 h-4 text-[#D69A3A]" />
+          <AlertTriangle className="w-4 h-4 text-[#F3DA8A]" />
           <span>Low Stock Alerts</span>
           {lowStockCount > 0 && (
-            <span className="text-xs px-2 py-0.5 rounded-full bg-[#FDF2F2] text-[#C84D4D] font-bold">
+            <span className="text-xs px-2 py-0.5 rounded-full bg-[#FDF2F2] text-[#F2AFC0] font-bold">
               {lowStockCount}
             </span>
           )}
@@ -497,13 +497,13 @@ export default function InventoryManagementPage() {
           onClick={() => setActiveTab('suppliers')}
           className={`pb-3 text-sm font-semibold flex items-center gap-2 border-b-2 transition-colors ${
             activeTab === 'suppliers'
-              ? 'border-[#C76B4A] text-[#C76B4A]'
-              : 'border-transparent text-[#777872] hover:text-[#292B28]'
+              ? 'border-[#C2B0DC] text-[#C2B0DC]'
+              : 'border-transparent text-[#5A5D58] hover:text-[#252525]'
           }`}
         >
           <Truck className="w-4 h-4" />
           <span>Suppliers Directory</span>
-          <span className="text-xs px-2 py-0.5 rounded-full bg-[#F3F1EB] text-[#292B28] font-medium">
+          <span className="text-xs px-2 py-0.5 rounded-full bg-[#F3DA8A]/25 text-[#252525] font-medium">
             {suppliers.length}
           </span>
         </button>
@@ -512,13 +512,13 @@ export default function InventoryManagementPage() {
           onClick={() => setActiveTab('orders')}
           className={`pb-3 text-sm font-semibold flex items-center gap-2 border-b-2 transition-colors ${
             activeTab === 'orders'
-              ? 'border-[#C76B4A] text-[#C76B4A]'
-              : 'border-transparent text-[#777872] hover:text-[#292B28]'
+              ? 'border-[#C2B0DC] text-[#C2B0DC]'
+              : 'border-transparent text-[#5A5D58] hover:text-[#252525]'
           }`}
         >
           <ClipboardList className="w-4 h-4" />
           <span>Purchase Orders</span>
-          <span className="text-xs px-2 py-0.5 rounded-full bg-[#F3F1EB] text-[#292B28] font-medium">
+          <span className="text-xs px-2 py-0.5 rounded-full bg-[#F3DA8A]/25 text-[#252525] font-medium">
             {purchaseOrders.length}
           </span>
         </button>
@@ -528,7 +528,7 @@ export default function InventoryManagementPage() {
       {activeTab === 'stock' && (
         <div className="space-y-4">
           {/* Filters Bar */}
-          <Card className="border-[#EAE7E0] bg-white shadow-xs">
+          <Card className="border-black/[0.06] bg-white shadow-xs">
             <CardContent className="p-4 flex flex-col md:flex-row items-center justify-between gap-4">
               <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
                 {['all', 'meat', 'poultry', 'dairy', 'produce', 'spices', 'dry_goods', 'beverages', 'packaging'].map((cat) => (
@@ -537,8 +537,8 @@ export default function InventoryManagementPage() {
                     onClick={() => setCategoryFilter(cat)}
                     className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                       categoryFilter === cat
-                        ? 'bg-[#C76B4A] text-white'
-                        : 'bg-[#F3F1EB] text-[#777872] hover:bg-[#EAE7E0] hover:text-[#292B28]'
+                        ? 'bg-[#C2B0DC] text-white'
+                        : 'bg-[#F3DA8A]/25 text-[#5A5D58] hover:bg-black/[0.06] hover:text-[#252525]'
                     }`}
                   >
                     {cat.charAt(0).toUpperCase() + cat.slice(1).replace('_', ' ')}
@@ -547,22 +547,22 @@ export default function InventoryManagementPage() {
               </div>
 
               <div className="relative w-full md:w-64">
-                <Search className="w-4 h-4 absolute left-3 top-2.5 text-[#A2A29A]" />
+                <Search className="w-4 h-4 absolute left-3 top-2.5 text-[#8E928B]" />
                 <Input
                   placeholder="Search ingredient or SKU..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9 text-xs h-9 border-[#EAE7E0] bg-[#FAF8F4]"
+                  className="pl-9 text-xs h-9 border-black/[0.06] bg-[#FAF9F6]"
                 />
               </div>
             </CardContent>
           </Card>
 
           {/* Table */}
-          <Card className="border-[#EAE7E0] bg-white shadow-xs overflow-hidden">
+          <Card className="border-black/[0.06] bg-white shadow-xs overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm text-[#292B28]">
-                <thead className="bg-[#FAF8F4] text-xs font-semibold text-[#777872] uppercase tracking-wider border-b border-[#EAE7E0]">
+              <table className="w-full text-left text-sm text-[#252525]">
+                <thead className="bg-[#FAF9F6] text-xs font-semibold text-[#5A5D58] uppercase tracking-wider border-b border-black/[0.06]">
                   <tr>
                     <th className="px-6 py-3.5">Ingredient & SKU</th>
                     <th className="px-6 py-3.5">Category</th>
@@ -574,18 +574,18 @@ export default function InventoryManagementPage() {
                     <th className="px-6 py-3.5 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#EAE7E0]">
+                <tbody className="divide-y divide-black/[0.06]">
                   {isInvLoading ? (
                     <tr>
-                      <td colSpan={8} className="px-6 py-12 text-center text-[#777872]">
-                        <RefreshCw className="w-6 h-6 animate-spin mx-auto text-[#C76B4A] mb-2" />
+                      <td colSpan={8} className="px-6 py-12 text-center text-[#5A5D58]">
+                        <RefreshCw className="w-6 h-6 animate-spin mx-auto text-[#C2B0DC] mb-2" />
                         Loading inventory catalog...
                       </td>
                     </tr>
                   ) : inventoryItems.length === 0 ? (
                     <tr>
-                      <td colSpan={8} className="px-6 py-12 text-center text-[#777872]">
-                        <Boxes className="w-8 h-8 mx-auto text-[#A2A29A] mb-2" />
+                      <td colSpan={8} className="px-6 py-12 text-center text-[#5A5D58]">
+                        <Boxes className="w-8 h-8 mx-auto text-[#8E928B] mb-2" />
                         No raw materials found matching filters.
                       </td>
                     </tr>
@@ -595,39 +595,39 @@ export default function InventoryManagementPage() {
                       const minStockNum = Number(item.minimum_stock);
 
                       return (
-                        <tr key={item.id} className="hover:bg-[#FAF8F4]/50 transition-colors">
+                        <tr key={item.id} className="hover:bg-[#FAF9F6]/50 transition-colors">
                           <td className="px-6 py-4">
-                            <div className="font-semibold text-[#292B28]">{item.name}</div>
-                            <div className="text-xs text-[#A2A29A] font-mono mt-0.5">{item.sku || 'NO-SKU'}</div>
+                            <div className="font-semibold text-[#252525]">{item.name}</div>
+                            <div className="text-xs text-[#8E928B] font-mono mt-0.5">{item.sku || 'NO-SKU'}</div>
                           </td>
 
                           <td className="px-6 py-4">
-                            <span className="capitalize text-xs font-medium text-[#777872] px-2 py-0.5 bg-[#F3F1EB] rounded">
+                            <span className="capitalize text-xs font-medium text-[#5A5D58] px-2 py-0.5 bg-[#F3DA8A]/25 rounded">
                               {item.category.replace('_', ' ')}
                             </span>
                           </td>
 
                           <td className="px-6 py-4">
-                            <div className="font-bold text-sm text-[#292B28]">
-                              {stockNum.toFixed(2)} <span className="text-xs font-normal text-[#777872]">{item.unit}</span>
+                            <div className="font-bold text-sm text-[#252525]">
+                              {stockNum.toFixed(2)} <span className="text-xs font-normal text-[#5A5D58]">{item.unit}</span>
                             </div>
                           </td>
 
                           <td className="px-6 py-4">
-                            <div className="text-xs text-[#777872]">
+                            <div className="text-xs text-[#5A5D58]">
                               {minStockNum.toFixed(2)} {item.unit}
                             </div>
                           </td>
 
                           <td className="px-6 py-4">
-                            <div className="text-xs font-medium text-[#292B28]">
-                              ₹{Number(item.unit_cost).toFixed(2)} <span className="text-[10px] text-[#A2A29A]">/ {item.unit}</span>
+                            <div className="text-xs font-medium text-[#252525]">
+                              ₹{Number(item.unit_cost).toFixed(2)} <span className="text-[10px] text-[#8E928B]">/ {item.unit}</span>
                             </div>
                           </td>
 
                           <td className="px-6 py-4">
-                            <div className="text-xs text-[#292B28] font-medium">{item.supplier?.name || 'Local Market'}</div>
-                            <div className="text-[11px] text-[#A2A29A]">{item.storage_location || 'General Store'}</div>
+                            <div className="text-xs text-[#252525] font-medium">{item.supplier?.name || 'Local Market'}</div>
+                            <div className="text-[11px] text-[#8E928B]">{item.storage_location || 'General Store'}</div>
                           </td>
 
                           <td className="px-6 py-4">{getStatusBadge(item.status)}</td>
@@ -640,7 +640,7 @@ export default function InventoryManagementPage() {
                                 setSelectedItemForAdjust(item);
                                 setIsAdjustStockModalOpen(true);
                               }}
-                              className="h-8 text-xs border-[#EAE7E0] hover:bg-[#F3F1EB] text-[#292B28]"
+                              className="h-8 text-xs border-black/[0.06] hover:bg-[#F3DA8A]/25 text-[#252525]"
                             >
                               <SlidersHorizontal className="w-3 h-3 mr-1" /> Adjust Stock
                             </Button>
@@ -659,19 +659,19 @@ export default function InventoryManagementPage() {
       {/* Tab 2: Low Stock Alerts */}
       {activeTab === 'alerts' && (
         <div className="space-y-4">
-          <Card className="border-[#EAE7E0] bg-white shadow-xs">
+          <Card className="border-black/[0.06] bg-white shadow-xs">
             <CardHeader className="pb-3">
-              <CardTitle className="text-lg flex items-center gap-2 text-[#C84D4D]">
+              <CardTitle className="text-lg flex items-center gap-2 text-[#F2AFC0]">
                 <AlertTriangle className="w-5 h-5" />
                 Critical Replenishment Alerts
               </CardTitle>
-              <CardDescription className="text-xs text-[#777872]">
+              <CardDescription className="text-xs text-[#5A5D58]">
                 The following raw materials have dipped below their safety threshold and require replenishment.
               </CardDescription>
             </CardHeader>
             <CardContent>
               {lowStockAlerts.length === 0 ? (
-                <div className="text-center py-12 text-[#39845C]">
+                <div className="text-center py-12 text-[#B4D58A]">
                   <CheckCircle2 className="w-8 h-8 mx-auto mb-2" />
                   <p className="font-semibold text-sm">All inventory levels are currently above safety thresholds!</p>
                 </div>
@@ -689,29 +689,29 @@ export default function InventoryManagementPage() {
                       >
                         <div>
                           <div className="flex items-center justify-between">
-                            <h4 className="font-bold text-[#292B28] text-sm">{item.name}</h4>
+                            <h4 className="font-bold text-[#252525] text-sm">{item.name}</h4>
                             {getStatusBadge(item.status)}
                           </div>
-                          <p className="text-xs text-[#777872] mt-1 font-mono">SKU: {item.sku || 'N/A'}</p>
+                          <p className="text-xs text-[#5A5D58] mt-1 font-mono">SKU: {item.sku || 'N/A'}</p>
 
                           <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
-                            <div className="bg-white p-2 rounded-lg border border-[#EAE7E0]">
-                              <p className="text-[#A2A29A]">Current Stock</p>
-                              <p className="font-bold text-sm text-[#C84D4D]">{current.toFixed(2)} {item.unit}</p>
+                            <div className="bg-white p-2 rounded-lg border border-black/[0.06]">
+                              <p className="text-[#8E928B]">Current Stock</p>
+                              <p className="font-bold text-sm text-[#F2AFC0]">{current.toFixed(2)} {item.unit}</p>
                             </div>
-                            <div className="bg-white p-2 rounded-lg border border-[#EAE7E0]">
-                              <p className="text-[#A2A29A]">Minimum Reorder</p>
-                              <p className="font-bold text-sm text-[#292B28]">{min.toFixed(2)} {item.unit}</p>
+                            <div className="bg-white p-2 rounded-lg border border-black/[0.06]">
+                              <p className="text-[#8E928B]">Minimum Reorder</p>
+                              <p className="font-bold text-sm text-[#252525]">{min.toFixed(2)} {item.unit}</p>
                             </div>
                           </div>
 
-                          <div className="mt-2 text-xs text-[#777872]">
-                            Supplier: <span className="font-semibold text-[#292B28]">{item.supplier?.name || 'Local Wholesale'}</span>
+                          <div className="mt-2 text-xs text-[#5A5D58]">
+                            Supplier: <span className="font-semibold text-[#252525]">{item.supplier?.name || 'Local Wholesale'}</span>
                           </div>
                         </div>
 
                         <div className="pt-2 border-t border-[#F8D7DA] flex items-center justify-between">
-                          <span className="text-xs text-[#C84D4D] font-semibold">
+                          <span className="text-xs text-[#F2AFC0] font-semibold">
                             Deficit: +{Math.max(0, deficit).toFixed(2)} {item.unit}
                           </span>
 
@@ -730,7 +730,7 @@ export default function InventoryManagementPage() {
                               }
                               setIsCreatePoModalOpen(true);
                             }}
-                            className="h-7 text-xs bg-[#C76B4A] hover:bg-[#AE593B] text-white"
+                            className="h-7 text-xs bg-[#C2B0DC] hover:bg-[#B19CCF] text-white"
                           >
                             Order Now
                           </Button>
@@ -750,38 +750,38 @@ export default function InventoryManagementPage() {
         <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {suppliers.map((sup) => (
-              <Card key={sup.id} className="border-[#EAE7E0] bg-white shadow-xs hover:border-[#C76B4A] transition-all">
+              <Card key={sup.id} className="border-black/[0.06] bg-white shadow-xs hover:border-[#C2B0DC] transition-all">
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-base text-[#292B28] font-bold">{sup.name}</CardTitle>
-                    <Badge className="bg-[#EEF1E9] text-[#39845C] border-none text-[10px] capitalize">{sup.status}</Badge>
+                    <CardTitle className="text-base text-[#252525] font-bold">{sup.name}</CardTitle>
+                    <Badge className="bg-[#B4D58A]/25 text-[#B4D58A] border-none text-[10px] capitalize">{sup.status}</Badge>
                   </div>
-                  <CardDescription className="text-xs text-[#777872]">
+                  <CardDescription className="text-xs text-[#5A5D58]">
                     Contact: {sup.contact_person || 'Representative'}
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-2 text-xs text-[#292B28]">
+                <CardContent className="space-y-2 text-xs text-[#252525]">
                   {sup.phone && (
                     <div className="flex items-center gap-2">
-                      <Phone className="w-3.5 h-3.5 text-[#A2A29A]" />
+                      <Phone className="w-3.5 h-3.5 text-[#8E928B]" />
                       <span>{sup.phone}</span>
                     </div>
                   )}
                   {sup.email && (
                     <div className="flex items-center gap-2">
-                      <Mail className="w-3.5 h-3.5 text-[#A2A29A]" />
+                      <Mail className="w-3.5 h-3.5 text-[#8E928B]" />
                       <span>{sup.email}</span>
                     </div>
                   )}
                   {sup.address && (
-                    <div className="flex items-center gap-2 text-[#777872]">
-                      <Building2 className="w-3.5 h-3.5 text-[#A2A29A]" />
+                    <div className="flex items-center gap-2 text-[#5A5D58]">
+                      <Building2 className="w-3.5 h-3.5 text-[#8E928B]" />
                       <span className="truncate">{sup.address}</span>
                     </div>
                   )}
 
-                  <div className="pt-3 border-t border-[#EAE7E0] flex items-center justify-between text-xs text-[#777872]">
-                    <span>Terms: <strong className="text-[#292B28] uppercase">{sup.payment_terms.replace('_', ' ')}</strong></span>
+                  <div className="pt-3 border-t border-black/[0.06] flex items-center justify-between text-xs text-[#5A5D58]">
+                    <span>Terms: <strong className="text-[#252525] uppercase">{sup.payment_terms.replace('_', ' ')}</strong></span>
                     <span>GST: {sup.tax_number || 'N/A'}</span>
                   </div>
                 </CardContent>
@@ -793,10 +793,10 @@ export default function InventoryManagementPage() {
 
       {/* Tab 4: Purchase Orders */}
       {activeTab === 'orders' && (
-        <Card className="border-[#EAE7E0] bg-white shadow-xs overflow-hidden">
+        <Card className="border-black/[0.06] bg-white shadow-xs overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm text-[#292B28]">
-              <thead className="bg-[#FAF8F4] text-xs font-semibold text-[#777872] uppercase tracking-wider border-b border-[#EAE7E0]">
+            <table className="w-full text-left text-sm text-[#252525]">
+              <thead className="bg-[#FAF9F6] text-xs font-semibold text-[#5A5D58] uppercase tracking-wider border-b border-black/[0.06]">
                 <tr>
                   <th className="px-6 py-3.5">PO Number</th>
                   <th className="px-6 py-3.5">Supplier</th>
@@ -807,28 +807,28 @@ export default function InventoryManagementPage() {
                   <th className="px-6 py-3.5 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#EAE7E0]">
+              <tbody className="divide-y divide-black/[0.06]">
                 {purchaseOrders.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="px-6 py-12 text-center text-[#777872]">
-                      <ClipboardList className="w-8 h-8 mx-auto text-[#A2A29A] mb-2" />
+                    <td colSpan={7} className="px-6 py-12 text-center text-[#5A5D58]">
+                      <ClipboardList className="w-8 h-8 mx-auto text-[#8E928B] mb-2" />
                       No purchase orders recorded yet.
                     </td>
                   </tr>
                 ) : (
                   purchaseOrders.map((po) => (
-                    <tr key={po.id} className="hover:bg-[#FAF8F4]/50 transition-colors">
-                      <td className="px-6 py-4 font-mono font-bold text-xs text-[#292B28]">{po.po_number}</td>
-                      <td className="px-6 py-4 text-xs font-medium text-[#292B28]">{po.supplier?.name}</td>
-                      <td className="px-6 py-4 text-xs text-[#777872]">{po.order_date}</td>
-                      <td className="px-6 py-4 text-xs text-[#777872]">{po.expected_delivery_date || '—'}</td>
-                      <td className="px-6 py-4 text-xs font-bold text-[#292B28]">₹{Number(po.total_amount).toFixed(2)}</td>
+                    <tr key={po.id} className="hover:bg-[#FAF9F6]/50 transition-colors">
+                      <td className="px-6 py-4 font-mono font-bold text-xs text-[#252525]">{po.po_number}</td>
+                      <td className="px-6 py-4 text-xs font-medium text-[#252525]">{po.supplier?.name}</td>
+                      <td className="px-6 py-4 text-xs text-[#5A5D58]">{po.order_date}</td>
+                      <td className="px-6 py-4 text-xs text-[#5A5D58]">{po.expected_delivery_date || '—'}</td>
+                      <td className="px-6 py-4 text-xs font-bold text-[#252525]">₹{Number(po.total_amount).toFixed(2)}</td>
                       <td className="px-6 py-4">
                         <Badge
                           className={`capitalize text-[10px] ${
                             po.status === 'received'
-                              ? 'bg-[#EEF1E9] text-[#39845C] border-none'
-                              : 'bg-[#FEF7EC] text-[#D69A3A] border-none'
+                              ? 'bg-[#B4D58A]/25 text-[#B4D58A] border-none'
+                              : 'bg-[#FEF7EC] text-[#F3DA8A] border-none'
                           }`}
                         >
                           {po.status.replace('_', ' ')}
@@ -847,7 +847,7 @@ export default function InventoryManagementPage() {
                               setReceivedQuantities(initialQtyMap);
                               setIsReceivePoModalOpen(true);
                             }}
-                            className="h-8 text-xs bg-[#39845C] hover:bg-[#2F6B4A] text-white"
+                            className="h-8 text-xs bg-[#B4D58A] hover:bg-[#2F6B4A] text-white"
                           >
                             <PackageCheck className="w-3.5 h-3.5 mr-1" /> Receive Shipment
                           </Button>
@@ -865,18 +865,18 @@ export default function InventoryManagementPage() {
       {/* Modal 1: Add New Material */}
       {isAddItemModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-lg w-full p-6 border border-[#EAE7E0] animate-in fade-in-0 zoom-in-95">
-            <div className="flex items-center justify-between pb-4 border-b border-[#EAE7E0]">
+          <div className="bg-white rounded-xl shadow-xl max-w-lg w-full p-6 border border-black/[0.06] animate-in fade-in-0 zoom-in-95">
+            <div className="flex items-center justify-between pb-4 border-b border-black/[0.06]">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-[#F8EAE3] text-[#C76B4A] flex items-center justify-center">
+                <div className="w-8 h-8 rounded-lg bg-[#C2B0DC]/20 text-[#C2B0DC] flex items-center justify-center">
                   <Boxes className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-[#292B28]">Register Raw Material</h3>
-                  <p className="text-xs text-[#777872]">Add tracked ingredient or kitchen packaging material</p>
+                  <h3 className="font-bold text-[#252525]">Register Raw Material</h3>
+                  <p className="text-xs text-[#5A5D58]">Add tracked ingredient or kitchen packaging material</p>
                 </div>
               </div>
-              <button onClick={() => setIsAddItemModalOpen(false)} className="text-[#A2A29A] hover:text-[#292B28]">
+              <button onClick={() => setIsAddItemModalOpen(false)} className="text-[#8E928B] hover:text-[#252525]">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -901,7 +901,7 @@ export default function InventoryManagementPage() {
             >
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-[#292B28]">Material Name *</label>
+                  <label className="text-xs font-semibold text-[#252525]">Material Name *</label>
                   <Input
                     required
                     placeholder="e.g. Basmati Rice Premium"
@@ -911,7 +911,7 @@ export default function InventoryManagementPage() {
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-[#292B28]">SKU Code</label>
+                  <label className="text-xs font-semibold text-[#252525]">SKU Code</label>
                   <Input
                     placeholder="e.g. ING-RICE-01"
                     value={itemSku}
@@ -923,11 +923,11 @@ export default function InventoryManagementPage() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-[#292B28]">Category *</label>
+                  <label className="text-xs font-semibold text-[#252525]">Category *</label>
                   <select
                     value={itemCategory}
                     onChange={(e) => setItemCategory(e.target.value)}
-                    className="w-full h-9 px-3 rounded-md border border-[#EAE7E0] bg-white text-xs text-[#292B28]"
+                    className="w-full h-9 px-3 rounded-md border border-black/[0.06] bg-white text-xs text-[#252525]"
                   >
                     <option value="produce">Produce & Vegetables</option>
                     <option value="meat">Red Meat</option>
@@ -942,11 +942,11 @@ export default function InventoryManagementPage() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-[#292B28]">Measurement Unit *</label>
+                  <label className="text-xs font-semibold text-[#252525]">Measurement Unit *</label>
                   <select
                     value={itemUnit}
                     onChange={(e) => setItemUnit(e.target.value)}
-                    className="w-full h-9 px-3 rounded-md border border-[#EAE7E0] bg-white text-xs text-[#292B28]"
+                    className="w-full h-9 px-3 rounded-md border border-black/[0.06] bg-white text-xs text-[#252525]"
                   >
                     <option value="kg">Kilograms (kg)</option>
                     <option value="g">Grams (g)</option>
@@ -961,7 +961,7 @@ export default function InventoryManagementPage() {
 
               <div className="grid grid-cols-3 gap-3">
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-[#292B28]">Initial Stock *</label>
+                  <label className="text-xs font-semibold text-[#252525]">Initial Stock *</label>
                   <Input
                     type="number"
                     step="0.01"
@@ -972,7 +972,7 @@ export default function InventoryManagementPage() {
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-[#292B28]">Min Alert Level *</label>
+                  <label className="text-xs font-semibold text-[#252525]">Min Alert Level *</label>
                   <Input
                     type="number"
                     step="0.01"
@@ -983,7 +983,7 @@ export default function InventoryManagementPage() {
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-[#292B28]">Cost per Unit (₹) *</label>
+                  <label className="text-xs font-semibold text-[#252525]">Cost per Unit (₹) *</label>
                   <Input
                     type="number"
                     step="0.01"
@@ -997,11 +997,11 @@ export default function InventoryManagementPage() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-[#292B28]">Preferred Supplier</label>
+                  <label className="text-xs font-semibold text-[#252525]">Preferred Supplier</label>
                   <select
                     value={itemSupplierId}
                     onChange={(e) => setItemSupplierId(e.target.value)}
-                    className="w-full h-9 px-3 rounded-md border border-[#EAE7E0] bg-white text-xs text-[#292B28]"
+                    className="w-full h-9 px-3 rounded-md border border-black/[0.06] bg-white text-xs text-[#252525]"
                   >
                     <option value="">No Supplier Assigned</option>
                     {suppliers.map((s) => (
@@ -1011,7 +1011,7 @@ export default function InventoryManagementPage() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-[#292B28]">Storage Location</label>
+                  <label className="text-xs font-semibold text-[#252525]">Storage Location</label>
                   <Input
                     placeholder="e.g. Walk-in Chiller #2"
                     value={itemLocation}
@@ -1021,7 +1021,7 @@ export default function InventoryManagementPage() {
                 </div>
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-4 border-t border-[#EAE7E0]">
+              <div className="flex items-center justify-end gap-2 pt-4 border-t border-black/[0.06]">
                 <Button
                   type="button"
                   variant="outline"
@@ -1033,7 +1033,7 @@ export default function InventoryManagementPage() {
                 <Button
                   type="submit"
                   disabled={addItemMutation.isPending}
-                  className="text-xs h-9 bg-[#C76B4A] hover:bg-[#AE593B] text-white"
+                  className="text-xs h-9 bg-[#C2B0DC] hover:bg-[#B19CCF] text-white"
                 >
                   {addItemMutation.isPending ? 'Registering...' : 'Register Material'}
                 </Button>
@@ -1046,15 +1046,15 @@ export default function InventoryManagementPage() {
       {/* Modal 2: Adjust Stock / Wastage */}
       {isAdjustStockModalOpen && selectedItemForAdjust && (
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 border border-[#EAE7E0] animate-in fade-in-0 zoom-in-95">
-            <div className="flex items-center justify-between pb-3 border-b border-[#EAE7E0]">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 border border-black/[0.06] animate-in fade-in-0 zoom-in-95">
+            <div className="flex items-center justify-between pb-3 border-b border-black/[0.06]">
               <div>
-                <h3 className="font-bold text-[#292B28]">Adjust Stock Level</h3>
-                <p className="text-xs text-[#777872]">
+                <h3 className="font-bold text-[#252525]">Adjust Stock Level</h3>
+                <p className="text-xs text-[#5A5D58]">
                   {selectedItemForAdjust.name} (Current: {Number(selectedItemForAdjust.current_stock).toFixed(2)} {selectedItemForAdjust.unit})
                 </p>
               </div>
-              <button onClick={() => setIsAdjustStockModalOpen(false)} className="text-[#A2A29A] hover:text-[#292B28]">
+              <button onClick={() => setIsAdjustStockModalOpen(false)} className="text-[#8E928B] hover:text-[#252525]">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -1073,7 +1073,7 @@ export default function InventoryManagementPage() {
               className="space-y-3 pt-4"
             >
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-[#292B28]">Adjustment Type *</label>
+                <label className="text-xs font-semibold text-[#252525]">Adjustment Type *</label>
                 <select
                   value={adjustType}
                   onChange={(e) => {
@@ -1087,7 +1087,7 @@ export default function InventoryManagementPage() {
                       setAdjustReason('Physical audit stock correction');
                     }
                   }}
-                  className="w-full h-9 px-3 rounded-md border border-[#EAE7E0] bg-white text-xs text-[#292B28]"
+                  className="w-full h-9 px-3 rounded-md border border-black/[0.06] bg-white text-xs text-[#252525]"
                 >
                   <option value="wastage">Wastage / Kitchen Prep Loss (Deduction)</option>
                   <option value="spoilage">Spoilage / Expiry (Deduction)</option>
@@ -1098,7 +1098,7 @@ export default function InventoryManagementPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-[#292B28]">
+                <label className="text-xs font-semibold text-[#252525]">
                   Quantity Delta ({selectedItemForAdjust.unit}) *
                 </label>
                 <Input
@@ -1110,11 +1110,11 @@ export default function InventoryManagementPage() {
                   onChange={(e) => setAdjustQty(e.target.value)}
                   className="h-9 text-xs"
                 />
-                <p className="text-[11px] text-[#A2A29A]">Use negative numbers for wastage/loss, positive for additions.</p>
+                <p className="text-[11px] text-[#8E928B]">Use negative numbers for wastage/loss, positive for additions.</p>
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-[#292B28]">Reason *</label>
+                <label className="text-xs font-semibold text-[#252525]">Reason *</label>
                 <Input
                   required
                   placeholder="e.g. Spilled sauce pan, damaged delivery bag"
@@ -1125,7 +1125,7 @@ export default function InventoryManagementPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-[#292B28]">Auditor Notes</label>
+                <label className="text-xs font-semibold text-[#252525]">Auditor Notes</label>
                 <Input
                   placeholder="Logged by Chef or Manager"
                   value={adjustNotes}
@@ -1134,7 +1134,7 @@ export default function InventoryManagementPage() {
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-4 border-t border-[#EAE7E0]">
+              <div className="flex items-center justify-end gap-2 pt-4 border-t border-black/[0.06]">
                 <Button
                   type="button"
                   variant="outline"
@@ -1146,7 +1146,7 @@ export default function InventoryManagementPage() {
                 <Button
                   type="submit"
                   disabled={adjustStockMutation.isPending}
-                  className="text-xs h-9 bg-[#C76B4A] hover:bg-[#AE593B] text-white"
+                  className="text-xs h-9 bg-[#C2B0DC] hover:bg-[#B19CCF] text-white"
                 >
                   {adjustStockMutation.isPending ? 'Saving...' : 'Record Adjustment'}
                 </Button>
@@ -1159,18 +1159,18 @@ export default function InventoryManagementPage() {
       {/* Modal 3: Add Supplier */}
       {isAddSupplierModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-lg w-full p-6 border border-[#EAE7E0] animate-in fade-in-0 zoom-in-95">
-            <div className="flex items-center justify-between pb-4 border-b border-[#EAE7E0]">
+          <div className="bg-white rounded-xl shadow-xl max-w-lg w-full p-6 border border-black/[0.06] animate-in fade-in-0 zoom-in-95">
+            <div className="flex items-center justify-between pb-4 border-b border-black/[0.06]">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-[#EBF3FC] text-[#5185B8] flex items-center justify-center">
+                <div className="w-8 h-8 rounded-lg bg-[#C2B0DC]/20 text-[#C2B0DC] flex items-center justify-center">
                   <Truck className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-[#292B28]">Register New Supplier</h3>
-                  <p className="text-xs text-[#777872]">Vendor profile for purchase orders and material supply</p>
+                  <h3 className="font-bold text-[#252525]">Register New Supplier</h3>
+                  <p className="text-xs text-[#5A5D58]">Vendor profile for purchase orders and material supply</p>
                 </div>
               </div>
-              <button onClick={() => setIsAddSupplierModalOpen(false)} className="text-[#A2A29A] hover:text-[#292B28]">
+              <button onClick={() => setIsAddSupplierModalOpen(false)} className="text-[#8E928B] hover:text-[#252525]">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -1192,7 +1192,7 @@ export default function InventoryManagementPage() {
             >
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-[#292B28]">Supplier Business Name *</label>
+                  <label className="text-xs font-semibold text-[#252525]">Supplier Business Name *</label>
                   <Input
                     required
                     placeholder="e.g. Apex Meat Farms"
@@ -1202,7 +1202,7 @@ export default function InventoryManagementPage() {
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-[#292B28]">Contact Representative</label>
+                  <label className="text-xs font-semibold text-[#252525]">Contact Representative</label>
                   <Input
                     placeholder="e.g. Rajesh Sharma"
                     value={supContact}
@@ -1214,7 +1214,7 @@ export default function InventoryManagementPage() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-[#292B28]">Phone Number</label>
+                  <label className="text-xs font-semibold text-[#252525]">Phone Number</label>
                   <Input
                     placeholder="+91 98765 43210"
                     value={supPhone}
@@ -1223,7 +1223,7 @@ export default function InventoryManagementPage() {
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-[#292B28]">Email Address</label>
+                  <label className="text-xs font-semibold text-[#252525]">Email Address</label>
                   <Input
                     type="email"
                     placeholder="orders@vendor.example.com"
@@ -1235,7 +1235,7 @@ export default function InventoryManagementPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-[#292B28]">Warehouse / Office Address</label>
+                <label className="text-xs font-semibold text-[#252525]">Warehouse / Office Address</label>
                 <Input
                   placeholder="Street, City, Industrial Area"
                   value={supAddress}
@@ -1246,7 +1246,7 @@ export default function InventoryManagementPage() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-[#292B28]">GST / Tax Number</label>
+                  <label className="text-xs font-semibold text-[#252525]">GST / Tax Number</label>
                   <Input
                     placeholder="27AAAAA0000A1Z5"
                     value={supTax}
@@ -1255,11 +1255,11 @@ export default function InventoryManagementPage() {
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-[#292B28]">Payment Terms</label>
+                  <label className="text-xs font-semibold text-[#252525]">Payment Terms</label>
                   <select
                     value={supTerms}
                     onChange={(e) => setSupTerms(e.target.value)}
-                    className="w-full h-9 px-3 rounded-md border border-[#EAE7E0] bg-white text-xs text-[#292B28]"
+                    className="w-full h-9 px-3 rounded-md border border-black/[0.06] bg-white text-xs text-[#252525]"
                   >
                     <option value="net_15">Net 15 Days</option>
                     <option value="net_30">Net 30 Days</option>
@@ -1269,7 +1269,7 @@ export default function InventoryManagementPage() {
                 </div>
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-4 border-t border-[#EAE7E0]">
+              <div className="flex items-center justify-end gap-2 pt-4 border-t border-black/[0.06]">
                 <Button
                   type="button"
                   variant="outline"
@@ -1281,7 +1281,7 @@ export default function InventoryManagementPage() {
                 <Button
                   type="submit"
                   disabled={addSupplierMutation.isPending}
-                  className="text-xs h-9 bg-[#C76B4A] hover:bg-[#AE593B] text-white"
+                  className="text-xs h-9 bg-[#C2B0DC] hover:bg-[#B19CCF] text-white"
                 >
                   {addSupplierMutation.isPending ? 'Saving...' : 'Register Supplier'}
                 </Button>
@@ -1294,18 +1294,18 @@ export default function InventoryManagementPage() {
       {/* Modal 4: Create Purchase Order */}
       {isCreatePoModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-lg w-full p-6 border border-[#EAE7E0] animate-in fade-in-0 zoom-in-95">
-            <div className="flex items-center justify-between pb-3 border-b border-[#EAE7E0]">
+          <div className="bg-white rounded-xl shadow-xl max-w-lg w-full p-6 border border-black/[0.06] animate-in fade-in-0 zoom-in-95">
+            <div className="flex items-center justify-between pb-3 border-b border-black/[0.06]">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-[#FAF8F4] text-[#C76B4A] flex items-center justify-center">
+                <div className="w-8 h-8 rounded-lg bg-[#FAF9F6] text-[#C2B0DC] flex items-center justify-center">
                   <ClipboardList className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-[#292B28]">Issue Purchase Order</h3>
-                  <p className="text-xs text-[#777872]">Order supplies from registered vendor</p>
+                  <h3 className="font-bold text-[#252525]">Issue Purchase Order</h3>
+                  <p className="text-xs text-[#5A5D58]">Order supplies from registered vendor</p>
                 </div>
               </div>
-              <button onClick={() => setIsCreatePoModalOpen(false)} className="text-[#A2A29A] hover:text-[#292B28]">
+              <button onClick={() => setIsCreatePoModalOpen(false)} className="text-[#8E928B] hover:text-[#252525]">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -1330,12 +1330,12 @@ export default function InventoryManagementPage() {
             >
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-[#292B28]">Supplier *</label>
+                  <label className="text-xs font-semibold text-[#252525]">Supplier *</label>
                   <select
                     required
                     value={poSupplierId}
                     onChange={(e) => setPoSupplierId(e.target.value)}
-                    className="w-full h-9 px-3 rounded-md border border-[#EAE7E0] bg-white text-xs text-[#292B28]"
+                    className="w-full h-9 px-3 rounded-md border border-black/[0.06] bg-white text-xs text-[#252525]"
                   >
                     <option value="">Select Vendor...</option>
                     {suppliers.map((s) => (
@@ -1345,7 +1345,7 @@ export default function InventoryManagementPage() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-[#292B28]">Expected Delivery Date</label>
+                  <label className="text-xs font-semibold text-[#252525]">Expected Delivery Date</label>
                   <Input
                     type="date"
                     value={poExpectedDate}
@@ -1358,7 +1358,7 @@ export default function InventoryManagementPage() {
               {/* Items Section */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <label className="text-xs font-semibold text-[#292B28]">Ordered Materials</label>
+                  <label className="text-xs font-semibold text-[#252525]">Ordered Materials</label>
                   <Button
                     type="button"
                     variant="ghost"
@@ -1375,7 +1375,7 @@ export default function InventoryManagementPage() {
                         ]);
                       }
                     }}
-                    className="h-7 text-xs text-[#C76B4A]"
+                    className="h-7 text-xs text-[#C2B0DC]"
                   >
                     + Add Item
                   </Button>
@@ -1385,7 +1385,7 @@ export default function InventoryManagementPage() {
                   {poItems.map((item, idx) => {
                     const inv = inventoryItems.find((i) => i.id === item.inventory_item_id);
                     return (
-                      <div key={idx} className="flex items-center gap-2 p-2 rounded-lg bg-[#FAF8F4] border border-[#EAE7E0]">
+                      <div key={idx} className="flex items-center gap-2 p-2 rounded-lg bg-[#FAF9F6] border border-black/[0.06]">
                         <select
                           value={item.inventory_item_id}
                           onChange={(e) => {
@@ -1399,7 +1399,7 @@ export default function InventoryManagementPage() {
                             };
                             setPoItems(updated);
                           }}
-                          className="w-1/2 h-8 px-2 rounded border border-[#EAE7E0] bg-white text-xs text-[#292B28]"
+                          className="w-1/2 h-8 px-2 rounded border border-black/[0.06] bg-white text-xs text-[#252525]"
                         >
                           {inventoryItems.map((invItem) => (
                             <option key={invItem.id} value={invItem.id}>
@@ -1443,7 +1443,7 @@ export default function InventoryManagementPage() {
                         <button
                           type="button"
                           onClick={() => setPoItems(poItems.filter((_, i) => i !== idx))}
-                          className="text-[#A2A29A] hover:text-[#C84D4D]"
+                          className="text-[#8E928B] hover:text-[#F2AFC0]"
                         >
                           <X className="w-4 h-4" />
                         </button>
@@ -1454,7 +1454,7 @@ export default function InventoryManagementPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-[#292B28]">Order Notes</label>
+                <label className="text-xs font-semibold text-[#252525]">Order Notes</label>
                 <Input
                   placeholder="Special instructions or delivery dock gate info"
                   value={poNotes}
@@ -1463,7 +1463,7 @@ export default function InventoryManagementPage() {
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-4 border-t border-[#EAE7E0]">
+              <div className="flex items-center justify-end gap-2 pt-4 border-t border-black/[0.06]">
                 <Button
                   type="button"
                   variant="outline"
@@ -1475,7 +1475,7 @@ export default function InventoryManagementPage() {
                 <Button
                   type="submit"
                   disabled={createPoMutation.isPending || poItems.length === 0}
-                  className="text-xs h-9 bg-[#C76B4A] hover:bg-[#AE593B] text-white"
+                  className="text-xs h-9 bg-[#C2B0DC] hover:bg-[#B19CCF] text-white"
                 >
                   {createPoMutation.isPending ? 'Issuing...' : 'Issue Purchase Order'}
                 </Button>
@@ -1488,31 +1488,31 @@ export default function InventoryManagementPage() {
       {/* Modal 5: Receive PO Shipment */}
       {isReceivePoModalOpen && selectedPoForReceive && (
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-lg w-full p-6 border border-[#EAE7E0] animate-in fade-in-0 zoom-in-95">
-            <div className="flex items-center justify-between pb-3 border-b border-[#EAE7E0]">
+          <div className="bg-white rounded-xl shadow-xl max-w-lg w-full p-6 border border-black/[0.06] animate-in fade-in-0 zoom-in-95">
+            <div className="flex items-center justify-between pb-3 border-b border-black/[0.06]">
               <div>
-                <h3 className="font-bold text-[#292B28]">Receive Shipment Intake</h3>
-                <p className="text-xs text-[#777872]">
-                  Intake delivery for <span className="font-mono font-bold text-[#292B28]">{selectedPoForReceive.po_number}</span>
+                <h3 className="font-bold text-[#252525]">Receive Shipment Intake</h3>
+                <p className="text-xs text-[#5A5D58]">
+                  Intake delivery for <span className="font-mono font-bold text-[#252525]">{selectedPoForReceive.po_number}</span>
                 </p>
               </div>
-              <button onClick={() => setIsReceivePoModalOpen(false)} className="text-[#A2A29A] hover:text-[#292B28]">
+              <button onClick={() => setIsReceivePoModalOpen(false)} className="text-[#8E928B] hover:text-[#252525]">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <div className="space-y-3 py-4 max-h-64 overflow-y-auto">
               {selectedPoForReceive.items?.map((item) => (
-                <div key={item.id} className="p-3 rounded-lg border border-[#EAE7E0] bg-[#FAF8F4] flex items-center justify-between gap-3">
+                <div key={item.id} className="p-3 rounded-lg border border-black/[0.06] bg-[#FAF9F6] flex items-center justify-between gap-3">
                   <div>
-                    <p className="font-semibold text-xs text-[#292B28]">{item.inventory_item?.name || 'Raw Material'}</p>
-                    <p className="text-[11px] text-[#777872]">
+                    <p className="font-semibold text-xs text-[#252525]">{item.inventory_item?.name || 'Raw Material'}</p>
+                    <p className="text-[11px] text-[#5A5D58]">
                       Ordered: {Number(item.quantity_ordered).toFixed(2)} | Already Recv: {Number(item.quantity_received).toFixed(2)}
                     </p>
                   </div>
 
                   <div className="w-32">
-                    <label className="text-[10px] text-[#777872] block">Receive Now ({item.inventory_item?.unit || 'units'}):</label>
+                    <label className="text-[10px] text-[#5A5D58] block">Receive Now ({item.inventory_item?.unit || 'units'}):</label>
                     <Input
                       type="number"
                       step="0.01"
@@ -1531,7 +1531,7 @@ export default function InventoryManagementPage() {
               ))}
             </div>
 
-            <div className="flex items-center justify-end gap-2 pt-3 border-t border-[#EAE7E0]">
+            <div className="flex items-center justify-end gap-2 pt-3 border-t border-black/[0.06]">
               <Button
                 variant="outline"
                 size="sm"
@@ -1553,7 +1553,7 @@ export default function InventoryManagementPage() {
                   });
                 }}
                 disabled={receivePoMutation.isPending}
-                className="text-xs bg-[#39845C] hover:bg-[#2F6B4A] text-white"
+                className="text-xs bg-[#B4D58A] hover:bg-[#2F6B4A] text-white"
               >
                 {receivePoMutation.isPending ? 'Updating...' : 'Accept Goods & Increment Stock'}
               </Button>

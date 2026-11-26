@@ -124,10 +124,10 @@ export default function RolesPermissionsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="font-serif text-2xl sm:text-3xl font-semibold text-[#292B28]">
+          <h1 className="font-bold text-2xl sm:text-3xl font-semibold text-[#252525]">
             Roles & Permission Matrix
           </h1>
-          <p className="text-xs text-[#777872]">
+          <p className="text-xs text-[#5A5D58]">
             Granular access control matrix enforcing backend policies across all 14 functional modules
           </p>
         </div>
@@ -156,7 +156,7 @@ export default function RolesPermissionsPage() {
       </div>
 
       {/* Role Selector Tabs */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-[#EAE7E0]">
+      <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-black/[0.06]">
         {roles.map((r: any) => {
           const isSelected = r.id === (currentRole?.id ?? selectedRoleId);
           return (
@@ -168,13 +168,13 @@ export default function RolesPermissionsPage() {
               }}
               className={`px-3.5 py-2 rounded-[10px] text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
                 isSelected
-                  ? 'bg-[#C76B4A] text-white shadow-xs'
-                  : 'bg-white border border-[#EAE7E0] text-[#777872] hover:bg-[#FAF8F4] hover:text-[#292B28]'
+                  ? 'bg-[#C2B0DC] text-white shadow-xs'
+                  : 'bg-white border border-black/[0.06] text-[#5A5D58] hover:bg-[#FAF9F6] hover:text-[#252525]'
               }`}
             >
               {r.name}
               {r.is_system_role && (
-                <span className={`ml-1.5 text-[10px] opacity-75 ${isSelected ? 'text-white' : 'text-[#A2A29A]'}`}>
+                <span className={`ml-1.5 text-[10px] opacity-75 ${isSelected ? 'text-white' : 'text-[#8E928B]'}`}>
                   (System)
                 </span>
               )}
@@ -185,7 +185,7 @@ export default function RolesPermissionsPage() {
 
       {/* Current Role Details & Permission Matrix */}
       {currentRole?.name === 'Super Admin' && (
-        <div className="flex items-center gap-3 p-4 rounded-xl bg-[#F8EAE3] border border-[#F2DFD6] text-xs text-[#AE593B]">
+        <div className="flex items-center gap-3 p-4 rounded-xl bg-[#C2B0DC]/20 border border-[#F2DFD6] text-xs text-[#B19CCF]">
           <Info className="h-5 w-5 shrink-0" />
           <span>
             The <strong>Super Admin</strong> role has universal system authorization across all restaurants, branches, financial records, and operational functions by architecture design.
@@ -200,8 +200,8 @@ export default function RolesPermissionsPage() {
           const hasSomeInGroup = perms.some((p) => activePermissions.includes(p.name));
 
           return (
-            <Card key={groupTitle} className="border-[#EAE7E0] hover:border-[#D8D4CA] transition-all">
-              <CardHeader className="p-4 pb-2 border-b border-[#F1EEE8] flex flex-row items-center justify-between">
+            <Card key={groupTitle} className="border-black/[0.06] hover:border-[#D8D4CA] transition-all">
+              <CardHeader className="p-4 pb-2 border-b border-black/[0.04] flex flex-row items-center justify-between">
                 <div>
                   <CardTitle className="text-sm font-semibold">{groupTitle}</CardTitle>
                   <CardDescription className="text-[11px]">
@@ -213,7 +213,7 @@ export default function RolesPermissionsPage() {
                   <button
                     type="button"
                     onClick={() => selectAllInGroup(perms)}
-                    className="text-[11px] font-medium text-[#C76B4A] hover:text-[#AE593B] cursor-pointer"
+                    className="text-[11px] font-medium text-[#C2B0DC] hover:text-[#B19CCF] cursor-pointer"
                   >
                     {hasAllInGroup ? 'Deselect All' : 'Select All'}
                   </button>
@@ -228,7 +228,7 @@ export default function RolesPermissionsPage() {
                     <label
                       key={perm.id}
                       className={`flex items-center justify-between p-2 rounded-lg text-xs cursor-pointer transition-colors ${
-                        isChecked ? 'bg-[#FAF8F4] text-[#292B28]' : 'text-[#777872] hover:bg-[#FAF8F4]/50'
+                        isChecked ? 'bg-[#FAF9F6] text-[#252525]' : 'text-[#5A5D58] hover:bg-[#FAF9F6]/50'
                       }`}
                     >
                       <span className="font-medium">{perm.label}</span>
@@ -237,7 +237,7 @@ export default function RolesPermissionsPage() {
                         checked={isChecked}
                         disabled={currentRole?.name === 'Super Admin'}
                         onChange={() => togglePermission(perm.name)}
-                        className="rounded border-[#EAE7E0] text-[#C76B4A] focus:ring-[#C76B4A] cursor-pointer"
+                        className="rounded border-black/[0.06] text-[#C2B0DC] focus:ring-[#C2B0DC] cursor-pointer"
                       />
                     </label>
                   );
@@ -250,12 +250,12 @@ export default function RolesPermissionsPage() {
 
       {/* Create Custom Role Modal */}
       {isCreateRoleModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#292B28]/40 backdrop-blur-xs p-4">
-          <div className="w-full max-w-sm rounded-2xl bg-white border border-[#EAE7E0] shadow-xl p-6 space-y-4">
-            <div className="flex items-center justify-between pb-2 border-b border-[#EAE7E0]">
-              <h2 className="font-serif text-lg font-semibold text-[#292B28]">Add Custom Role</h2>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#252525]/40 backdrop-blur-xs p-4">
+          <div className="w-full max-w-sm rounded-2xl bg-white border border-black/[0.06] shadow-xl p-6 space-y-4">
+            <div className="flex items-center justify-between pb-2 border-b border-black/[0.06]">
+              <h2 className="font-bold text-lg font-semibold text-[#252525]">Add Custom Role</h2>
               <button onClick={() => setIsCreateRoleModalOpen(false)}>
-                <X className="h-5 w-5 text-[#777872]" />
+                <X className="h-5 w-5 text-[#5A5D58]" />
               </button>
             </div>
             <form

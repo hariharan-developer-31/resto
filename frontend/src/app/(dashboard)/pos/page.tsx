@@ -341,13 +341,13 @@ export default function PosPage() {
   });
 
   return (
-    <div className="flex flex-col lg:flex-row gap-4 h-[calc(100vh-5.5rem)] -m-4 sm:-m-6 p-4 overflow-hidden bg-[#FAF8F4]">
+    <div className="flex flex-col lg:flex-row gap-4 h-[calc(100vh-5.5rem)] -m-4 sm:-m-6 p-4 overflow-hidden bg-[#FAF9F6]">
       {/* LEFT PANE: Tables, Categories & Item Catalog */}
-      <div className="flex-1 flex flex-col min-w-0 bg-white rounded-xl border border-[#EAE7E0] shadow-xs overflow-hidden">
+      <div className="flex-1 flex flex-col min-w-0 bg-white rounded-xl border border-black/[0.06] shadow-xs overflow-hidden">
         {/* TOP BAR: Mode Selector & Table Strip */}
-        <div className="p-3 border-b border-[#EAE7E0] bg-[#FAF8F4]/50 flex flex-wrap items-center justify-between gap-3 shrink-0">
+        <div className="p-3 border-b border-black/[0.06] bg-[#FAF9F6]/50 flex flex-wrap items-center justify-between gap-3 shrink-0">
           {/* Order Type Switcher */}
-          <div className="flex bg-[#F3F1EB] p-1 rounded-lg">
+          <div className="flex bg-[#F3DA8A]/25 p-1 rounded-lg">
             <button
               onClick={() => {
                 setOrderType('dine_in');
@@ -355,8 +355,8 @@ export default function PosPage() {
               }}
               className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${
                 orderType === 'dine_in'
-                  ? 'bg-white text-[#C76B4A] shadow-xs'
-                  : 'text-[#777872] hover:text-[#292B28]'
+                  ? 'bg-white text-[#C2B0DC] shadow-xs'
+                  : 'text-[#5A5D58] hover:text-[#252525]'
               }`}
             >
               🍽️ Dine-In
@@ -369,8 +369,8 @@ export default function PosPage() {
               }}
               className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${
                 orderType === 'takeaway'
-                  ? 'bg-white text-[#C76B4A] shadow-xs'
-                  : 'text-[#777872] hover:text-[#292B28]'
+                  ? 'bg-white text-[#C2B0DC] shadow-xs'
+                  : 'text-[#5A5D58] hover:text-[#252525]'
               }`}
             >
               🛍️ Takeaway
@@ -383,8 +383,8 @@ export default function PosPage() {
               }}
               className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${
                 orderType === 'delivery'
-                  ? 'bg-white text-[#C76B4A] shadow-xs'
-                  : 'text-[#777872] hover:text-[#292B28]'
+                  ? 'bg-white text-[#C2B0DC] shadow-xs'
+                  : 'text-[#5A5D58] hover:text-[#252525]'
               }`}
             >
               🛵 Delivery
@@ -394,7 +394,7 @@ export default function PosPage() {
           {/* Dine-In: Selected Table Banner or Takeaway inputs */}
           {orderType === 'dine_in' ? (
             <div className="flex items-center gap-2 overflow-x-auto max-w-full py-0.5">
-              <span className="text-xs text-[#777872] font-medium shrink-0">Tables:</span>
+              <span className="text-xs text-[#5A5D58] font-medium shrink-0">Tables:</span>
               {tables.map((t: DiningTable) => {
                 const isSelected = selectedTable?.id === t.id;
                 const isOccupied = t.status === 'occupied';
@@ -406,12 +406,12 @@ export default function PosPage() {
                     onClick={() => setSelectedTable(t)}
                     className={`px-2.5 py-1 text-xs font-semibold rounded-md shrink-0 border transition-all flex items-center gap-1.5 ${
                       isSelected
-                        ? 'bg-[#C76B4A] text-white border-[#C76B4A] shadow-xs'
+                        ? 'bg-[#C2B0DC] text-white border-[#C2B0DC] shadow-xs'
                         : isOccupied
-                        ? 'bg-[#EBF3FC] text-[#5185B8] border-[#CFE2F7] hover:bg-[#CFE2F7]'
+                        ? 'bg-[#C2B0DC]/20 text-[#C2B0DC] border-[#CFE2F7] hover:bg-[#CFE2F7]'
                         : isBilled
                         ? 'bg-[#F5EDF9] text-[#8E44AD] border-[#E8D7F1]'
-                        : 'bg-white text-[#292B28] border-[#EAE7E0] hover:bg-[#F3F1EB]'
+                        : 'bg-white text-[#252525] border-black/[0.06] hover:bg-[#F3DA8A]/25'
                     }`}
                   >
                     <span>{t.table_number}</span>
@@ -420,10 +420,10 @@ export default function PosPage() {
                         isSelected
                           ? 'bg-white'
                           : isOccupied
-                          ? 'bg-[#5185B8]'
+                          ? 'bg-[#C2B0DC]'
                           : isBilled
                           ? 'bg-[#8E44AD]'
-                          : 'bg-[#39845C]'
+                          : 'bg-[#B4D58A]'
                       }`}
                     />
                   </button>
@@ -433,7 +433,7 @@ export default function PosPage() {
           ) : (
             <div className="flex items-center gap-2">
               <div className="relative">
-                <User className="absolute left-2.5 top-2 h-3.5 w-3.5 text-[#777872]" />
+                <User className="absolute left-2.5 top-2 h-3.5 w-3.5 text-[#5A5D58]" />
                 <Input
                   placeholder="Customer Name"
                   value={customerName}
@@ -442,7 +442,7 @@ export default function PosPage() {
                 />
               </div>
               <div className="relative">
-                <Phone className="absolute left-2.5 top-2 h-3.5 w-3.5 text-[#777872]" />
+                <Phone className="absolute left-2.5 top-2 h-3.5 w-3.5 text-[#5A5D58]" />
                 <Input
                   placeholder="Phone"
                   value={customerPhone}
@@ -456,7 +456,7 @@ export default function PosPage() {
 
         {/* ACTIVE TABLE ORDER NOTIFICATION BANNER */}
         {orderType === 'dine_in' && selectedTable && activeTableOrder && (
-          <div className="bg-[#EBF3FC] border-b border-[#CFE2F7] px-4 py-2 flex items-center justify-between text-xs text-[#5185B8] shrink-0">
+          <div className="bg-[#C2B0DC]/20 border-b border-[#CFE2F7] px-4 py-2 flex items-center justify-between text-xs text-[#C2B0DC] shrink-0">
             <div className="flex items-center gap-2">
               <span className="font-bold">Table {selectedTable.table_number} has an Active Order</span>
               <span>· {activeTableOrder.order_number}</span>
@@ -464,7 +464,7 @@ export default function PosPage() {
               <span>· Total: ₹{Number(activeTableOrder.total_amount).toFixed(2)}</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-[11px] text-[#5185B8]">Adding items fires Round {activeTableOrder.round_count + 1}</span>
+              <span className="text-[11px] text-[#C2B0DC]">Adding items fires Round {activeTableOrder.round_count + 1}</span>
               <Button
                 size="sm"
                 variant="outline"
@@ -472,7 +472,7 @@ export default function PosPage() {
                   setSettlementOrder(activeTableOrder);
                   setTenderAmount(Number(activeTableOrder.total_amount));
                 }}
-                className="h-7 px-2.5 text-xs bg-white text-[#5185B8] border-[#5185B8] hover:bg-[#EBF3FC]"
+                className="h-7 px-2.5 text-xs bg-white text-[#C2B0DC] border-[#C2B0DC] hover:bg-[#C2B0DC]/20"
               >
                 Settle Table Bill
               </Button>
@@ -481,10 +481,10 @@ export default function PosPage() {
         )}
 
         {/* SEARCH & FILTERS BAR */}
-        <div className="p-3 border-b border-[#EAE7E0] flex flex-wrap items-center justify-between gap-2 shrink-0">
+        <div className="p-3 border-b border-black/[0.06] flex flex-wrap items-center justify-between gap-2 shrink-0">
           {/* Search Box */}
           <div className="relative flex-1 min-w-[200px]">
-            <Search className="absolute left-3 top-2.5 h-3.5 w-3.5 text-[#777872]" />
+            <Search className="absolute left-3 top-2.5 h-3.5 w-3.5 text-[#5A5D58]" />
             <Input
               placeholder="Search food by name, code..."
               value={searchQuery}
@@ -494,7 +494,7 @@ export default function PosPage() {
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="absolute right-2.5 top-2.5 text-[#777872] hover:text-[#292B28]"
+                className="absolute right-2.5 top-2.5 text-[#5A5D58] hover:text-[#252525]"
               >
                 <X className="h-3.5 w-3.5" />
               </button>
@@ -502,11 +502,11 @@ export default function PosPage() {
           </div>
 
           {/* Veg / Non-Veg Quick Filter */}
-          <div className="flex items-center gap-1 bg-[#F3F1EB] p-1 rounded-lg text-xs">
+          <div className="flex items-center gap-1 bg-[#F3DA8A]/25 p-1 rounded-lg text-xs">
             <button
               onClick={() => setTypeFilter('all')}
               className={`px-2.5 py-1 rounded font-medium transition-all ${
-                typeFilter === 'all' ? 'bg-white text-[#292B28] shadow-xs' : 'text-[#777872]'
+                typeFilter === 'all' ? 'bg-white text-[#252525] shadow-xs' : 'text-[#5A5D58]'
               }`}
             >
               All
@@ -514,30 +514,30 @@ export default function PosPage() {
             <button
               onClick={() => setTypeFilter('veg')}
               className={`px-2.5 py-1 rounded font-medium flex items-center gap-1 transition-all ${
-                typeFilter === 'veg' ? 'bg-[#39845C] text-white shadow-xs' : 'text-[#39845C]'
+                typeFilter === 'veg' ? 'bg-[#B4D58A] text-white shadow-xs' : 'text-[#B4D58A]'
               }`}
             >
-              <span className="h-2 w-2 rounded-full bg-[#39845C] border border-white" /> Veg
+              <span className="h-2 w-2 rounded-full bg-[#B4D58A] border border-white" /> Veg
             </button>
             <button
               onClick={() => setTypeFilter('non_veg')}
               className={`px-2.5 py-1 rounded font-medium flex items-center gap-1 transition-all ${
-                typeFilter === 'non_veg' ? 'bg-[#C84D4D] text-white shadow-xs' : 'text-[#C84D4D]'
+                typeFilter === 'non_veg' ? 'bg-[#F2AFC0] text-white shadow-xs' : 'text-[#F2AFC0]'
               }`}
             >
-              <span className="h-2 w-2 rounded-full bg-[#C84D4D] border border-white" /> Non-Veg
+              <span className="h-2 w-2 rounded-full bg-[#F2AFC0] border border-white" /> Non-Veg
             </button>
           </div>
         </div>
 
         {/* CATEGORY TABS STRIP */}
-        <div className="px-3 py-2 border-b border-[#EAE7E0] bg-[#FAF8F4] overflow-x-auto flex gap-1.5 shrink-0">
+        <div className="px-3 py-2 border-b border-black/[0.06] bg-[#FAF9F6] overflow-x-auto flex gap-1.5 shrink-0">
           <button
             onClick={() => setSelectedCategory('all')}
             className={`px-3 py-1.5 text-xs font-semibold rounded-lg shrink-0 transition-all ${
               selectedCategory === 'all'
-                ? 'bg-[#C76B4A] text-white shadow-xs'
-                : 'bg-white text-[#777872] border border-[#EAE7E0] hover:bg-[#F3F1EB]'
+                ? 'bg-[#C2B0DC] text-white shadow-xs'
+                : 'bg-white text-[#5A5D58] border border-black/[0.06] hover:bg-[#F3DA8A]/25'
             }`}
           >
             All Items ({menuItems.length})
@@ -548,8 +548,8 @@ export default function PosPage() {
               onClick={() => setSelectedCategory(String(cat.id))}
               className={`px-3 py-1.5 text-xs font-semibold rounded-lg shrink-0 transition-all ${
                 selectedCategory === String(cat.id)
-                  ? 'bg-[#C76B4A] text-white shadow-xs'
-                  : 'bg-white text-[#777872] border border-[#EAE7E0] hover:bg-[#F3F1EB]'
+                  ? 'bg-[#C2B0DC] text-white shadow-xs'
+                  : 'bg-white text-[#5A5D58] border border-black/[0.06] hover:bg-[#F3DA8A]/25'
               }`}
             >
               {cat.name}
@@ -562,12 +562,12 @@ export default function PosPage() {
           {itemsLoading ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3">
               {[...Array(8)].map((_, i) => (
-                <div key={i} className="h-28 rounded-xl bg-[#F3F1EB] animate-pulse" />
+                <div key={i} className="h-28 rounded-xl bg-[#F3DA8A]/25 animate-pulse" />
               ))}
             </div>
           ) : filteredItems.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-48 text-[#777872]">
-              <UtensilsCrossed className="h-8 w-8 mb-2 stroke-1 text-[#A2A29A]" />
+            <div className="flex flex-col items-center justify-center h-48 text-[#5A5D58]">
+              <UtensilsCrossed className="h-8 w-8 mb-2 stroke-1 text-[#8E928B]" />
               <p className="text-sm font-medium">No dishes match your filter criteria.</p>
             </div>
           ) : (
@@ -584,8 +584,8 @@ export default function PosPage() {
                     onClick={() => handleItemClick(item)}
                     className={`p-3 rounded-xl border text-left flex flex-col justify-between transition-all group relative ${
                       item.is_available
-                        ? 'bg-white border-[#EAE7E0] hover:border-[#C76B4A] hover:shadow-xs active:scale-[0.98]'
-                        : 'bg-[#F9F9F8] border-[#EAE7E0] opacity-50 cursor-not-allowed'
+                        ? 'bg-white border-black/[0.06] hover:border-[#C2B0DC] hover:shadow-xs active:scale-[0.98]'
+                        : 'bg-[#F9F9F8] border-black/[0.06] opacity-50 cursor-not-allowed'
                     }`}
                   >
                     <div>
@@ -593,38 +593,38 @@ export default function PosPage() {
                       <div className="flex items-center justify-between mb-1.5">
                         <div
                           className={`h-3 w-3 rounded-sm border flex items-center justify-center p-0.5 ${
-                            isVeg ? 'border-[#39845C]' : 'border-[#C84D4D]'
+                            isVeg ? 'border-[#B4D58A]' : 'border-[#F2AFC0]'
                           }`}
                         >
                           <div
                             className={`h-1.5 w-1.5 rounded-full ${
-                              isVeg ? 'bg-[#39845C]' : 'bg-[#C84D4D]'
+                              isVeg ? 'bg-[#B4D58A]' : 'bg-[#F2AFC0]'
                             }`}
                           />
                         </div>
-                        <span className="text-[10px] text-[#777872] uppercase font-mono tracking-wider bg-[#F3F1EB] px-1.5 py-0.5 rounded">
+                        <span className="text-[10px] text-[#5A5D58] uppercase font-mono tracking-wider bg-[#F3DA8A]/25 px-1.5 py-0.5 rounded">
                           {item.kitchen_station}
                         </span>
                       </div>
 
                       {/* Name */}
-                      <h4 className="text-xs font-semibold text-[#292B28] line-clamp-2 leading-tight">
+                      <h4 className="text-xs font-semibold text-[#252525] line-clamp-2 leading-tight">
                         {item.name}
                       </h4>
                     </div>
 
                     {/* Bottom: Price and Variant Tag */}
-                    <div className="mt-2 pt-2 border-t border-[#F1EEE8] flex items-center justify-between">
-                      <span className="text-xs font-bold text-[#C76B4A]">
+                    <div className="mt-2 pt-2 border-t border-black/[0.04] flex items-center justify-between">
+                      <span className="text-xs font-bold text-[#C2B0DC]">
                         ₹{Number(item.base_price).toFixed(2)}
                       </span>
 
                       {hasVariants || hasAddons ? (
-                        <span className="text-[10px] text-[#777872] bg-[#FAF8F4] px-1.5 py-0.5 rounded border border-[#EAE7E0]">
+                        <span className="text-[10px] text-[#5A5D58] bg-[#FAF9F6] px-1.5 py-0.5 rounded border border-black/[0.06]">
                           Customize +
                         </span>
                       ) : (
-                        <span className="h-5 w-5 rounded-full bg-[#F8EAE3] text-[#C76B4A] flex items-center justify-center group-hover:bg-[#C76B4A] group-hover:text-white transition-colors">
+                        <span className="h-5 w-5 rounded-full bg-[#C2B0DC]/20 text-[#C2B0DC] flex items-center justify-center group-hover:bg-[#C2B0DC] group-hover:text-white transition-colors">
                           <Plus className="h-3 w-3" />
                         </span>
                       )}
@@ -638,17 +638,17 @@ export default function PosPage() {
       </div>
 
       {/* RIGHT PANE: Order Cart, KOT Dispatch & Bill Settlement */}
-      <div className="w-full lg:w-96 flex flex-col bg-white rounded-xl border border-[#EAE7E0] shadow-xs overflow-hidden shrink-0">
+      <div className="w-full lg:w-96 flex flex-col bg-white rounded-xl border border-black/[0.06] shadow-xs overflow-hidden shrink-0">
         {/* Cart Header */}
-        <div className="p-3.5 border-b border-[#EAE7E0] bg-[#FAF8F4]/80 flex items-center justify-between shrink-0">
+        <div className="p-3.5 border-b border-black/[0.06] bg-[#FAF9F6]/80 flex items-center justify-between shrink-0">
           <div>
             <div className="flex items-center gap-1.5">
-              <h3 className="font-bold text-sm text-[#292B28]">Order Cart</h3>
+              <h3 className="font-bold text-sm text-[#252525]">Order Cart</h3>
               <Badge variant="outline" className="text-[10px] uppercase font-semibold">
                 {orderType.replace('_', ' ')}
               </Badge>
             </div>
-            <p className="text-[11px] text-[#777872] mt-0.5">
+            <p className="text-[11px] text-[#5A5D58] mt-0.5">
               {orderType === 'dine_in'
                 ? selectedTable
                   ? `Table ${selectedTable.table_number} · ${selectedTable.location}`
@@ -662,7 +662,7 @@ export default function PosPage() {
           {cart.length > 0 && (
             <button
               onClick={() => setCart([])}
-              className="text-xs text-[#C84D4D] hover:underline font-medium flex items-center gap-1"
+              className="text-xs text-[#F2AFC0] hover:underline font-medium flex items-center gap-1"
             >
               <Trash2 className="h-3 w-3" /> Clear
             </button>
@@ -671,7 +671,7 @@ export default function PosPage() {
 
         {/* Error message if any */}
         {errorMsg && (
-          <div className="bg-[#FDF2F2] border-b border-[#F9D6D6] px-3 py-2 text-xs text-[#C84D4D] flex items-center justify-between">
+          <div className="bg-[#FDF2F2] border-b border-[#F9D6D6] px-3 py-2 text-xs text-[#F2AFC0] flex items-center justify-between">
             <span>{errorMsg}</span>
             <button onClick={() => setErrorMsg(null)}>
               <X className="h-3.5 w-3.5" />
@@ -680,11 +680,11 @@ export default function PosPage() {
         )}
 
         {/* Cart Items List */}
-        <div className="flex-1 p-3 overflow-y-auto divide-y divide-[#F1EEE8]">
+        <div className="flex-1 p-3 overflow-y-auto divide-y divide-black/[0.04]">
           {cart.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center text-center p-6 text-[#777872]">
-              <Receipt className="h-10 w-10 mb-2 stroke-1 text-[#A2A29A]" />
-              <p className="text-xs font-semibold text-[#292B28]">Cart is empty</p>
+            <div className="h-full flex flex-col items-center justify-center text-center p-6 text-[#5A5D58]">
+              <Receipt className="h-10 w-10 mb-2 stroke-1 text-[#8E928B]" />
+              <p className="text-xs font-semibold text-[#252525]">Cart is empty</p>
               <p className="text-[11px] mt-0.5">
                 Click any dish from the catalog to add items to this order.
               </p>
@@ -698,11 +698,11 @@ export default function PosPage() {
                 <div key={item.cartItemId} className="py-2.5 flex items-start justify-between gap-2">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5">
-                      <span className="text-xs font-semibold text-[#292B28] leading-tight">
+                      <span className="text-xs font-semibold text-[#252525] leading-tight">
                         {item.name}
                       </span>
                       {item.variantName && (
-                        <span className="text-[10px] bg-[#F8EAE3] text-[#C76B4A] px-1.5 py-0.2 rounded font-medium">
+                        <span className="text-[10px] bg-[#C2B0DC]/20 text-[#C2B0DC] px-1.5 py-0.2 rounded font-medium">
                           {item.variantName}
                         </span>
                       )}
@@ -710,35 +710,35 @@ export default function PosPage() {
 
                     {/* Addons List */}
                     {item.addons.length > 0 && (
-                      <div className="text-[10px] text-[#777872] mt-0.5">
+                      <div className="text-[10px] text-[#5A5D58] mt-0.5">
                         + {item.addons.map((a) => `${a.name} (₹${a.price})`).join(', ')}
                       </div>
                     )}
 
                     {/* Special Note */}
                     {item.specialInstructions && (
-                      <div className="text-[10px] italic text-[#C76B4A] mt-0.5">
+                      <div className="text-[10px] italic text-[#C2B0DC] mt-0.5">
                         Note: {item.specialInstructions}
                       </div>
                     )}
 
-                    <div className="text-xs font-bold text-[#292B28] mt-1">
+                    <div className="text-xs font-bold text-[#252525] mt-1">
                       ₹{itemTotal.toFixed(2)}
                     </div>
                   </div>
 
                   {/* Quantity Stepper */}
-                  <div className="flex items-center gap-1.5 bg-[#FAF8F4] border border-[#EAE7E0] rounded-lg p-0.5">
+                  <div className="flex items-center gap-1.5 bg-[#FAF9F6] border border-black/[0.06] rounded-lg p-0.5">
                     <button
                       onClick={() => updateCartQuantity(item.cartItemId, -1)}
-                      className="h-6 w-6 rounded flex items-center justify-center text-[#777872] hover:bg-white hover:text-[#292B28] transition-colors"
+                      className="h-6 w-6 rounded flex items-center justify-center text-[#5A5D58] hover:bg-white hover:text-[#252525] transition-colors"
                     >
                       <Minus className="h-3 w-3" />
                     </button>
                     <span className="text-xs font-bold w-4 text-center">{item.quantity}</span>
                     <button
                       onClick={() => updateCartQuantity(item.cartItemId, 1)}
-                      className="h-6 w-6 rounded flex items-center justify-center text-[#777872] hover:bg-white hover:text-[#292B28] transition-colors"
+                      className="h-6 w-6 rounded flex items-center justify-center text-[#5A5D58] hover:bg-white hover:text-[#252525] transition-colors"
                     >
                       <Plus className="h-3 w-3" />
                     </button>
@@ -750,32 +750,32 @@ export default function PosPage() {
         </div>
 
         {/* Cart Calculation & Settle Footer */}
-        <div className="p-3.5 border-t border-[#EAE7E0] bg-[#FAF8F4]/50 shrink-0 space-y-2">
+        <div className="p-3.5 border-t border-black/[0.06] bg-[#FAF9F6]/50 shrink-0 space-y-2">
           {/* Subtotal, Tax, Charges Breakdown */}
           <div className="space-y-1 text-xs">
-            <div className="flex justify-between text-[#777872]">
+            <div className="flex justify-between text-[#5A5D58]">
               <span>Subtotal</span>
-              <span className="font-semibold text-[#292B28]">₹{subtotal.toFixed(2)}</span>
+              <span className="font-semibold text-[#252525]">₹{subtotal.toFixed(2)}</span>
             </div>
-            <div className="flex justify-between text-[#777872]">
+            <div className="flex justify-between text-[#5A5D58]">
               <span>Taxes (5% GST)</span>
-              <span className="font-semibold text-[#292B28]">₹{taxAmount.toFixed(2)}</span>
+              <span className="font-semibold text-[#252525]">₹{taxAmount.toFixed(2)}</span>
             </div>
             {packagingCharge > 0 && (
-              <div className="flex justify-between text-[#777872]">
+              <div className="flex justify-between text-[#5A5D58]">
                 <span>Packaging Charge</span>
-                <span className="font-semibold text-[#292B28]">₹{packagingCharge.toFixed(2)}</span>
+                <span className="font-semibold text-[#252525]">₹{packagingCharge.toFixed(2)}</span>
               </div>
             )}
             {discountAmount > 0 && (
-              <div className="flex justify-between text-[#39845C]">
+              <div className="flex justify-between text-[#B4D58A]">
                 <span>Discount Applied</span>
                 <span className="font-semibold">-₹{discountAmount.toFixed(2)}</span>
               </div>
             )}
-            <div className="pt-2 border-t border-[#EAE7E0] flex justify-between items-baseline">
-              <span className="font-bold text-sm text-[#292B28]">Grand Total</span>
-              <span className="font-bold text-lg text-[#C76B4A]">₹{grandTotal.toFixed(2)}</span>
+            <div className="pt-2 border-t border-black/[0.06] flex justify-between items-baseline">
+              <span className="font-bold text-sm text-[#252525]">Grand Total</span>
+              <span className="font-bold text-lg text-[#C2B0DC]">₹{grandTotal.toFixed(2)}</span>
             </div>
           </div>
 
@@ -785,7 +785,7 @@ export default function PosPage() {
             <Button
               disabled={cart.length === 0 || fireKotMutation.isPending}
               onClick={() => fireKotMutation.mutate()}
-              className="bg-[#C76B4A] hover:bg-[#AE593B] text-white text-xs font-semibold h-10 flex items-center justify-center gap-1.5 shadow-xs"
+              className="bg-[#C2B0DC] hover:bg-[#B19CCF] text-white text-xs font-semibold h-10 flex items-center justify-center gap-1.5 shadow-xs"
             >
               <Send className="h-3.5 w-3.5" />
               {fireKotMutation.isPending ? 'Sending...' : 'Fire KOT'}
@@ -807,7 +807,7 @@ export default function PosPage() {
                   });
                 }
               }}
-              className="border-[#66745B] text-[#66745B] hover:bg-[#EEF1E9] text-xs font-semibold h-10 flex items-center justify-center gap-1.5"
+              className="border-[#B4D58A] text-[#B4D58A] hover:bg-[#B4D58A]/25 text-xs font-semibold h-10 flex items-center justify-center gap-1.5"
             >
               <Receipt className="h-3.5 w-3.5" />
               Settle Bill
@@ -819,15 +819,15 @@ export default function PosPage() {
       {/* MODAL 1: Item Customization (Variants & Addons) */}
       {customizingItem && (
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full border border-[#EAE7E0] shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-            <div className="p-4 border-b border-[#EAE7E0] flex items-center justify-between bg-[#FAF8F4]">
+          <div className="bg-white rounded-2xl max-w-md w-full border border-black/[0.06] shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+            <div className="p-4 border-b border-black/[0.06] flex items-center justify-between bg-[#FAF9F6]">
               <div>
-                <h3 className="font-bold text-base text-[#292B28]">{customizingItem.name}</h3>
-                <span className="text-xs text-[#777872]">Configure portion and add-on options</span>
+                <h3 className="font-bold text-base text-[#252525]">{customizingItem.name}</h3>
+                <span className="text-xs text-[#5A5D58]">Configure portion and add-on options</span>
               </div>
               <button
                 onClick={() => setCustomizingItem(null)}
-                className="text-[#777872] hover:text-[#292B28]"
+                className="text-[#5A5D58] hover:text-[#252525]"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -837,7 +837,7 @@ export default function PosPage() {
               {/* Variants */}
               {customizingItem.variants?.length > 0 && (
                 <div>
-                  <label className="text-xs font-bold text-[#292B28] block mb-2 uppercase tracking-wide">
+                  <label className="text-xs font-bold text-[#252525] block mb-2 uppercase tracking-wide">
                     Select Portion / Size
                   </label>
                   <div className="space-y-2">
@@ -847,8 +847,8 @@ export default function PosPage() {
                         onClick={() => setSelectedVariant(variant)}
                         className={`p-3 rounded-xl border flex items-center justify-between cursor-pointer transition-all ${
                           selectedVariant?.id === variant.id
-                            ? 'bg-[#F8EAE3] border-[#C76B4A] text-[#292B28] font-semibold'
-                            : 'bg-white border-[#EAE7E0] hover:bg-[#FAF8F4]'
+                            ? 'bg-[#C2B0DC]/20 border-[#C2B0DC] text-[#252525] font-semibold'
+                            : 'bg-white border-black/[0.06] hover:bg-[#FAF9F6]'
                         }`}
                       >
                         <div className="flex items-center gap-2">
@@ -857,11 +857,11 @@ export default function PosPage() {
                             name="variant"
                             checked={selectedVariant?.id === variant.id}
                             onChange={() => setSelectedVariant(variant)}
-                            className="text-[#C76B4A] focus:ring-[#C76B4A]"
+                            className="text-[#C2B0DC] focus:ring-[#C2B0DC]"
                           />
                           <span className="text-xs">{variant.name}</span>
                         </div>
-                        <span className="text-xs font-bold text-[#C76B4A]">
+                        <span className="text-xs font-bold text-[#C2B0DC]">
                           ₹{Number(variant.price).toFixed(2)}
                         </span>
                       </label>
@@ -873,7 +873,7 @@ export default function PosPage() {
               {/* Addons */}
               {customizingItem.addons?.length > 0 && (
                 <div>
-                  <label className="text-xs font-bold text-[#292B28] block mb-2 uppercase tracking-wide">
+                  <label className="text-xs font-bold text-[#252525] block mb-2 uppercase tracking-wide">
                     Optional Add-ons
                   </label>
                   <div className="space-y-2">
@@ -884,8 +884,8 @@ export default function PosPage() {
                           key={addon.id}
                           className={`p-3 rounded-xl border flex items-center justify-between cursor-pointer transition-all ${
                             isSelected
-                              ? 'bg-[#EEF1E9] border-[#66745B] text-[#292B28] font-semibold'
-                              : 'bg-white border-[#EAE7E0] hover:bg-[#FAF8F4]'
+                              ? 'bg-[#B4D58A]/25 border-[#B4D58A] text-[#252525] font-semibold'
+                              : 'bg-white border-black/[0.06] hover:bg-[#FAF9F6]'
                           }`}
                         >
                           <div className="flex items-center gap-2">
@@ -899,11 +899,11 @@ export default function PosPage() {
                                   setSelectedAddons(selectedAddons.filter((a) => a.id !== addon.id));
                                 }
                               }}
-                              className="rounded text-[#66745B] focus:ring-[#66745B]"
+                              className="rounded text-[#B4D58A] focus:ring-[#B4D58A]"
                             />
                             <span className="text-xs">{addon.name}</span>
                           </div>
-                          <span className="text-xs font-semibold text-[#66745B]">
+                          <span className="text-xs font-semibold text-[#B4D58A]">
                             +₹{Number(addon.price).toFixed(2)}
                           </span>
                         </label>
@@ -915,7 +915,7 @@ export default function PosPage() {
 
               {/* Cooking Instructions */}
               <div>
-                <label className="text-xs font-bold text-[#292B28] block mb-1.5 uppercase tracking-wide">
+                <label className="text-xs font-bold text-[#252525] block mb-1.5 uppercase tracking-wide">
                   Kitchen Notes / Instructions
                 </label>
                 <Input
@@ -927,8 +927,8 @@ export default function PosPage() {
               </div>
             </div>
 
-            <div className="p-4 border-t border-[#EAE7E0] bg-[#FAF8F4] flex items-center justify-between">
-              <span className="text-xs font-bold text-[#292B28]">
+            <div className="p-4 border-t border-black/[0.06] bg-[#FAF9F6] flex items-center justify-between">
+              <span className="text-xs font-bold text-[#252525]">
                 Item Price: ₹
                 {(
                   (selectedVariant ? Number(selectedVariant.price) : Number(customizingItem.base_price)) +
@@ -939,7 +939,7 @@ export default function PosPage() {
                 onClick={() =>
                   addToCartDirect(customizingItem, selectedVariant, selectedAddons, itemNote)
                 }
-                className="bg-[#C76B4A] hover:bg-[#AE593B] text-white text-xs font-semibold px-4 h-9"
+                className="bg-[#C2B0DC] hover:bg-[#B19CCF] text-white text-xs font-semibold px-4 h-9"
               >
                 Add to Cart
               </Button>
@@ -951,39 +951,39 @@ export default function PosPage() {
       {/* MODAL 2: Kitchen Order Ticket (KOT) Generated */}
       {kotData && (
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-sm w-full border border-[#EAE7E0] shadow-2xl p-5 space-y-4">
-            <div className="text-center pb-3 border-b border-dashed border-[#EAE7E0]">
-              <div className="h-10 w-10 bg-[#39845C]/10 text-[#39845C] rounded-full flex items-center justify-center mx-auto mb-2">
+          <div className="bg-white rounded-2xl max-w-sm w-full border border-black/[0.06] shadow-2xl p-5 space-y-4">
+            <div className="text-center pb-3 border-b border-dashed border-black/[0.06]">
+              <div className="h-10 w-10 bg-[#B4D58A]/10 text-[#B4D58A] rounded-full flex items-center justify-center mx-auto mb-2">
                 <CheckCircle2 className="h-6 w-6" />
               </div>
-              <h3 className="font-bold text-base text-[#292B28]">KOT Dispatched to Kitchen</h3>
-              <p className="text-xs font-mono font-bold text-[#C76B4A] mt-0.5">
+              <h3 className="font-bold text-base text-[#252525]">KOT Dispatched to Kitchen</h3>
+              <p className="text-xs font-mono font-bold text-[#C2B0DC] mt-0.5">
                 {kotData.kot_number}
               </p>
-              <p className="text-[11px] text-[#777872]">
+              <p className="text-[11px] text-[#5A5D58]">
                 Order {kotData.order?.order_number} · Round {kotData.round_number}
               </p>
             </div>
 
             <div className="space-y-2 max-h-52 overflow-y-auto text-xs">
               {kotData.new_items?.map((item: any, idx: number) => (
-                <div key={idx} className="flex justify-between items-start py-1 border-b border-[#F1EEE8]">
+                <div key={idx} className="flex justify-between items-start py-1 border-b border-black/[0.04]">
                   <div>
-                    <span className="font-semibold text-[#292B28]">
+                    <span className="font-semibold text-[#252525]">
                       {item.quantity}x {item.item_name}
                     </span>
                     {item.variant_name && (
-                      <span className="text-[10px] text-[#777872] block">
+                      <span className="text-[10px] text-[#5A5D58] block">
                         Portion: {item.variant_name}
                       </span>
                     )}
                     {item.special_instructions && (
-                      <span className="text-[10px] text-[#C76B4A] italic block">
+                      <span className="text-[10px] text-[#C2B0DC] italic block">
                         Note: {item.special_instructions}
                       </span>
                     )}
                   </div>
-                  <span className="text-[10px] bg-[#F3F1EB] px-1.5 py-0.5 rounded uppercase font-mono">
+                  <span className="text-[10px] bg-[#F3DA8A]/25 px-1.5 py-0.5 rounded uppercase font-mono">
                     {item.kitchen_station}
                   </span>
                 </div>
@@ -1000,7 +1000,7 @@ export default function PosPage() {
               </Button>
               <Button
                 onClick={() => setKotData(null)}
-                className="flex-1 bg-[#C76B4A] hover:bg-[#AE593B] text-white text-xs h-9"
+                className="flex-1 bg-[#C2B0DC] hover:bg-[#B19CCF] text-white text-xs h-9"
               >
                 Done
               </Button>
@@ -1012,34 +1012,34 @@ export default function PosPage() {
       {/* MODAL 3: Bill Settlement & Payment Collection */}
       {settlementOrder && (
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full border border-[#EAE7E0] shadow-2xl p-5 space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-[#EAE7E0]">
+          <div className="bg-white rounded-2xl max-w-md w-full border border-black/[0.06] shadow-2xl p-5 space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-black/[0.06]">
               <div>
-                <h3 className="font-bold text-base text-[#292B28]">Settle Table Bill</h3>
-                <p className="text-xs text-[#777872]">
+                <h3 className="font-bold text-base text-[#252525]">Settle Table Bill</h3>
+                <p className="text-xs text-[#5A5D58]">
                   {settlementOrder.order_number} ·{' '}
                   {settlementOrder.table ? `Table ${settlementOrder.table.table_number}` : 'Counter'}
                 </p>
               </div>
               <button
                 onClick={() => setSettlementOrder(null)}
-                className="text-[#777872] hover:text-[#292B28]"
+                className="text-[#5A5D58] hover:text-[#252525]"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
 
             {/* Total Due Banner */}
-            <div className="bg-[#FAF8F4] p-3 rounded-xl border border-[#EAE7E0] flex items-center justify-between">
-              <span className="text-xs font-semibold text-[#777872]">Total Amount Due</span>
-              <span className="text-xl font-bold text-[#C76B4A]">
+            <div className="bg-[#FAF9F6] p-3 rounded-xl border border-black/[0.06] flex items-center justify-between">
+              <span className="text-xs font-semibold text-[#5A5D58]">Total Amount Due</span>
+              <span className="text-xl font-bold text-[#C2B0DC]">
                 ₹{Number(settlementOrder.total_amount).toFixed(2)}
               </span>
             </div>
 
             {/* Payment Mode Tabs */}
             <div>
-              <label className="text-xs font-bold text-[#292B28] block mb-2 uppercase tracking-wide">
+              <label className="text-xs font-bold text-[#252525] block mb-2 uppercase tracking-wide">
                 Payment Mode
               </label>
               <div className="grid grid-cols-4 gap-2">
@@ -1048,8 +1048,8 @@ export default function PosPage() {
                   onClick={() => setPaymentMode('cash')}
                   className={`p-2.5 rounded-xl border text-center transition-all ${
                     paymentMode === 'cash'
-                      ? 'bg-[#F8EAE3] border-[#C76B4A] text-[#C76B4A] font-bold shadow-xs'
-                      : 'bg-white border-[#EAE7E0] text-[#777872]'
+                      ? 'bg-[#C2B0DC]/20 border-[#C2B0DC] text-[#C2B0DC] font-bold shadow-xs'
+                      : 'bg-white border-black/[0.06] text-[#5A5D58]'
                   }`}
                 >
                   <Banknote className="h-4 w-4 mx-auto mb-1" />
@@ -1060,8 +1060,8 @@ export default function PosPage() {
                   onClick={() => setPaymentMode('upi')}
                   className={`p-2.5 rounded-xl border text-center transition-all ${
                     paymentMode === 'upi'
-                      ? 'bg-[#F8EAE3] border-[#C76B4A] text-[#C76B4A] font-bold shadow-xs'
-                      : 'bg-white border-[#EAE7E0] text-[#777872]'
+                      ? 'bg-[#C2B0DC]/20 border-[#C2B0DC] text-[#C2B0DC] font-bold shadow-xs'
+                      : 'bg-white border-black/[0.06] text-[#5A5D58]'
                   }`}
                 >
                   <Smartphone className="h-4 w-4 mx-auto mb-1" />
@@ -1072,8 +1072,8 @@ export default function PosPage() {
                   onClick={() => setPaymentMode('card')}
                   className={`p-2.5 rounded-xl border text-center transition-all ${
                     paymentMode === 'card'
-                      ? 'bg-[#F8EAE3] border-[#C76B4A] text-[#C76B4A] font-bold shadow-xs'
-                      : 'bg-white border-[#EAE7E0] text-[#777872]'
+                      ? 'bg-[#C2B0DC]/20 border-[#C2B0DC] text-[#C2B0DC] font-bold shadow-xs'
+                      : 'bg-white border-black/[0.06] text-[#5A5D58]'
                   }`}
                 >
                   <CreditCard className="h-4 w-4 mx-auto mb-1" />
@@ -1084,8 +1084,8 @@ export default function PosPage() {
                   onClick={() => setPaymentMode('split')}
                   className={`p-2.5 rounded-xl border text-center transition-all ${
                     paymentMode === 'split'
-                      ? 'bg-[#F8EAE3] border-[#C76B4A] text-[#C76B4A] font-bold shadow-xs'
-                      : 'bg-white border-[#EAE7E0] text-[#777872]'
+                      ? 'bg-[#C2B0DC]/20 border-[#C2B0DC] text-[#C2B0DC] font-bold shadow-xs'
+                      : 'bg-white border-black/[0.06] text-[#5A5D58]'
                   }`}
                 >
                   <Layers className="h-4 w-4 mx-auto mb-1" />
@@ -1097,7 +1097,7 @@ export default function PosPage() {
             {/* Cash Tender Calculation */}
             {paymentMode === 'cash' && (
               <div className="space-y-2">
-                <div className="flex justify-between items-center text-xs font-semibold text-[#292B28]">
+                <div className="flex justify-between items-center text-xs font-semibold text-[#252525]">
                   <span>Cash Received</span>
                   <span>Change: ₹{Math.max(0, tenderAmount - Number(settlementOrder.total_amount)).toFixed(2)}</span>
                 </div>
@@ -1106,7 +1106,7 @@ export default function PosPage() {
                   value={tenderAmount || ''}
                   onChange={(e) => setTenderAmount(Number(e.target.value))}
                   placeholder="Enter Cash Tender Amount"
-                  className="text-base font-bold text-[#292B28]"
+                  className="text-base font-bold text-[#252525]"
                 />
                 <div className="flex gap-1.5">
                   {[
@@ -1119,7 +1119,7 @@ export default function PosPage() {
                       key={val}
                       type="button"
                       onClick={() => setTenderAmount(val)}
-                      className="px-2.5 py-1 text-xs bg-[#F3F1EB] rounded hover:bg-[#EAE7E0] font-semibold text-[#292B28]"
+                      className="px-2.5 py-1 text-xs bg-[#F3DA8A]/25 rounded hover:bg-black/[0.06] font-semibold text-[#252525]"
                     >
                       ₹{val}
                     </button>
@@ -1133,7 +1133,7 @@ export default function PosPage() {
               <div className="space-y-2">
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <label className="text-[11px] font-semibold text-[#777872]">Cash Portion</label>
+                    <label className="text-[11px] font-semibold text-[#5A5D58]">Cash Portion</label>
                     <Input
                       type="number"
                       value={splitPayments[0].amount || ''}
@@ -1147,7 +1147,7 @@ export default function PosPage() {
                     />
                   </div>
                   <div>
-                    <label className="text-[11px] font-semibold text-[#777872]">UPI Portion</label>
+                    <label className="text-[11px] font-semibold text-[#5A5D58]">UPI Portion</label>
                     <Input
                       type="number"
                       value={splitPayments[1].amount || ''}
@@ -1161,9 +1161,9 @@ export default function PosPage() {
                     />
                   </div>
                 </div>
-                <div className="text-[11px] text-[#777872] flex justify-between">
+                <div className="text-[11px] text-[#5A5D58] flex justify-between">
                   <span>Total Split Entered:</span>
-                  <span className="font-bold text-[#292B28]">
+                  <span className="font-bold text-[#252525]">
                     ₹{(splitPayments[0].amount + splitPayments[1].amount).toFixed(2)}
                   </span>
                 </div>
@@ -1173,7 +1173,7 @@ export default function PosPage() {
             <Button
               disabled={settleBillMutation.isPending}
               onClick={() => settleBillMutation.mutate()}
-              className="w-full bg-[#39845C] hover:bg-[#2e6b4a] text-white text-xs font-semibold h-10 shadow-xs"
+              className="w-full bg-[#B4D58A] hover:bg-[#2e6b4a] text-white text-xs font-semibold h-10 shadow-xs"
             >
               {settleBillMutation.isPending ? 'Processing Settlement...' : 'Complete Payment & Close Table'}
             </Button>
@@ -1184,52 +1184,52 @@ export default function PosPage() {
       {/* MODAL 4: Final Tax Invoice Receipt */}
       {invoiceData && (
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-sm w-full border border-[#EAE7E0] shadow-2xl p-6 space-y-4">
-            <div className="text-center pb-3 border-b border-dashed border-[#EAE7E0]">
-              <h3 className="font-serif text-lg font-bold text-[#292B28]">THE GRAND FEAST</h3>
-              <p className="text-[11px] text-[#777872]">Downtown Flagship Branch</p>
-              <p className="text-[11px] text-[#777872]">GSTIN: 33AAAAA0000A1Z5</p>
-              <div className="mt-2 py-1 bg-[#FAF8F4] rounded border border-[#EAE7E0] font-mono text-xs font-bold text-[#C76B4A]">
+          <div className="bg-white rounded-2xl max-w-sm w-full border border-black/[0.06] shadow-2xl p-6 space-y-4">
+            <div className="text-center pb-3 border-b border-dashed border-black/[0.06]">
+              <h3 className="font-bold text-lg font-bold text-[#252525]">THE GRAND FEAST</h3>
+              <p className="text-[11px] text-[#5A5D58]">Downtown Flagship Branch</p>
+              <p className="text-[11px] text-[#5A5D58]">GSTIN: 33AAAAA0000A1Z5</p>
+              <div className="mt-2 py-1 bg-[#FAF9F6] rounded border border-black/[0.06] font-mono text-xs font-bold text-[#C2B0DC]">
                 INVOICE: {invoiceData.invoice_number}
               </div>
             </div>
 
             <div className="text-xs space-y-1.5 py-1">
-              <div className="flex justify-between text-[#777872]">
+              <div className="flex justify-between text-[#5A5D58]">
                 <span>Date & Time</span>
-                <span className="text-[#292B28]">{new Date().toLocaleString()}</span>
+                <span className="text-[#252525]">{new Date().toLocaleString()}</span>
               </div>
-              <div className="flex justify-between text-[#777872]">
+              <div className="flex justify-between text-[#5A5D58]">
                 <span>Billed To</span>
-                <span className="text-[#292B28]">
+                <span className="text-[#252525]">
                   {invoiceData.order?.table
                     ? `Table ${invoiceData.order.table.table_number}`
                     : 'Counter Customer'}
                 </span>
               </div>
-              <div className="flex justify-between text-[#777872]">
+              <div className="flex justify-between text-[#5A5D58]">
                 <span>Settled By</span>
-                <span className="text-[#292B28]">{user?.name}</span>
+                <span className="text-[#252525]">{user?.name}</span>
               </div>
             </div>
 
-            <div className="border-t border-b border-dashed border-[#EAE7E0] py-2 space-y-1 text-xs">
-              <div className="flex justify-between text-[#777872]">
+            <div className="border-t border-b border-dashed border-black/[0.06] py-2 space-y-1 text-xs">
+              <div className="flex justify-between text-[#5A5D58]">
                 <span>Subtotal</span>
                 <span>₹{Number(invoiceData.order?.subtotal || 0).toFixed(2)}</span>
               </div>
-              <div className="flex justify-between text-[#777872]">
+              <div className="flex justify-between text-[#5A5D58]">
                 <span>GST (5%)</span>
                 <span>₹{Number(invoiceData.order?.tax_amount || 0).toFixed(2)}</span>
               </div>
-              <div className="flex justify-between font-bold text-sm text-[#292B28] pt-1">
+              <div className="flex justify-between font-bold text-sm text-[#252525] pt-1">
                 <span>Total Paid</span>
-                <span className="text-[#39845C]">
+                <span className="text-[#B4D58A]">
                   ₹{Number(invoiceData.order?.paid_amount || invoiceData.order?.total_amount).toFixed(2)}
                 </span>
               </div>
               {invoiceData.change_amount > 0 && (
-                <div className="flex justify-between text-xs text-[#777872]">
+                <div className="flex justify-between text-xs text-[#5A5D58]">
                   <span>Change Returned</span>
                   <span>₹{Number(invoiceData.change_amount).toFixed(2)}</span>
                 </div>
@@ -1246,7 +1246,7 @@ export default function PosPage() {
               </Button>
               <Button
                 onClick={() => setInvoiceData(null)}
-                className="flex-1 bg-[#C76B4A] hover:bg-[#AE593B] text-white text-xs h-9"
+                className="flex-1 bg-[#C2B0DC] hover:bg-[#B19CCF] text-white text-xs h-9"
               >
                 Close
               </Button>

@@ -3,24 +3,34 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const badgeVariants = cva(
-  "inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium transition-colors",
+  "inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold tracking-wide transition-all",
   {
     variants: {
       variant: {
         default:
-          "bg-[#F8EAE3] text-[#AE593B] border border-[#F2DFD6]",
+          "bg-[#C2B0DC] text-white shadow-xs",
+        lilac:
+          "bg-[#C2B0DC] text-white shadow-xs",
+        mint:
+          "bg-[#B4D58A] text-[#252525] shadow-xs",
+        butter:
+          "bg-[#F3DA8A] text-[#252525] shadow-xs",
+        pink:
+          "bg-[#F2AFC0] text-white shadow-xs",
+        white:
+          "bg-white text-[#252525] shadow-[0_2px_10px_rgba(60,40,80,0.12)]",
         secondary:
-          "bg-[#EEF1E9] text-[#66745B] border border-[#E0E5DA]",
+          "bg-[#B4D58A] text-[#252525]",
         success:
-          "bg-[#EBF5EF] text-[#39845C] border border-[#D5EAD9]",
+          "bg-[#B4D58A] text-[#252525]",
         warning:
-          "bg-[#FBF5EA] text-[#D69A3A] border border-[#F5E6CC]",
+          "bg-[#F3DA8A] text-[#252525]",
         info:
-          "bg-[#EBF3FC] text-[#5185B8] border border-[#CFE2F7]",
+          "bg-[#C2B0DC] text-white",
         danger:
-          "bg-[#FDF0F0] text-[#C84D4D] border border-[#F8DADA]",
+          "bg-[#F2AFC0] text-white",
         outline:
-          "border border-[#EAE7E0] text-[#777872] bg-white",
+          "border border-[#252525]/15 text-[#252525] bg-white/80",
       },
     },
     defaultVariants: {

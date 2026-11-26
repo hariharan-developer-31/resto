@@ -7,9 +7,7 @@ import {
   Menu,
   Building2,
   GitBranch,
-  ShieldCheck,
-  Activity,
-  CheckCircle2,
+  Sparkles,
 } from 'lucide-react';
 
 interface TopbarProps {
@@ -31,20 +29,20 @@ export function Topbar({ onMenuClick }: TopbarProps) {
   );
 
   return (
-    <header className="sticky top-0 z-30 flex h-18 w-full items-center justify-between border-b border-[#EAE7E0] bg-[#FFFFFF]/90 backdrop-blur-md px-4 sm:px-6">
+    <header className="sticky top-0 z-30 flex h-20 w-full items-center justify-between bg-white/80 backdrop-blur-xl px-6 sm:px-8 border-b border-black/[0.04]">
       {/* Left: Mobile hamburger + Tenant Selectors */}
-      <div className="flex items-center gap-3 sm:gap-4">
+      <div className="flex items-center gap-4">
         <button
           onClick={onMenuClick}
-          className="p-2 text-[#777872] hover:text-[#292B28] hover:bg-[#FAF8F4] rounded-lg md:hidden"
+          className="p-2.5 text-[#252525] hover:bg-[#C2B0DC]/20 rounded-2xl md:hidden transition-colors"
         >
           <Menu className="h-5 w-5" />
         </button>
 
         {/* Restaurant Switcher */}
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1.5 px-3 py-1.5 bg-[#FAF8F4] border border-[#EAE7E0] rounded-[10px] text-xs font-medium text-[#292B28]">
-            <Building2 className="h-3.5 w-3.5 text-[#C76B4A]" />
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 px-4 py-2 bg-[#C2B0DC]/15 rounded-2xl text-xs font-semibold text-[#252525]">
+            <Building2 className="h-4 w-4 text-[#C2B0DC]" />
             {availableRestaurants.length > 1 ? (
               <select
                 value={activeRestaurant?.id || ''}
@@ -54,7 +52,7 @@ export function Topbar({ onMenuClick }: TopbarProps) {
                   );
                   setActiveRestaurant(selected || null);
                 }}
-                className="bg-transparent font-medium text-[#292B28] outline-none cursor-pointer pr-1"
+                className="bg-transparent font-semibold text-[#252525] outline-none cursor-pointer pr-1"
               >
                 {availableRestaurants.map((r) => (
                   <option key={r.id} value={r.id}>
@@ -69,8 +67,8 @@ export function Topbar({ onMenuClick }: TopbarProps) {
 
           {/* Branch Switcher */}
           {activeRestaurant && availableBranches.length > 0 && (
-            <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-[#FAF8F4] border border-[#EAE7E0] rounded-[10px] text-xs font-medium text-[#292B28]">
-              <GitBranch className="h-3.5 w-3.5 text-[#66745B]" />
+            <div className="hidden sm:flex items-center gap-2 px-4 py-2 bg-[#B4D58A]/20 rounded-2xl text-xs font-semibold text-[#252525]">
+              <GitBranch className="h-4 w-4 text-[#252525]" />
               {availableBranches.length > 1 ? (
                 <select
                   value={activeBranch?.id || ''}
@@ -80,7 +78,7 @@ export function Topbar({ onMenuClick }: TopbarProps) {
                     );
                     setActiveBranch(selected || null);
                   }}
-                  className="bg-transparent font-medium text-[#292B28] outline-none cursor-pointer pr-1"
+                  className="bg-transparent font-semibold text-[#252525] outline-none cursor-pointer pr-1"
                 >
                   {availableBranches.map((b) => (
                     <option key={b.id} value={b.id}>
@@ -99,18 +97,18 @@ export function Topbar({ onMenuClick }: TopbarProps) {
       {/* Right: Status Pill & Profile */}
       <div className="flex items-center gap-3">
         {/* System Health Badge */}
-        <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#EBF5EF] border border-[#D5EAD9] text-xs font-medium text-[#39845C]">
-          <span className="h-2 w-2 rounded-full bg-[#39845C] animate-pulse" />
-          <span>API Connected</span>
+        <div className="hidden md:flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#B4D58A]/25 text-xs font-bold text-[#252525]">
+          <span className="h-2 w-2 rounded-full bg-[#B4D58A] animate-pulse" />
+          <span className="tracking-wide">API CONNECTED</span>
         </div>
 
         {/* User Role Badge */}
         {user?.is_super_admin ? (
-          <Badge variant="default" className="text-[11px] font-semibold">
+          <Badge variant="lilac" className="text-xs uppercase tracking-wider py-1 px-3">
             Super Admin
           </Badge>
         ) : (
-          <Badge variant="secondary" className="text-[11px] font-semibold">
+          <Badge variant="butter" className="text-xs uppercase tracking-wider py-1 px-3">
             {user?.roles?.[0] || 'Staff'}
           </Badge>
         )}

@@ -50,7 +50,7 @@ export default function RestaurantsPage() {
   const [currency, setCurrency] = useState('INR');
   const [currencySymbol, setCurrencySymbol] = useState('₹');
   const [timezone, setTimezone] = useState('Asia/Kolkata');
-  const [primaryColor, setPrimaryColor] = useState('#C76B4A');
+  const [primaryColor, setPrimaryColor] = useState('#C2B0DC');
   const [description, setDescription] = useState('');
 
   // Fetch restaurants
@@ -77,7 +77,7 @@ export default function RestaurantsPage() {
     setCurrency('INR');
     setCurrencySymbol('₹');
     setTimezone('Asia/Kolkata');
-    setPrimaryColor('#C76B4A');
+    setPrimaryColor('#C2B0DC');
     setDescription('');
     setIsModalOpen(true);
   };
@@ -93,7 +93,7 @@ export default function RestaurantsPage() {
     setCurrency(r.currency || 'INR');
     setCurrencySymbol(r.currency_symbol || '₹');
     setTimezone(r.timezone || 'Asia/Kolkata');
-    setPrimaryColor(r.primary_color || '#C76B4A');
+    setPrimaryColor(r.primary_color || '#C2B0DC');
     setDescription(r.description || '');
     setIsModalOpen(true);
   };
@@ -177,10 +177,10 @@ export default function RestaurantsPage() {
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="font-serif text-2xl sm:text-3xl font-semibold text-[#292B28]">
+          <h1 className="font-bold text-2xl sm:text-3xl font-semibold text-[#252525]">
             Restaurant Management
           </h1>
-          <p className="text-xs text-[#777872]">
+          <p className="text-xs text-[#5A5D58]">
             Provision and configure tenant restaurant entities, branding, and billing currencies
           </p>
         </div>
@@ -196,27 +196,27 @@ export default function RestaurantsPage() {
       {/* Filter / Search Bar */}
       <div className="flex items-center gap-3">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#A2A29A]" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#8E928B]" />
           <input
             type="text"
             placeholder="Search restaurants by name, slug or email..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full h-10 pl-9 pr-4 rounded-[10px] border border-[#EAE7E0] bg-white text-sm text-[#292B28] placeholder:text-[#A2A29A] outline-none focus:border-[#C76B4A]"
+            className="w-full h-10 pl-9 pr-4 rounded-[10px] border border-black/[0.06] bg-white text-sm text-[#252525] placeholder:text-[#8E928B] outline-none focus:border-[#C2B0DC]"
           />
         </div>
       </div>
 
       {/* Restaurants List Cards */}
       {isLoading ? (
-        <div className="py-16 text-center text-sm text-[#777872]">
+        <div className="py-16 text-center text-sm text-[#5A5D58]">
           Loading restaurants...
         </div>
       ) : restaurants.length === 0 ? (
-        <Card className="border-[#EAE7E0] p-12 text-center">
-          <Store className="h-12 w-12 text-[#A2A29A] mx-auto mb-3" />
-          <h3 className="font-serif text-lg font-semibold text-[#292B28]">No Restaurants Found</h3>
-          <p className="text-xs text-[#777872] mt-1 max-w-sm mx-auto">
+        <Card className="border-black/[0.06] p-12 text-center">
+          <Store className="h-12 w-12 text-[#8E928B] mx-auto mb-3" />
+          <h3 className="font-bold text-lg font-semibold text-[#252525]">No Restaurants Found</h3>
+          <p className="text-xs text-[#5A5D58] mt-1 max-w-sm mx-auto">
             {search ? 'No restaurant records match your search criteria.' : 'Create your first restaurant to begin multi-tenant operations.'}
           </p>
           <Button onClick={openCreateModal} variant="outline" size="sm" className="mt-4 gap-2">
@@ -226,20 +226,20 @@ export default function RestaurantsPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {restaurants.map((r: any) => (
-            <Card key={r.id} className="border-[#EAE7E0] hover:border-[#D8D4CA] transition-all flex flex-col justify-between">
+            <Card key={r.id} className="border-black/[0.06] hover:border-[#D8D4CA] transition-all flex flex-col justify-between">
               <div>
                 <CardHeader className="p-5 pb-3">
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-center gap-3">
                       <div
-                        className="h-10 w-10 rounded-xl flex items-center justify-center text-white font-serif font-bold text-lg shadow-2xs"
-                        style={{ backgroundColor: r.primary_color || '#C76B4A' }}
+                        className="h-10 w-10 rounded-xl flex items-center justify-center text-white font-bold font-bold text-lg shadow-2xs"
+                        style={{ backgroundColor: r.primary_color || '#C2B0DC' }}
                       >
                         {r.name.charAt(0)}
                       </div>
                       <div>
                         <CardTitle className="text-base font-semibold leading-tight">{r.name}</CardTitle>
-                        <span className="font-mono text-[11px] text-[#777872] block mt-0.5">
+                        <span className="font-mono text-[11px] text-[#5A5D58] block mt-0.5">
                           slug: {r.slug}
                         </span>
                       </div>
@@ -251,29 +251,29 @@ export default function RestaurantsPage() {
                   </div>
 
                   {r.description && (
-                    <p className="text-xs text-[#777872] line-clamp-2 mt-2 leading-relaxed">
+                    <p className="text-xs text-[#5A5D58] line-clamp-2 mt-2 leading-relaxed">
                       {r.description}
                     </p>
                   )}
                 </CardHeader>
 
                 <CardContent className="p-5 pt-0 space-y-2">
-                  <div className="grid grid-cols-3 gap-2 py-2.5 px-3 bg-[#FAF8F4] rounded-xl border border-[#F1EEE8] text-center">
+                  <div className="grid grid-cols-3 gap-2 py-2.5 px-3 bg-[#FAF9F6] rounded-xl border border-black/[0.04] text-center">
                     <div>
-                      <span className="text-[10px] uppercase font-semibold text-[#777872] block">Branches</span>
-                      <span className="font-semibold text-sm text-[#292B28]">{r.branches_count ?? 0}</span>
+                      <span className="text-[10px] uppercase font-semibold text-[#5A5D58] block">Branches</span>
+                      <span className="font-semibold text-sm text-[#252525]">{r.branches_count ?? 0}</span>
                     </div>
                     <div>
-                      <span className="text-[10px] uppercase font-semibold text-[#777872] block">Staff</span>
-                      <span className="font-semibold text-sm text-[#292B28]">{r.users_count ?? 0}</span>
+                      <span className="text-[10px] uppercase font-semibold text-[#5A5D58] block">Staff</span>
+                      <span className="font-semibold text-sm text-[#252525]">{r.users_count ?? 0}</span>
                     </div>
                     <div>
-                      <span className="text-[10px] uppercase font-semibold text-[#777872] block">Currency</span>
-                      <span className="font-semibold text-sm text-[#292B28]">{r.currency_symbol} {r.currency}</span>
+                      <span className="text-[10px] uppercase font-semibold text-[#5A5D58] block">Currency</span>
+                      <span className="font-semibold text-sm text-[#252525]">{r.currency_symbol} {r.currency}</span>
                     </div>
                   </div>
 
-                  <div className="space-y-1 text-xs text-[#777872] pt-1">
+                  <div className="space-y-1 text-xs text-[#5A5D58] pt-1">
                     {r.phone && <p>📞 {r.phone}</p>}
                     {r.email && <p>✉️ {r.email}</p>}
                     {r.gst_number && <p className="font-mono text-[11px]">GST: {r.gst_number}</p>}
@@ -282,10 +282,10 @@ export default function RestaurantsPage() {
               </div>
 
               {/* Card Footer Actions */}
-              <div className="p-4 border-t border-[#F1EEE8] bg-[#FAF8F4]/50 flex items-center justify-between rounded-b-2xl">
+              <div className="p-4 border-t border-black/[0.04] bg-[#FAF9F6]/50 flex items-center justify-between rounded-b-2xl">
                 <Link href={`/restaurants/${r.id}/branches`}>
                   <Button variant="outline" size="sm" className="gap-1.5 text-xs h-8">
-                    <GitBranch className="h-3.5 w-3.5 text-[#66745B]" />
+                    <GitBranch className="h-3.5 w-3.5 text-[#B4D58A]" />
                     Branches ({r.branches_count ?? 0})
                   </Button>
                 </Link>
@@ -296,8 +296,8 @@ export default function RestaurantsPage() {
                     title={r.is_active ? 'Deactivate' : 'Activate'}
                     className={`p-1.5 rounded-lg border transition-colors ${
                       r.is_active 
-                        ? 'text-[#39845C] border-[#D5EAD9] bg-[#EBF5EF] hover:bg-[#D5EAD9]' 
-                        : 'text-[#A2A29A] border-[#EAE7E0] bg-white hover:bg-[#F3F1EB]'
+                        ? 'text-[#B4D58A] border-[#D5EAD9] bg-[#B4D58A]/20 hover:bg-[#D5EAD9]' 
+                        : 'text-[#8E928B] border-black/[0.06] bg-white hover:bg-[#F3DA8A]/25'
                     }`}
                   >
                     <Power className="h-3.5 w-3.5" />
@@ -305,14 +305,14 @@ export default function RestaurantsPage() {
                   <button
                     onClick={() => openEditModal(r)}
                     title="Edit"
-                    className="p-1.5 rounded-lg border border-[#EAE7E0] text-[#777872] hover:text-[#292B28] hover:bg-white transition-colors"
+                    className="p-1.5 rounded-lg border border-black/[0.06] text-[#5A5D58] hover:text-[#252525] hover:bg-white transition-colors"
                   >
                     <Edit className="h-3.5 w-3.5" />
                   </button>
                   <button
                     onClick={() => handleDelete(r.id, r.name)}
                     title="Archive"
-                    className="p-1.5 rounded-lg border border-[#EAE7E0] text-[#C84D4D] hover:bg-[#FDF0F0] hover:border-[#F8DADA] transition-colors"
+                    className="p-1.5 rounded-lg border border-black/[0.06] text-[#F2AFC0] hover:bg-[#F2AFC0]/20 hover:border-[#F8DADA] transition-colors"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                   </button>
@@ -325,15 +325,15 @@ export default function RestaurantsPage() {
 
       {/* Create / Edit Restaurant Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#292B28]/40 backdrop-blur-xs p-4">
-          <div className="w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-2xl bg-white border border-[#EAE7E0] shadow-xl p-6 space-y-5">
-            <div className="flex items-center justify-between pb-3 border-b border-[#EAE7E0]">
-              <h2 className="font-serif text-xl font-semibold text-[#292B28]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#252525]/40 backdrop-blur-xs p-4">
+          <div className="w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-2xl bg-white border border-black/[0.06] shadow-xl p-6 space-y-5">
+            <div className="flex items-center justify-between pb-3 border-b border-black/[0.06]">
+              <h2 className="font-bold text-xl font-semibold text-[#252525]">
                 {editingRestaurant ? 'Edit Restaurant Profile' : 'Create New Restaurant'}
               </h2>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="p-1.5 text-[#777872] hover:text-[#292B28] rounded-lg hover:bg-[#FAF8F4]"
+                className="p-1.5 text-[#5A5D58] hover:text-[#252525] rounded-lg hover:bg-[#FAF9F6]"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -417,14 +417,14 @@ export default function RestaurantsPage() {
                 <Input
                   label="Brand Color"
                   type="text"
-                  placeholder="#C76B4A"
+                  placeholder="#C2B0DC"
                   value={primaryColor}
                   onChange={(e) => setPrimaryColor(e.target.value)}
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold uppercase tracking-wider text-[#777872]">
+                <label className="text-xs font-semibold uppercase tracking-wider text-[#5A5D58]">
                   Description / Hospitality Concept
                 </label>
                 <textarea
@@ -432,11 +432,11 @@ export default function RestaurantsPage() {
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Brief description of culinary concept, cuisine, and service format..."
-                  className="w-full rounded-[10px] border border-[#EAE7E0] p-3 text-sm text-[#292B28] placeholder:text-[#A2A29A] outline-none focus:border-[#C76B4A]"
+                  className="w-full rounded-[10px] border border-black/[0.06] p-3 text-sm text-[#252525] placeholder:text-[#8E928B] outline-none focus:border-[#C2B0DC]"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-3 pt-3 border-t border-[#EAE7E0]">
+              <div className="flex items-center justify-end gap-3 pt-3 border-t border-black/[0.06]">
                 <Button
                   type="button"
                   variant="outline"

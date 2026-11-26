@@ -271,10 +271,10 @@ export default function MenuCatalogPage() {
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="font-serif text-2xl sm:text-3xl font-semibold text-[#292B28]">
+          <h1 className="font-bold text-2xl sm:text-3xl font-semibold text-[#252525]">
             Menu Catalog & Kitchen Stations
           </h1>
-          <p className="text-xs text-[#777872]">
+          <p className="text-xs text-[#5A5D58]">
             Organize food categories, preparation times, variants, and add-ons for {activeRestaurant?.name}
           </p>
         </div>
@@ -307,13 +307,13 @@ export default function MenuCatalogPage() {
       </div>
 
       {/* Category Tabs */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-[#EAE7E0]">
+      <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-black/[0.06]">
         <button
           onClick={() => setSelectedCategoryId(null)}
           className={`px-3.5 py-1.5 rounded-[10px] text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
             selectedCategoryId === null
-              ? 'bg-[#C76B4A] text-white shadow-xs'
-              : 'bg-white border border-[#EAE7E0] text-[#777872] hover:bg-[#FAF8F4] hover:text-[#292B28]'
+              ? 'bg-[#C2B0DC] text-white shadow-xs'
+              : 'bg-white border border-black/[0.06] text-[#5A5D58] hover:bg-[#FAF9F6] hover:text-[#252525]'
           }`}
         >
           All Items ({categories.reduce((acc: number, c: any) => acc + (c.menu_items_count || 0), 0)})
@@ -327,8 +327,8 @@ export default function MenuCatalogPage() {
               onClick={() => setSelectedCategoryId(c.id)}
               className={`px-3.5 py-1.5 rounded-[10px] text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
                 isSelected
-                  ? 'bg-[#C76B4A] text-white shadow-xs'
-                  : 'bg-white border border-[#EAE7E0] text-[#777872] hover:bg-[#FAF8F4] hover:text-[#292B28]'
+                  ? 'bg-[#C2B0DC] text-white shadow-xs'
+                  : 'bg-white border border-black/[0.06] text-[#5A5D58] hover:bg-[#FAF9F6] hover:text-[#252525]'
               }`}
             >
               {c.name} ({c.menu_items_count || 0})
@@ -340,13 +340,13 @@ export default function MenuCatalogPage() {
       {/* Search and Dietary Filter Bar */}
       <div className="flex flex-col sm:flex-row items-center gap-3">
         <div className="relative flex-1 w-full sm:max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#A2A29A]" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#8E928B]" />
           <input
             type="text"
             placeholder="Search food by title or description..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full h-10 pl-9 pr-4 rounded-[10px] border border-[#EAE7E0] bg-white text-sm text-[#292B28] placeholder:text-[#A2A29A] outline-none focus:border-[#C76B4A]"
+            className="w-full h-10 pl-9 pr-4 rounded-[10px] border border-black/[0.06] bg-white text-sm text-[#252525] placeholder:text-[#8E928B] outline-none focus:border-[#C2B0DC]"
           />
         </div>
 
@@ -354,7 +354,7 @@ export default function MenuCatalogPage() {
           <select
             value={dietaryFilter}
             onChange={(e) => setDietaryFilter(e.target.value)}
-            className="h-10 px-3 rounded-[10px] border border-[#EAE7E0] bg-white text-xs font-medium text-[#292B28] outline-none cursor-pointer"
+            className="h-10 px-3 rounded-[10px] border border-black/[0.06] bg-white text-xs font-medium text-[#252525] outline-none cursor-pointer"
           >
             <option value="">All Dietary Types</option>
             <option value="veg">Veg Only 🟢</option>
@@ -367,12 +367,12 @@ export default function MenuCatalogPage() {
 
       {/* Menu Items Grid */}
       {isItemsLoading ? (
-        <div className="py-16 text-center text-sm text-[#777872]">Loading menu catalog...</div>
+        <div className="py-16 text-center text-sm text-[#5A5D58]">Loading menu catalog...</div>
       ) : menuItems.length === 0 ? (
-        <Card className="border-[#EAE7E0] p-12 text-center">
-          <Utensils className="h-12 w-12 text-[#A2A29A] mx-auto mb-3" />
-          <h3 className="font-serif text-lg font-semibold text-[#292B28]">No Menu Items</h3>
-          <p className="text-xs text-[#777872] mt-1">
+        <Card className="border-black/[0.06] p-12 text-center">
+          <Utensils className="h-12 w-12 text-[#8E928B] mx-auto mb-3" />
+          <h3 className="font-bold text-lg font-semibold text-[#252525]">No Menu Items</h3>
+          <p className="text-xs text-[#5A5D58] mt-1">
             {search ? 'No items match your search.' : 'Add your first culinary item to begin service.'}
           </p>
           <Button onClick={openCreateItemModal} size="sm" className="mt-4 gap-2">
@@ -388,8 +388,8 @@ export default function MenuCatalogPage() {
             return (
               <Card
                 key={item.id}
-                className={`border-[#EAE7E0] hover:border-[#D8D4CA] transition-all flex flex-col justify-between ${
-                  !item.is_available ? 'opacity-70 bg-[#FAF8F4]/40' : ''
+                className={`border-black/[0.06] hover:border-[#D8D4CA] transition-all flex flex-col justify-between ${
+                  !item.is_available ? 'opacity-70 bg-[#FAF9F6]/40' : ''
                 }`}
               >
                 <div>
@@ -400,16 +400,16 @@ export default function MenuCatalogPage() {
                         <div
                           className={`h-5 w-5 mt-0.5 rounded border flex items-center justify-center shrink-0 ${
                             isVeg
-                              ? 'border-[#39845C] text-[#39845C]'
+                              ? 'border-[#B4D58A] text-[#B4D58A]'
                               : isNonVeg
-                              ? 'border-[#C84D4D] text-[#C84D4D]'
-                              : 'border-[#D69A3A] text-[#D69A3A]'
+                              ? 'border-[#F2AFC0] text-[#F2AFC0]'
+                              : 'border-[#F3DA8A] text-[#F3DA8A]'
                           }`}
                           title={item.type.toUpperCase()}
                         >
                           <div
                             className={`h-2.5 w-2.5 rounded-full ${
-                              isVeg ? 'bg-[#39845C]' : isNonVeg ? 'bg-[#C84D4D]' : 'bg-[#D69A3A]'
+                              isVeg ? 'bg-[#B4D58A]' : isNonVeg ? 'bg-[#F2AFC0]' : 'bg-[#F3DA8A]'
                             }`}
                           />
                         </div>
@@ -421,18 +421,18 @@ export default function MenuCatalogPage() {
                             </CardTitle>
                             {item.is_featured && (
                               <span title="Featured">
-                                <Sparkles className="h-3.5 w-3.5 text-[#D69A3A] shrink-0" />
+                                <Sparkles className="h-3.5 w-3.5 text-[#F3DA8A] shrink-0" />
                               </span>
                             )}
                           </div>
-                          <span className="text-[11px] text-[#777872] block mt-0.5">
+                          <span className="text-[11px] text-[#5A5D58] block mt-0.5">
                             {item.category?.name}
                           </span>
                         </div>
                       </div>
 
                       <div className="text-right shrink-0">
-                        <span className="font-bold text-base text-[#292B28] block">
+                        <span className="font-bold text-base text-[#252525] block">
                           ₹{Number(item.base_price).toFixed(2)}
                         </span>
                         <Badge
@@ -445,20 +445,20 @@ export default function MenuCatalogPage() {
                     </div>
 
                     {item.description && (
-                      <p className="text-xs text-[#777872] line-clamp-2 mt-2 leading-relaxed">
+                      <p className="text-xs text-[#5A5D58] line-clamp-2 mt-2 leading-relaxed">
                         {item.description}
                       </p>
                     )}
                   </CardHeader>
 
                   <CardContent className="p-5 pt-0 space-y-3">
-                    <div className="flex items-center gap-3 text-xs text-[#777872] pt-1 border-t border-[#F1EEE8]">
+                    <div className="flex items-center gap-3 text-xs text-[#5A5D58] pt-1 border-t border-black/[0.04]">
                       <span className="flex items-center gap-1">
-                        <Clock className="h-3.5 w-3.5 text-[#A2A29A]" />
+                        <Clock className="h-3.5 w-3.5 text-[#8E928B]" />
                         {item.preparation_time}m prep
                       </span>
                       <span>•</span>
-                      <span className="flex items-center gap-1 uppercase font-semibold text-[10px] text-[#66745B]">
+                      <span className="flex items-center gap-1 uppercase font-semibold text-[10px] text-[#B4D58A]">
                         <ChefHat className="h-3.5 w-3.5" />
                         Station: {item.kitchen_station}
                       </span>
@@ -467,12 +467,12 @@ export default function MenuCatalogPage() {
                     {/* Variants tags */}
                     {item.variants && item.variants.length > 0 && (
                       <div className="space-y-1">
-                        <span className="text-[10px] uppercase font-semibold text-[#A2A29A]">Variants:</span>
+                        <span className="text-[10px] uppercase font-semibold text-[#8E928B]">Variants:</span>
                         <div className="flex flex-wrap gap-1">
                           {item.variants.map((v: any) => (
                             <span
                               key={v.id}
-                              className="px-2 py-0.5 rounded bg-[#FAF8F4] border border-[#EAE7E0] text-[10px] font-medium text-[#292B28]"
+                              className="px-2 py-0.5 rounded bg-[#FAF9F6] border border-black/[0.06] text-[10px] font-medium text-[#252525]"
                             >
                               {v.name}: ₹{Number(v.price).toFixed(0)}
                             </span>
@@ -484,12 +484,12 @@ export default function MenuCatalogPage() {
                     {/* Addons tags */}
                     {item.addons && item.addons.length > 0 && (
                       <div className="space-y-1">
-                        <span className="text-[10px] uppercase font-semibold text-[#A2A29A]">Add-ons:</span>
+                        <span className="text-[10px] uppercase font-semibold text-[#8E928B]">Add-ons:</span>
                         <div className="flex flex-wrap gap-1">
                           {item.addons.map((a: any) => (
                             <span
                               key={a.id}
-                              className="px-1.5 py-0.5 rounded bg-[#FAF8F4] text-[10px] text-[#777872]"
+                              className="px-1.5 py-0.5 rounded bg-[#FAF9F6] text-[10px] text-[#5A5D58]"
                             >
                               +{a.name} (₹{Number(a.price).toFixed(0)})
                             </span>
@@ -501,11 +501,11 @@ export default function MenuCatalogPage() {
                 </div>
 
                 {/* Footer Actions */}
-                <div className="p-3 px-5 border-t border-[#F1EEE8] bg-[#FAF8F4]/50 flex items-center justify-between rounded-b-2xl">
+                <div className="p-3 px-5 border-t border-black/[0.04] bg-[#FAF9F6]/50 flex items-center justify-between rounded-b-2xl">
                   <button
                     onClick={() => toggleStockMutation.mutate(item.id)}
                     className={`text-xs font-semibold flex items-center gap-1.5 cursor-pointer ${
-                      item.is_available ? 'text-[#39845C]' : 'text-[#C84D4D]'
+                      item.is_available ? 'text-[#B4D58A]' : 'text-[#F2AFC0]'
                     }`}
                   >
                     <Power className="h-3.5 w-3.5" />
@@ -516,7 +516,7 @@ export default function MenuCatalogPage() {
                     <button
                       onClick={() => openEditItemModal(item)}
                       title="Edit Item"
-                      className="p-1.5 rounded-lg border border-[#EAE7E0] text-[#777872] hover:text-[#292B28] hover:bg-white transition-colors"
+                      className="p-1.5 rounded-lg border border-black/[0.06] text-[#5A5D58] hover:text-[#252525] hover:bg-white transition-colors"
                     >
                       <Edit className="h-3.5 w-3.5" />
                     </button>
@@ -527,7 +527,7 @@ export default function MenuCatalogPage() {
                         }
                       }}
                       title="Delete Item"
-                      className="p-1.5 rounded-lg border border-[#EAE7E0] text-[#C84D4D] hover:bg-[#FDF0F0] hover:border-[#F8DADA] transition-colors"
+                      className="p-1.5 rounded-lg border border-black/[0.06] text-[#F2AFC0] hover:bg-[#F2AFC0]/20 hover:border-[#F8DADA] transition-colors"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                     </button>
@@ -541,15 +541,15 @@ export default function MenuCatalogPage() {
 
       {/* Modal: Add / Edit Food Item */}
       {isItemModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#292B28]/40 backdrop-blur-xs p-4">
-          <div className="w-full max-w-xl max-h-[92vh] overflow-y-auto rounded-2xl bg-white border border-[#EAE7E0] shadow-xl p-6 space-y-5">
-            <div className="flex items-center justify-between pb-3 border-b border-[#EAE7E0]">
-              <h2 className="font-serif text-xl font-semibold text-[#292B28]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#252525]/40 backdrop-blur-xs p-4">
+          <div className="w-full max-w-xl max-h-[92vh] overflow-y-auto rounded-2xl bg-white border border-black/[0.06] shadow-xl p-6 space-y-5">
+            <div className="flex items-center justify-between pb-3 border-b border-black/[0.06]">
+              <h2 className="font-bold text-xl font-semibold text-[#252525]">
                 {editingItem ? 'Edit Food Item' : 'New Culinary Item'}
               </h2>
               <button
                 onClick={() => setIsItemModalOpen(false)}
-                className="p-1.5 text-[#777872] hover:text-[#292B28] rounded-lg hover:bg-[#FAF8F4]"
+                className="p-1.5 text-[#5A5D58] hover:text-[#252525] rounded-lg hover:bg-[#FAF9F6]"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -573,13 +573,13 @@ export default function MenuCatalogPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-semibold uppercase tracking-wider text-[#777872]">
+                  <label className="text-xs font-semibold uppercase tracking-wider text-[#5A5D58]">
                     Category *
                   </label>
                   <select
                     value={itemCategoryId}
                     onChange={(e) => setItemCategoryId(Number(e.target.value))}
-                    className="w-full h-10 px-3 rounded-[10px] border border-[#EAE7E0] bg-white text-sm text-[#292B28] outline-none focus:border-[#C76B4A]"
+                    className="w-full h-10 px-3 rounded-[10px] border border-black/[0.06] bg-white text-sm text-[#252525] outline-none focus:border-[#C2B0DC]"
                     required
                   >
                     <option value="">Select Category</option>
@@ -590,13 +590,13 @@ export default function MenuCatalogPage() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-semibold uppercase tracking-wider text-[#777872]">
+                  <label className="text-xs font-semibold uppercase tracking-wider text-[#5A5D58]">
                     Dietary Classification *
                   </label>
                   <select
                     value={itemType}
                     onChange={(e) => setItemType(e.target.value)}
-                    className="w-full h-10 px-3 rounded-[10px] border border-[#EAE7E0] bg-white text-sm text-[#292B28] outline-none focus:border-[#C76B4A]"
+                    className="w-full h-10 px-3 rounded-[10px] border border-black/[0.06] bg-white text-sm text-[#252525] outline-none focus:border-[#C2B0DC]"
                   >
                     <option value="veg">🟢 Veg</option>
                     <option value="non_veg">🔴 Non-Veg</option>
@@ -623,13 +623,13 @@ export default function MenuCatalogPage() {
                   onChange={(e) => setItemPrepTime(e.target.value)}
                 />
                 <div className="space-y-1.5">
-                  <label className="text-xs font-semibold uppercase tracking-wider text-[#777872]">
+                  <label className="text-xs font-semibold uppercase tracking-wider text-[#5A5D58]">
                     Kitchen Station
                   </label>
                   <select
                     value={itemStation}
                     onChange={(e) => setItemStation(e.target.value)}
-                    className="w-full h-10 px-3 rounded-[10px] border border-[#EAE7E0] bg-white text-sm text-[#292B28] outline-none focus:border-[#C76B4A]"
+                    className="w-full h-10 px-3 rounded-[10px] border border-black/[0.06] bg-white text-sm text-[#252525] outline-none focus:border-[#C2B0DC]"
                   >
                     <option value="main">Main Kitchen</option>
                     <option value="grill">Grill / Tandoor</option>
@@ -640,7 +640,7 @@ export default function MenuCatalogPage() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold uppercase tracking-wider text-[#777872]">
+                <label className="text-xs font-semibold uppercase tracking-wider text-[#5A5D58]">
                   Description & Ingredients
                 </label>
                 <textarea
@@ -648,20 +648,20 @@ export default function MenuCatalogPage() {
                   value={itemDescription}
                   onChange={(e) => setItemDescription(e.target.value)}
                   placeholder="Appetizing description of ingredients and preparation method..."
-                  className="w-full rounded-[10px] border border-[#EAE7E0] p-3 text-sm text-[#292B28] placeholder:text-[#A2A29A] outline-none focus:border-[#C76B4A]"
+                  className="w-full rounded-[10px] border border-black/[0.06] p-3 text-sm text-[#252525] placeholder:text-[#8E928B] outline-none focus:border-[#C2B0DC]"
                 />
               </div>
 
               {/* Variants Builder */}
-              <div className="space-y-2 pt-2 border-t border-[#F1EEE8]">
+              <div className="space-y-2 pt-2 border-t border-black/[0.04]">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold uppercase tracking-wider text-[#777872]">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-[#5A5D58]">
                     Food Variants (Portion Sizes)
                   </span>
                   <button
                     type="button"
                     onClick={() => setVariantsList([...variantsList, { name: '', price: '', is_default: false }])}
-                    className="text-xs font-medium text-[#C76B4A] hover:underline"
+                    className="text-xs font-medium text-[#C2B0DC] hover:underline"
                   >
                     + Add Variant
                   </button>
@@ -693,7 +693,7 @@ export default function MenuCatalogPage() {
                     <button
                       type="button"
                       onClick={() => setVariantsList(variantsList.filter((_, i) => i !== index))}
-                      className="p-2 text-[#C84D4D] hover:bg-[#FDF0F0] rounded-lg"
+                      className="p-2 text-[#F2AFC0] hover:bg-[#F2AFC0]/20 rounded-lg"
                     >
                       <X className="h-4 w-4" />
                     </button>
@@ -703,11 +703,11 @@ export default function MenuCatalogPage() {
 
               {/* Addons Selection */}
               {addons.length > 0 && (
-                <div className="space-y-2 pt-2 border-t border-[#F1EEE8]">
-                  <span className="text-xs font-semibold uppercase tracking-wider text-[#777872]">
+                <div className="space-y-2 pt-2 border-t border-black/[0.04]">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-[#5A5D58]">
                     Available Add-ons
                   </span>
-                  <div className="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto p-2 rounded-xl border border-[#EAE7E0] bg-[#FAF8F4]">
+                  <div className="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto p-2 rounded-xl border border-black/[0.06] bg-[#FAF9F6]">
                     {addons.map((a: any) => {
                       const isChecked = selectedAddonIds.includes(a.id);
                       return (
@@ -719,7 +719,7 @@ export default function MenuCatalogPage() {
                               if (e.target.checked) setSelectedAddonIds([...selectedAddonIds, a.id]);
                               else setSelectedAddonIds(selectedAddonIds.filter((id) => id !== a.id));
                             }}
-                            className="rounded border-[#EAE7E0] text-[#C76B4A] focus:ring-[#C76B4A]"
+                            className="rounded border-black/[0.06] text-[#C2B0DC] focus:ring-[#C2B0DC]"
                           />
                           <span>{a.name} (+₹{a.price})</span>
                         </label>
@@ -729,7 +729,7 @@ export default function MenuCatalogPage() {
                 </div>
               )}
 
-              <div className="flex items-center justify-end gap-3 pt-3 border-t border-[#EAE7E0]">
+              <div className="flex items-center justify-end gap-3 pt-3 border-t border-black/[0.06]">
                 <Button type="button" variant="outline" onClick={() => setIsItemModalOpen(false)}>
                   Cancel
                 </Button>
@@ -744,12 +744,12 @@ export default function MenuCatalogPage() {
 
       {/* Modal: Create Category */}
       {isCategoryModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#292B28]/40 backdrop-blur-xs p-4">
-          <div className="w-full max-w-sm rounded-2xl bg-white border border-[#EAE7E0] shadow-xl p-6 space-y-4">
-            <div className="flex items-center justify-between pb-2 border-b border-[#EAE7E0]">
-              <h2 className="font-serif text-lg font-semibold text-[#292B28]">Add Menu Category</h2>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#252525]/40 backdrop-blur-xs p-4">
+          <div className="w-full max-w-sm rounded-2xl bg-white border border-black/[0.06] shadow-xl p-6 space-y-4">
+            <div className="flex items-center justify-between pb-2 border-b border-black/[0.06]">
+              <h2 className="font-bold text-lg font-semibold text-[#252525]">Add Menu Category</h2>
               <button onClick={() => setIsCategoryModalOpen(false)}>
-                <X className="h-5 w-5 text-[#777872]" />
+                <X className="h-5 w-5 text-[#5A5D58]" />
               </button>
             </div>
             <form
@@ -789,12 +789,12 @@ export default function MenuCatalogPage() {
 
       {/* Modal: Create Add-on */}
       {isAddonModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#292B28]/40 backdrop-blur-xs p-4">
-          <div className="w-full max-w-sm rounded-2xl bg-white border border-[#EAE7E0] shadow-xl p-6 space-y-4">
-            <div className="flex items-center justify-between pb-2 border-b border-[#EAE7E0]">
-              <h2 className="font-serif text-lg font-semibold text-[#292B28]">New Add-on Option</h2>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#252525]/40 backdrop-blur-xs p-4">
+          <div className="w-full max-w-sm rounded-2xl bg-white border border-black/[0.06] shadow-xl p-6 space-y-4">
+            <div className="flex items-center justify-between pb-2 border-b border-black/[0.06]">
+              <h2 className="font-bold text-lg font-semibold text-[#252525]">New Add-on Option</h2>
               <button onClick={() => setIsAddonModalOpen(false)}>
-                <X className="h-5 w-5 text-[#777872]" />
+                <X className="h-5 w-5 text-[#5A5D58]" />
               </button>
             </div>
             <form

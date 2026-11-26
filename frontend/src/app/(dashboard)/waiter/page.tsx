@@ -185,37 +185,37 @@ export default function WaiterPage() {
   return (
     <div className="space-y-4 max-w-5xl mx-auto pb-12">
       {/* Top Header Card */}
-      <div className="bg-white rounded-2xl border border-[#EAE7E0] p-4 sm:p-5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="bg-white rounded-2xl border border-black/[0.06] p-4 sm:p-5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="h-11 w-11 rounded-xl bg-[#F8EAE3] text-[#C76B4A] flex items-center justify-center font-bold text-lg shrink-0">
+          <div className="h-11 w-11 rounded-xl bg-[#C2B0DC]/20 text-[#C2B0DC] flex items-center justify-center font-bold text-lg shrink-0">
             <UserCheck className="h-6 w-6" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-lg font-bold text-[#292B28]">Waiter Station</h1>
+              <h1 className="text-lg font-bold text-[#252525]">Waiter Station</h1>
               <Badge variant="success" className="text-[10px]">
                 Active Floor Shift
               </Badge>
             </div>
-            <p className="text-xs text-[#777872] mt-0.5">
-              Logged in as <strong className="text-[#292B28]">{user?.name}</strong> · Real-time kitchen & floor sync
+            <p className="text-xs text-[#5A5D58] mt-0.5">
+              Logged in as <strong className="text-[#252525]">{user?.name}</strong> · Real-time kitchen & floor sync
             </p>
           </div>
         </div>
 
         {/* Quick Counters */}
-        <div className="flex items-center gap-2 sm:gap-3 bg-[#FAF8F4] p-1.5 rounded-xl border border-[#EAE7E0]">
-          <div className="px-3 py-1 text-center border-r border-[#EAE7E0]">
-            <span className="block text-xs text-[#777872]">My Tables</span>
-            <span className="text-sm font-bold text-[#292B28]">{myTablesCount}</span>
+        <div className="flex items-center gap-2 sm:gap-3 bg-[#FAF9F6] p-1.5 rounded-xl border border-black/[0.06]">
+          <div className="px-3 py-1 text-center border-r border-black/[0.06]">
+            <span className="block text-xs text-[#5A5D58]">My Tables</span>
+            <span className="text-sm font-bold text-[#252525]">{myTablesCount}</span>
           </div>
-          <div className="px-3 py-1 text-center border-r border-[#EAE7E0]">
-            <span className="block text-xs text-[#777872]">Occupied</span>
-            <span className="text-sm font-bold text-[#C76B4A]">{occupiedCount}</span>
+          <div className="px-3 py-1 text-center border-r border-black/[0.06]">
+            <span className="block text-xs text-[#5A5D58]">Occupied</span>
+            <span className="text-sm font-bold text-[#C2B0DC]">{occupiedCount}</span>
           </div>
           <div className="px-3 py-1 text-center">
-            <span className="block text-xs text-[#777872]">Ready to Serve</span>
-            <span className="text-sm font-bold text-[#39845C]">{readyDishesCount}</span>
+            <span className="block text-xs text-[#5A5D58]">Ready to Serve</span>
+            <span className="text-sm font-bold text-[#B4D58A]">{readyDishesCount}</span>
           </div>
         </div>
       </div>
@@ -226,8 +226,8 @@ export default function WaiterPage() {
           onClick={() => setFilterMode('all')}
           className={`px-3.5 py-1.5 text-xs font-semibold rounded-lg shrink-0 transition-all ${
             filterMode === 'all'
-              ? 'bg-[#292B28] text-white shadow-xs'
-              : 'bg-white text-[#777872] border border-[#EAE7E0] hover:bg-[#F3F1EB]'
+              ? 'bg-[#252525] text-white shadow-xs'
+              : 'bg-white text-[#5A5D58] border border-black/[0.06] hover:bg-[#F3DA8A]/25'
           }`}
         >
           All Tables ({tables.length})
@@ -236,8 +236,8 @@ export default function WaiterPage() {
           onClick={() => setFilterMode('my_tables')}
           className={`px-3.5 py-1.5 text-xs font-semibold rounded-lg shrink-0 transition-all ${
             filterMode === 'my_tables'
-              ? 'bg-[#C76B4A] text-white shadow-xs'
-              : 'bg-white text-[#777872] border border-[#EAE7E0] hover:bg-[#F3F1EB]'
+              ? 'bg-[#C2B0DC] text-white shadow-xs'
+              : 'bg-white text-[#5A5D58] border border-black/[0.06] hover:bg-[#F3DA8A]/25'
           }`}
         >
           My Assigned Tables ({myTablesCount})
@@ -246,8 +246,8 @@ export default function WaiterPage() {
           onClick={() => setFilterMode('occupied')}
           className={`px-3.5 py-1.5 text-xs font-semibold rounded-lg shrink-0 transition-all ${
             filterMode === 'occupied'
-              ? 'bg-[#5185B8] text-white shadow-xs'
-              : 'bg-white text-[#777872] border border-[#EAE7E0] hover:bg-[#F3F1EB]'
+              ? 'bg-[#C2B0DC] text-white shadow-xs'
+              : 'bg-white text-[#5A5D58] border border-black/[0.06] hover:bg-[#F3DA8A]/25'
           }`}
         >
           Occupied Tables ({occupiedCount})
@@ -256,8 +256,8 @@ export default function WaiterPage() {
           onClick={() => setFilterMode('ready')}
           className={`px-3.5 py-1.5 text-xs font-semibold rounded-lg shrink-0 transition-all flex items-center gap-1.5 ${
             filterMode === 'ready'
-              ? 'bg-[#39845C] text-white shadow-xs'
-              : 'bg-white text-[#39845C] border border-[#39845C]/30 hover:bg-[#EEF1E9]'
+              ? 'bg-[#B4D58A] text-white shadow-xs'
+              : 'bg-white text-[#B4D58A] border border-[#B4D58A]/30 hover:bg-[#B4D58A]/25'
           }`}
         >
           <Sparkles className="h-3.5 w-3.5" />
@@ -277,10 +277,10 @@ export default function WaiterPage() {
               key={tbl.id}
               className={`rounded-2xl border transition-all overflow-hidden ${
                 hasReadyDishes
-                  ? 'border-[#39845C] ring-2 ring-[#39845C]/20 shadow-sm'
+                  ? 'border-[#B4D58A] ring-2 ring-[#B4D58A]/20 shadow-sm'
                   : isOccupied
                   ? 'border-[#CFE2F7] bg-white'
-                  : 'border-[#EAE7E0] bg-white'
+                  : 'border-black/[0.06] bg-white'
               }`}
             >
               <CardContent className="p-4 space-y-3">
@@ -288,14 +288,14 @@ export default function WaiterPage() {
                 <div className="flex items-start justify-between">
                   <div>
                     <div className="flex items-center gap-2">
-                      <h3 className="font-bold text-base text-[#292B28]">{tbl.table_number}</h3>
+                      <h3 className="font-bold text-base text-[#252525]">{tbl.table_number}</h3>
                       {isMyTable && (
-                        <span className="text-[10px] bg-[#F8EAE3] text-[#C76B4A] px-1.5 py-0.5 rounded font-bold">
+                        <span className="text-[10px] bg-[#C2B0DC]/20 text-[#C2B0DC] px-1.5 py-0.5 rounded font-bold">
                           Assigned to You
                         </span>
                       )}
                     </div>
-                    <span className="text-xs text-[#777872] block mt-0.5">
+                    <span className="text-xs text-[#5A5D58] block mt-0.5">
                       {tbl.location} · {tbl.seating_capacity} Seats
                     </span>
                   </div>
@@ -324,18 +324,18 @@ export default function WaiterPage() {
 
                 {/* ACTIVE ORDER SECTION */}
                 {isOccupied && tbl.active_order ? (
-                  <div className="bg-[#FAF8F4] rounded-xl p-3 border border-[#EAE7E0] space-y-2">
+                  <div className="bg-[#FAF9F6] rounded-xl p-3 border border-black/[0.06] space-y-2">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="font-semibold text-[#292B28]">
+                      <span className="font-semibold text-[#252525]">
                         Order {tbl.active_order.order_number}
                       </span>
-                      <span className="text-[#C76B4A] font-bold">
+                      <span className="text-[#C2B0DC] font-bold">
                         Round {tbl.active_order.round_count}
                       </span>
                     </div>
 
                     {/* Order Items List */}
-                    <div className="space-y-1.5 max-h-40 overflow-y-auto divide-y divide-[#F1EEE8] text-xs">
+                    <div className="space-y-1.5 max-h-40 overflow-y-auto divide-y divide-black/[0.04] text-xs">
                       {tbl.active_order.items?.map((item: any) => {
                         const isReady = item.status === 'ready';
                         const isPreparing = item.status === 'preparing';
@@ -347,11 +347,11 @@ export default function WaiterPage() {
                             className="pt-1.5 flex items-center justify-between gap-1.5"
                           >
                             <div className="flex-1 min-w-0">
-                              <span className="font-medium text-[#292B28] block truncate">
+                              <span className="font-medium text-[#252525] block truncate">
                                 {item.quantity}x {item.item_name}
                               </span>
                               {item.special_instructions && (
-                                <span className="text-[10px] text-[#C76B4A] italic block truncate">
+                                <span className="text-[10px] text-[#C2B0DC] italic block truncate">
                                   {item.special_instructions}
                                 </span>
                               )}
@@ -368,7 +368,7 @@ export default function WaiterPage() {
                                       status: 'served',
                                     })
                                   }
-                                  className="h-6 px-2 text-[10px] bg-[#39845C] hover:bg-[#2e6b4a] text-white flex items-center gap-1 font-bold"
+                                  className="h-6 px-2 text-[10px] bg-[#B4D58A] hover:bg-[#2e6b4a] text-white flex items-center gap-1 font-bold"
                                 >
                                   <Check className="h-3 w-3" /> Mark Served
                                 </Button>
@@ -376,13 +376,13 @@ export default function WaiterPage() {
                                 <span
                                   className={`text-[10px] px-1.5 py-0.5 rounded font-mono uppercase ${
                                     isServed
-                                      ? 'bg-[#EAE7E0] text-[#777872]'
+                                      ? 'bg-black/[0.06] text-[#5A5D58]'
                                       : isPreparing
-                                      ? 'bg-[#EBF3FC] text-[#5185B8] flex items-center gap-1'
-                                      : 'bg-[#FEF5E7] text-[#D69A3A]'
+                                      ? 'bg-[#C2B0DC]/20 text-[#C2B0DC] flex items-center gap-1'
+                                      : 'bg-[#FEF5E7] text-[#F3DA8A]'
                                   }`}
                                 >
-                                  {isPreparing && <Flame className="h-2.5 w-2.5 text-[#C76B4A]" />}
+                                  {isPreparing && <Flame className="h-2.5 w-2.5 text-[#C2B0DC]" />}
                                   {item.status}
                                 </span>
                               )}
@@ -393,7 +393,7 @@ export default function WaiterPage() {
                     </div>
                   </div>
                 ) : (
-                  <div className="bg-[#FAF8F4] rounded-xl p-3 text-center text-xs text-[#777872]">
+                  <div className="bg-[#FAF9F6] rounded-xl p-3 text-center text-xs text-[#5A5D58]">
                     Table is currently available for guest seating.
                   </div>
                 )}
@@ -404,7 +404,7 @@ export default function WaiterPage() {
                     setSelectedTable(tbl);
                     setOrderPadOpen(true);
                   }}
-                  className="w-full bg-[#C76B4A] hover:bg-[#AE593B] text-white text-xs font-semibold h-9 flex items-center justify-center gap-1.5 shadow-xs"
+                  className="w-full bg-[#C2B0DC] hover:bg-[#B19CCF] text-white text-xs font-semibold h-9 flex items-center justify-center gap-1.5 shadow-xs"
                 >
                   <UtensilsCrossed className="h-3.5 w-3.5" />
                   {isOccupied ? 'Add Items (New Round)' : 'Seat Guests & Take Order'}
@@ -418,14 +418,14 @@ export default function WaiterPage() {
       {/* MODAL: Rapid Order Pad Drawer */}
       {orderPadOpen && selectedTable && (
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
-          <div className="bg-white rounded-2xl max-w-lg w-full border border-[#EAE7E0] shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
+          <div className="bg-white rounded-2xl max-w-lg w-full border border-black/[0.06] shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
             {/* Header */}
-            <div className="p-4 border-b border-[#EAE7E0] bg-[#FAF8F4] flex items-center justify-between shrink-0">
+            <div className="p-4 border-b border-black/[0.06] bg-[#FAF9F6] flex items-center justify-between shrink-0">
               <div>
-                <h3 className="font-bold text-base text-[#292B28]">
+                <h3 className="font-bold text-base text-[#252525]">
                   Order Pad · Table {selectedTable.table_number}
                 </h3>
-                <span className="text-xs text-[#777872]">
+                <span className="text-xs text-[#5A5D58]">
                   {selectedTable.status === 'occupied'
                     ? 'Firing additional round to active kitchen order'
                     : 'Initial order creation'}
@@ -433,16 +433,16 @@ export default function WaiterPage() {
               </div>
               <button
                 onClick={() => setOrderPadOpen(false)}
-                className="text-[#777872] hover:text-[#292B28]"
+                className="text-[#5A5D58] hover:text-[#252525]"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
 
             {/* Menu Search & Category Tabs */}
-            <div className="p-3 border-b border-[#EAE7E0] space-y-2 shrink-0">
+            <div className="p-3 border-b border-black/[0.06] space-y-2 shrink-0">
               <div className="relative">
-                <Search className="absolute left-3 top-2.5 h-3.5 w-3.5 text-[#777872]" />
+                <Search className="absolute left-3 top-2.5 h-3.5 w-3.5 text-[#5A5D58]" />
                 <Input
                   placeholder="Quick search dish..."
                   value={padSearch}
@@ -456,8 +456,8 @@ export default function WaiterPage() {
                   onClick={() => setPadCategory('all')}
                   className={`px-2.5 py-1 text-xs rounded-md font-medium shrink-0 ${
                     padCategory === 'all'
-                      ? 'bg-[#C76B4A] text-white'
-                      : 'bg-[#F3F1EB] text-[#777872]'
+                      ? 'bg-[#C2B0DC] text-white'
+                      : 'bg-[#F3DA8A]/25 text-[#5A5D58]'
                   }`}
                 >
                   All
@@ -468,8 +468,8 @@ export default function WaiterPage() {
                     onClick={() => setPadCategory(String(c.id))}
                     className={`px-2.5 py-1 text-xs rounded-md font-medium shrink-0 ${
                       padCategory === String(c.id)
-                        ? 'bg-[#C76B4A] text-white'
-                        : 'bg-[#F3F1EB] text-[#777872]'
+                        ? 'bg-[#C2B0DC] text-white'
+                        : 'bg-[#F3DA8A]/25 text-[#5A5D58]'
                     }`}
                   >
                     {c.name}
@@ -479,7 +479,7 @@ export default function WaiterPage() {
             </div>
 
             {/* Menu Items Fast Tap List */}
-            <div className="flex-1 p-3 overflow-y-auto divide-y divide-[#F1EEE8]">
+            <div className="flex-1 p-3 overflow-y-auto divide-y divide-black/[0.04]">
               {menuItems
                 .filter((item: MenuItem) => {
                   const matchCat = padCategory === 'all' || String(item.category_id) === padCategory;
@@ -495,16 +495,16 @@ export default function WaiterPage() {
                       className="py-2 flex items-center justify-between gap-2"
                     >
                       <div>
-                        <span className="text-xs font-semibold text-[#292B28] block">
+                        <span className="text-xs font-semibold text-[#252525] block">
                           {item.name}
                         </span>
-                        <span className="text-[11px] font-bold text-[#C76B4A]">
+                        <span className="text-[11px] font-bold text-[#C2B0DC]">
                           ₹{Number(item.base_price).toFixed(2)}
                         </span>
                       </div>
 
                       {inPadCart ? (
-                        <div className="flex items-center gap-2 bg-[#FAF8F4] border border-[#EAE7E0] rounded-lg p-0.5">
+                        <div className="flex items-center gap-2 bg-[#FAF9F6] border border-black/[0.06] rounded-lg p-0.5">
                           <button
                             onClick={() => {
                               setPadCart((prev) =>
@@ -517,7 +517,7 @@ export default function WaiterPage() {
                                   .filter((i) => i.quantity > 0)
                               );
                             }}
-                            className="h-6 w-6 rounded flex items-center justify-center text-[#777872] hover:bg-white"
+                            className="h-6 w-6 rounded flex items-center justify-center text-[#5A5D58] hover:bg-white"
                           >
                             <Minus className="h-3 w-3" />
                           </button>
@@ -534,7 +534,7 @@ export default function WaiterPage() {
                                 )
                               );
                             }}
-                            className="h-6 w-6 rounded flex items-center justify-center text-[#777872] hover:bg-white"
+                            className="h-6 w-6 rounded flex items-center justify-center text-[#5A5D58] hover:bg-white"
                           >
                             <Plus className="h-3 w-3" />
                           </button>
@@ -553,7 +553,7 @@ export default function WaiterPage() {
                               },
                             ]);
                           }}
-                          className="h-7 px-3 text-xs bg-[#F8EAE3] text-[#C76B4A] hover:bg-[#C76B4A] hover:text-white"
+                          className="h-7 px-3 text-xs bg-[#C2B0DC]/20 text-[#C2B0DC] hover:bg-[#C2B0DC] hover:text-white"
                         >
                           + Add
                         </Button>
@@ -564,7 +564,7 @@ export default function WaiterPage() {
             </div>
 
             {/* Note & Bottom Submit */}
-            <div className="p-3 border-t border-[#EAE7E0] bg-[#FAF8F4] space-y-2 shrink-0">
+            <div className="p-3 border-t border-black/[0.06] bg-[#FAF9F6] space-y-2 shrink-0">
               <Input
                 placeholder="Table instructions (e.g. all food together, less salt)"
                 value={padNote}
@@ -573,13 +573,13 @@ export default function WaiterPage() {
               />
 
               <div className="flex items-center justify-between pt-1">
-                <span className="text-xs font-bold text-[#292B28]">
+                <span className="text-xs font-bold text-[#252525]">
                   Total Items: {padCart.reduce((s, i) => s + i.quantity, 0)}
                 </span>
                 <Button
                   disabled={padCart.length === 0 || fireOrderMutation.isPending}
                   onClick={() => fireOrderMutation.mutate()}
-                  className="bg-[#C76B4A] hover:bg-[#AE593B] text-white text-xs font-semibold h-9 px-4 flex items-center gap-1.5"
+                  className="bg-[#C2B0DC] hover:bg-[#B19CCF] text-white text-xs font-semibold h-9 px-4 flex items-center gap-1.5"
                 >
                   <Send className="h-3.5 w-3.5" />
                   {fireOrderMutation.isPending ? 'Firing...' : 'Fire to Kitchen'}
@@ -593,17 +593,17 @@ export default function WaiterPage() {
       {/* MODAL: Quick Table Status Change */}
       {statusDialogTable && (
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-xs w-full border border-[#EAE7E0] shadow-xl p-4 space-y-3">
-            <h3 className="font-bold text-sm text-[#292B28] text-center">
+          <div className="bg-white rounded-2xl max-w-xs w-full border border-black/[0.06] shadow-xl p-4 space-y-3">
+            <h3 className="font-bold text-sm text-[#252525] text-center">
               Update Status · Table {statusDialogTable.table_number}
             </h3>
 
             <div className="space-y-1.5">
               {[
-                { status: 'available', label: 'Available (Ready for Guests)', color: 'bg-[#39845C]' },
-                { status: 'occupied', label: 'Occupied (Guests Seated)', color: 'bg-[#5185B8]' },
+                { status: 'available', label: 'Available (Ready for Guests)', color: 'bg-[#B4D58A]' },
+                { status: 'occupied', label: 'Occupied (Guests Seated)', color: 'bg-[#C2B0DC]' },
                 { status: 'billed', label: 'Billed (Bill Requested)', color: 'bg-[#8E44AD]' },
-                { status: 'cleaning', label: 'Cleaning (Table Reset)', color: 'bg-[#D69A3A]' },
+                { status: 'cleaning', label: 'Cleaning (Table Reset)', color: 'bg-[#F3DA8A]' },
               ].map((opt) => (
                 <button
                   key={opt.status}
@@ -615,8 +615,8 @@ export default function WaiterPage() {
                   }
                   className={`w-full p-2.5 rounded-xl border text-left flex items-center gap-2 text-xs font-semibold transition-all ${
                     statusDialogTable.status === opt.status
-                      ? 'bg-[#F8EAE3] border-[#C76B4A] text-[#C76B4A]'
-                      : 'bg-white border-[#EAE7E0] text-[#292B28] hover:bg-[#FAF8F4]'
+                      ? 'bg-[#C2B0DC]/20 border-[#C2B0DC] text-[#C2B0DC]'
+                      : 'bg-white border-black/[0.06] text-[#252525] hover:bg-[#FAF9F6]'
                   }`}
                 >
                   <span className={`h-2.5 w-2.5 rounded-full ${opt.color}`} />

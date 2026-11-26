@@ -89,7 +89,7 @@ export default function DashboardPage() {
       value: formatCurrency(overview.today_revenue),
       sub: 'Settled orders today',
       icon: DollarSign,
-      color: 'text-[#C76B4A] bg-[#F8EAE3]',
+      color: 'text-[#C2B0DC] bg-[#C2B0DC]/20',
       highlight: true,
     },
     {
@@ -97,94 +97,94 @@ export default function DashboardPage() {
       value: formatCurrency(overview.monthly_revenue),
       sub: 'This calendar month',
       icon: TrendingUp,
-      color: 'text-[#66745B] bg-[#EEF1E9]',
+      color: 'text-[#B4D58A] bg-[#B4D58A]/25',
     },
     {
       title: 'Pending Payments',
       value: formatCurrency(overview.pending_payments),
       sub: 'Active open bills',
       icon: CreditCard,
-      color: 'text-[#D69A3A] bg-[#FBF5EA]',
+      color: 'text-[#F3DA8A] bg-[#F3DA8A]/25',
     },
     {
       title: 'Active Tables',
       value: overview.active_tables,
       sub: 'Currently seated',
       icon: Grid,
-      color: 'text-[#5185B8] bg-[#EBF3FB]',
+      color: 'text-[#C2B0DC] bg-[#EBF3FB]',
     },
     {
       title: 'Total Orders',
       value: overview.total_orders,
       sub: 'All-time volume',
       icon: UtensilsCrossed,
-      color: 'text-[#C76B4A] bg-[#F8EAE3]',
+      color: 'text-[#C2B0DC] bg-[#C2B0DC]/20',
     },
     {
       title: 'Cancelled Orders',
       value: overview.cancelled_orders,
       sub: 'With logged audit reasons',
       icon: XCircle,
-      color: 'text-[#C84D4D] bg-[#FDF0F0]',
+      color: 'text-[#F2AFC0] bg-[#F2AFC0]/20',
     },
     {
       title: 'Total Restaurants',
       value: overview.total_restaurants,
       sub: 'Active SaaS tenants',
       icon: Store,
-      color: 'text-[#292B28] bg-[#F3F1EB]',
+      color: 'text-[#252525] bg-[#F3DA8A]/25',
     },
     {
       title: 'Total Branches',
       value: overview.total_branches,
       sub: 'Physical locations',
       icon: GitBranch,
-      color: 'text-[#66745B] bg-[#EEF1E9]',
+      color: 'text-[#B4D58A] bg-[#B4D58A]/25',
     },
     {
       title: 'Total Staff',
       value: overview.total_staff,
       sub: 'Managers, Cashiers & Chefs',
       icon: Users,
-      color: 'text-[#292B28] bg-[#F3F1EB]',
+      color: 'text-[#252525] bg-[#F3DA8A]/25',
     },
     {
       title: 'Total Waiters',
       value: overview.total_waiters,
       sub: 'Mobile ordering captains',
       icon: Users,
-      color: 'text-[#D69A3A] bg-[#FBF5EA]',
+      color: 'text-[#F3DA8A] bg-[#F3DA8A]/25',
     },
     {
       title: 'Total Reservations',
       value: overview.total_reservations,
       sub: 'Confirmed bookings',
       icon: CalendarDays,
-      color: 'text-[#39845C] bg-[#EBF5EF]',
+      color: 'text-[#B4D58A] bg-[#B4D58A]/20',
     },
     {
       title: 'System Users',
       value: overview.total_users,
       sub: 'All registered accounts',
       icon: ShieldCheck,
-      color: 'text-[#5185B8] bg-[#EBF3FB]',
+      color: 'text-[#C2B0DC] bg-[#EBF3FB]',
     },
   ];
 
   return (
     <div className="space-y-8">
       {/* Top Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-6 rounded-2xl bg-white border border-[#EAE7E0] shadow-xs">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-6 rounded-2xl bg-white border border-black/[0.06] shadow-xs">
         <div className="space-y-1">
           <div className="flex items-center gap-2.5">
-            <h1 className="font-serif text-2xl sm:text-3xl font-semibold tracking-tight text-[#292B28]">
+            <h1 className="font-bold text-2xl sm:text-3xl font-semibold tracking-tight text-[#252525]">
               {isSuperAdmin ? 'Super Admin Control Center' : `${activeRestaurant?.name || 'Restaurant'} Dashboard`}
             </h1>
             <Badge variant="default" className="text-xs">
               {user?.roles?.[0] || 'Staff'}
             </Badge>
           </div>
-          <p className="text-xs text-[#777872]">
+          <p className="text-xs text-[#5A5D58]">
             {isSuperAdmin
               ? 'Multi-restaurant platform performance, financial telemetry and tenant operations'
               : `Managing operations for ${activeRestaurant?.name} • Branch: ${activeBranch?.name || 'Main'}`}
@@ -218,12 +218,12 @@ export default function DashboardPage() {
           return (
             <Card
               key={m.title}
-              className={`border-[#EAE7E0] hover:border-[#D8D4CA] transition-all p-4 ${
-                m.highlight ? 'bg-gradient-to-br from-white to-[#F8EAE3]/30' : ''
+              className={`border-black/[0.06] hover:border-[#D8D4CA] transition-all p-4 ${
+                m.highlight ? 'bg-gradient-to-br from-white to-[#C2B0DC]/20/30' : ''
               }`}
             >
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[11px] font-semibold uppercase tracking-wider text-[#777872] truncate">
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-[#5A5D58] truncate">
                   {m.title}
                 </span>
                 <div className={`p-2 rounded-xl ${m.color} shrink-0`}>
@@ -231,10 +231,10 @@ export default function DashboardPage() {
                 </div>
               </div>
               <div className="space-y-0.5">
-                <p className="font-serif text-2xl font-bold tracking-tight text-[#292B28]">
+                <p className="font-bold text-2xl font-bold tracking-tight text-[#252525]">
                   {m.value}
                 </p>
-                <p className="text-[11px] text-[#A2A29A] truncate">{m.sub}</p>
+                <p className="text-[11px] text-[#8E928B] truncate">{m.sub}</p>
               </div>
             </Card>
           );
@@ -244,7 +244,7 @@ export default function DashboardPage() {
       {/* Charts Section: Revenue & Order Trends */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Revenue Trend Area Chart (2 cols) */}
-        <Card className="lg:col-span-2 border-[#EAE7E0]">
+        <Card className="lg:col-span-2 border-black/[0.06]">
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
               <div>
@@ -264,30 +264,30 @@ export default function DashboardPage() {
                 <AreaChart data={revenueTrends} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                   <defs>
                     <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#C76B4A" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#C76B4A" stopOpacity={0.0} />
+                      <stop offset="5%" stopColor="#C2B0DC" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#C2B0DC" stopOpacity={0.0} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#F1EEE8" vertical={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="black/[0.04]" vertical={false} />
                   <XAxis
                     dataKey="label"
-                    stroke="#A2A29A"
+                    stroke="#8E928B"
                     fontSize={11}
                     tickLine={false}
-                    axisLine={{ stroke: '#EAE7E0' }}
+                    axisLine={{ stroke: 'black/[0.06]' }}
                   />
                   <YAxis
-                    stroke="#A2A29A"
+                    stroke="#8E928B"
                     fontSize={11}
                     tickLine={false}
-                    axisLine={{ stroke: '#EAE7E0' }}
+                    axisLine={{ stroke: 'black/[0.06]' }}
                     tickFormatter={(val) => `₹${val}`}
                   />
                   <Tooltip
                     contentStyle={{
                       backgroundColor: '#FFFFFF',
                       borderRadius: '10px',
-                      border: '1px solid #EAE7E0',
+                      border: '1px solid black/[0.06]',
                       boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
                       fontFamily: 'var(--font-dm-sans)',
                       fontSize: '12px',
@@ -297,7 +297,7 @@ export default function DashboardPage() {
                   <Area
                     type="monotone"
                     dataKey="revenue"
-                    stroke="#C76B4A"
+                    stroke="#C2B0DC"
                     strokeWidth={2.5}
                     fillOpacity={1}
                     fill="url(#colorRevenue)"
@@ -309,7 +309,7 @@ export default function DashboardPage() {
         </Card>
 
         {/* Order Volume Bar Chart (1 col) */}
-        <Card className="border-[#EAE7E0]">
+        <Card className="border-black/[0.06]">
           <CardHeader className="pb-2">
             <CardTitle className="text-base font-semibold">Daily Order Volume</CardTitle>
             <CardDescription className="text-xs">
@@ -320,31 +320,31 @@ export default function DashboardPage() {
             <div className="h-64 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={revenueTrends} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#F1EEE8" vertical={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="black/[0.04]" vertical={false} />
                   <XAxis
                     dataKey="label"
-                    stroke="#A2A29A"
+                    stroke="#8E928B"
                     fontSize={10}
                     tickLine={false}
-                    axisLine={{ stroke: '#EAE7E0' }}
+                    axisLine={{ stroke: 'black/[0.06]' }}
                   />
                   <YAxis
-                    stroke="#A2A29A"
+                    stroke="#8E928B"
                     fontSize={11}
                     tickLine={false}
-                    axisLine={{ stroke: '#EAE7E0' }}
+                    axisLine={{ stroke: 'black/[0.06]' }}
                     allowDecimals={false}
                   />
                   <Tooltip
                     contentStyle={{
                       backgroundColor: '#FFFFFF',
                       borderRadius: '10px',
-                      border: '1px solid #EAE7E0',
+                      border: '1px solid black/[0.06]',
                       fontSize: '12px',
                     }}
                     formatter={(value: any) => [value, 'Orders']}
                   />
-                  <Bar dataKey="orders" fill="#66745B" radius={[6, 6, 0, 0]} />
+                  <Bar dataKey="orders" fill="#B4D58A" radius={[6, 6, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -353,8 +353,8 @@ export default function DashboardPage() {
       </div>
 
       {/* Multi-Restaurant Performance Table */}
-      <Card className="border-[#EAE7E0] overflow-hidden">
-        <CardHeader className="p-5 pb-3 border-b border-[#F1EEE8] flex flex-row items-center justify-between">
+      <Card className="border-black/[0.06] overflow-hidden">
+        <CardHeader className="p-5 pb-3 border-b border-black/[0.04] flex flex-row items-center justify-between">
           <div>
             <CardTitle className="text-base font-semibold">Restaurant Tenant Performance</CardTitle>
             <CardDescription className="text-xs">
@@ -369,7 +369,7 @@ export default function DashboardPage() {
         </CardHeader>
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="bg-[#FAF8F4] border-b border-[#EAE7E0] text-[#777872] uppercase font-semibold">
+            <thead className="bg-[#FAF9F6] border-b border-black/[0.06] text-[#5A5D58] uppercase font-semibold">
               <tr>
                 <th className="py-3 px-5">Restaurant</th>
                 <th className="py-3 px-4">Branches</th>
@@ -379,39 +379,39 @@ export default function DashboardPage() {
                 <th className="py-3 px-4 text-right">Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#F1EEE8]">
+            <tbody className="divide-y divide-black/[0.04]">
               {restaurantPerformance.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="py-6 text-center text-[#777872]">
+                  <td colSpan={6} className="py-6 text-center text-[#5A5D58]">
                     No restaurants currently provisioned.
                   </td>
                 </tr>
               ) : (
                 restaurantPerformance.map((rp: any) => (
-                  <tr key={rp.id} className="hover:bg-[#FAF8F4]/60 transition-colors">
-                    <td className="py-3.5 px-5 font-semibold text-[#292B28]">
+                  <tr key={rp.id} className="hover:bg-[#FAF9F6]/60 transition-colors">
+                    <td className="py-3.5 px-5 font-semibold text-[#252525]">
                       <div className="flex items-center gap-2.5">
-                        <div className="h-7 w-7 rounded-lg bg-[#F8EAE3] text-[#C76B4A] font-bold flex items-center justify-center text-xs">
+                        <div className="h-7 w-7 rounded-lg bg-[#C2B0DC]/20 text-[#C2B0DC] font-bold flex items-center justify-center text-xs">
                           {rp.name.charAt(0)}
                         </div>
                         <div>
                           <span>{rp.name}</span>
-                          <span className="text-[10px] text-[#777872] block font-mono">
+                          <span className="text-[10px] text-[#5A5D58] block font-mono">
                             /{rp.slug}
                           </span>
                         </div>
                       </div>
                     </td>
-                    <td className="py-3.5 px-4 text-[#292B28]">
+                    <td className="py-3.5 px-4 text-[#252525]">
                       {rp.branches_count} location{rp.branches_count !== 1 ? 's' : ''}
                     </td>
-                    <td className="py-3.5 px-4 font-semibold text-[#5185B8]">
+                    <td className="py-3.5 px-4 font-semibold text-[#C2B0DC]">
                       {rp.active_tables} table{rp.active_tables !== 1 ? 's' : ''} occupied
                     </td>
-                    <td className="py-3.5 px-4 font-mono font-medium text-[#292B28]">
+                    <td className="py-3.5 px-4 font-mono font-medium text-[#252525]">
                       {rp.orders_count}
                     </td>
-                    <td className="py-3.5 px-4 font-bold text-[#39845C]">
+                    <td className="py-3.5 px-4 font-bold text-[#B4D58A]">
                       {rp.currency_symbol}{Number(rp.total_revenue).toFixed(2)}
                     </td>
                     <td className="py-3.5 px-4 text-right">
@@ -430,39 +430,39 @@ export default function DashboardPage() {
       {/* Two Column Grid: Recent Orders & Recent Activities */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Recent Orders Feed */}
-        <Card className="border-[#EAE7E0]">
-          <CardHeader className="p-5 pb-3 border-b border-[#F1EEE8] flex flex-row items-center justify-between">
+        <Card className="border-black/[0.06]">
+          <CardHeader className="p-5 pb-3 border-b border-black/[0.04] flex flex-row items-center justify-between">
             <div>
               <CardTitle className="text-base font-semibold">Recent Orders</CardTitle>
               <CardDescription className="text-xs">
                 Latest transactions across dine-in and takeaway
               </CardDescription>
             </div>
-            <Receipt className="h-4 w-4 text-[#777872]" />
+            <Receipt className="h-4 w-4 text-[#5A5D58]" />
           </CardHeader>
-          <div className="divide-y divide-[#F1EEE8]">
+          <div className="divide-y divide-black/[0.04]">
             {recentOrders.length === 0 ? (
-              <div className="p-6 text-center text-xs text-[#777872]">No recent orders logged.</div>
+              <div className="p-6 text-center text-xs text-[#5A5D58]">No recent orders logged.</div>
             ) : (
               recentOrders.map((ord: any) => (
-                <div key={ord.id} className="p-4 flex items-center justify-between hover:bg-[#FAF8F4]/50 transition-colors text-xs">
+                <div key={ord.id} className="p-4 flex items-center justify-between hover:bg-[#FAF9F6]/50 transition-colors text-xs">
                   <div className="flex items-center gap-3">
-                    <div className="h-9 w-9 rounded-xl bg-[#FAF8F4] border border-[#EAE7E0] flex items-center justify-center font-semibold text-[#C76B4A]">
+                    <div className="h-9 w-9 rounded-xl bg-[#FAF9F6] border border-black/[0.06] flex items-center justify-center font-semibold text-[#C2B0DC]">
                       {ord.order_type === 'dine_in' ? 'DIN' : 'TAK'}
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="font-bold text-[#292B28]">{ord.order_number}</span>
-                        <span className="text-[11px] text-[#777872]">• Table {ord.table_number}</span>
+                        <span className="font-bold text-[#252525]">{ord.order_number}</span>
+                        <span className="text-[11px] text-[#5A5D58]">• Table {ord.table_number}</span>
                       </div>
-                      <span className="text-[11px] text-[#A2A29A]">
+                      <span className="text-[11px] text-[#8E928B]">
                         {ord.restaurant_name} ({ord.branch_name}) • {ord.created_at}
                       </span>
                     </div>
                   </div>
 
                   <div className="text-right">
-                    <span className="font-bold text-sm text-[#292B28] block">
+                    <span className="font-bold text-sm text-[#252525] block">
                       {ord.currency_symbol}{ord.total_amount.toFixed(2)}
                     </span>
                     <Badge
@@ -485,8 +485,8 @@ export default function DashboardPage() {
         </Card>
 
         {/* Recent Audit Logs Feed */}
-        <Card className="border-[#EAE7E0]">
-          <CardHeader className="p-5 pb-3 border-b border-[#F1EEE8] flex flex-row items-center justify-between">
+        <Card className="border-black/[0.06]">
+          <CardHeader className="p-5 pb-3 border-b border-black/[0.04] flex flex-row items-center justify-between">
             <div>
               <CardTitle className="text-base font-semibold">Audit Activity Trail</CardTitle>
               <CardDescription className="text-xs">
@@ -494,31 +494,31 @@ export default function DashboardPage() {
               </CardDescription>
             </div>
             <Link href="/audit-logs">
-              <Button variant="ghost" size="sm" className="text-xs gap-1 text-[#C76B4A]">
+              <Button variant="ghost" size="sm" className="text-xs gap-1 text-[#C2B0DC]">
                 Full Log <ArrowUpRight className="h-3.5 w-3.5" />
               </Button>
             </Link>
           </CardHeader>
-          <div className="divide-y divide-[#F1EEE8]">
+          <div className="divide-y divide-black/[0.04]">
             {recentActivities.length === 0 ? (
-              <div className="p-6 text-center text-xs text-[#777872]">No activity logged yet.</div>
+              <div className="p-6 text-center text-xs text-[#5A5D58]">No activity logged yet.</div>
             ) : (
               recentActivities.map((act: any) => (
-                <div key={act.id} className="p-4 flex items-center justify-between hover:bg-[#FAF8F4]/50 transition-colors text-xs">
+                <div key={act.id} className="p-4 flex items-center justify-between hover:bg-[#FAF9F6]/50 transition-colors text-xs">
                   <div className="flex items-center gap-3">
-                    <div className="h-8 w-8 rounded-full bg-[#EBF3FB] text-[#5185B8] flex items-center justify-center shrink-0">
+                    <div className="h-8 w-8 rounded-full bg-[#EBF3FB] text-[#C2B0DC] flex items-center justify-center shrink-0">
                       <ShieldCheck className="h-4 w-4" />
                     </div>
                     <div>
-                      <span className="font-mono font-semibold text-[#292B28] block">
+                      <span className="font-mono font-semibold text-[#252525] block">
                         {act.action}
                       </span>
-                      <span className="text-[11px] text-[#777872]">
+                      <span className="text-[11px] text-[#5A5D58]">
                         by <strong>{act.user_name}</strong> • {act.restaurant_name}
                       </span>
                     </div>
                   </div>
-                  <span className="text-[11px] text-[#A2A29A] font-mono shrink-0">
+                  <span className="text-[11px] text-[#8E928B] font-mono shrink-0">
                     {act.created_at}
                   </span>
                 </div>

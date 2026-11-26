@@ -18,6 +18,7 @@ import {
   KeyRound,
   ShieldCheck,
   Check,
+  ArrowRight,
 } from 'lucide-react';
 
 export default function LoginPage() {
@@ -29,12 +30,12 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
 
   const demoAccounts = [
-    { role: 'Super Admin', email: 'superadmin@resto.com', desc: 'Universal multi-tenant control' },
-    { role: 'Restaurant Admin', email: 'admin@grandfeast.com', desc: 'The Grand Feast owner' },
-    { role: 'Branch Manager', email: 'manager@grandfeast.com', desc: 'Downtown Flagship manager' },
-    { role: 'Cashier / POS', email: 'cashier@grandfeast.com', desc: 'Billing & Table checkout' },
-    { role: 'Waiter', email: 'waiter@grandfeast.com', desc: 'Table orders & status' },
-    { role: 'Kitchen Chef', email: 'kitchen@grandfeast.com', desc: 'Kitchen KDS preparation' },
+    { role: 'Super Admin', email: 'superadmin@resto.com', desc: 'Universal multi-tenant control', color: 'bg-[#C2B0DC]/25 text-[#252525] border-[#C2B0DC]' },
+    { role: 'Restaurant Admin', email: 'admin@grandfeast.com', desc: 'The Grand Feast owner', color: 'bg-[#B4D58A]/25 text-[#252525] border-[#B4D58A]' },
+    { role: 'Branch Manager', email: 'manager@grandfeast.com', desc: 'Downtown Flagship manager', color: 'bg-[#F3DA8A]/25 text-[#252525] border-[#F3DA8A]' },
+    { role: 'Cashier / POS', email: 'cashier@grandfeast.com', desc: 'Billing & Table checkout', color: 'bg-[#F2AFC0]/25 text-[#252525] border-[#F2AFC0]' },
+    { role: 'Waiter', email: 'waiter@grandfeast.com', desc: 'Table orders & status', color: 'bg-[#C2B0DC]/20 text-[#252525] border-[#C2B0DC]' },
+    { role: 'Kitchen Chef', email: 'kitchen@grandfeast.com', desc: 'Kitchen KDS preparation', color: 'bg-[#B4D58A]/20 text-[#252525] border-[#B4D58A]' },
   ];
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -77,30 +78,35 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#FAF8F4] px-4 py-12 sm:px-6 lg:px-8">
-      <div className="w-full max-w-md space-y-6">
+    <div className="relative min-h-screen flex items-center justify-center bg-[#C2B0DC] px-4 py-12 sm:px-6 lg:px-8 overflow-hidden font-poppins">
+      {/* Decorative floating blur spheres */}
+      <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-white/20 blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-32 -right-32 w-96 h-96 rounded-full bg-[#F2AFC0]/30 blur-3xl pointer-events-none" />
+      <div className="absolute top-1/4 right-10 w-64 h-64 rounded-full bg-[#F3DA8A]/25 blur-2xl pointer-events-none" />
+
+      <div className="relative z-10 w-full max-w-lg space-y-6 animate-slide-up">
         {/* Brand header */}
-        <div className="text-center space-y-2">
-          <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[#C76B4A] text-white shadow-sm mb-2">
-            <Sparkles className="h-6 w-6" />
-          </div>
-          <h1 className="font-serif text-3xl font-semibold tracking-tight text-[#292B28]">
+        <div className="text-center space-y-3">
+          <Link href="/" className="inline-flex h-14 w-14 items-center justify-center rounded-3xl bg-white text-[#C2B0DC] shadow-[0_10px_30px_rgba(60,40,80,0.2)] mb-1 hover:scale-105 transition-transform">
+            <Sparkles className="h-7 w-7" />
+          </Link>
+          <h1 className="font-baloo text-4xl sm:text-5xl font-extrabold tracking-tight text-white leading-none">
             Restaurant OS
           </h1>
-          <p className="text-sm text-[#777872]">
-            High-performance multi-restaurant operating platform
+          <p className="text-sm font-medium text-white/90 uppercase tracking-widest">
+            Creative Multi-Tenant Operating Platform
           </p>
         </div>
 
         {/* Login Card */}
-        <Card className="border-[#EAE7E0] shadow-sm">
-          <CardHeader className="space-y-1">
-            <CardTitle className="text-xl">Sign in to your station</CardTitle>
-            <CardDescription>
+        <Card className="rounded-3xl border-none shadow-[0_20px_60px_rgba(60,40,80,0.22)] bg-white/95 backdrop-blur-xl p-2 sm:p-4">
+          <CardHeader className="space-y-1.5 pb-4">
+            <CardTitle className="text-2xl font-bold text-[#252525]">Sign in to station</CardTitle>
+            <CardDescription className="text-sm text-[#5A5D58]">
               Enter your credentials to access your restaurant station
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-6">
             <form onSubmit={handleLogin} className="space-y-4">
               <Input
                 label="Email or Username"
@@ -111,29 +117,32 @@ export default function LoginPage() {
                 required
               />
 
-              <div className="space-y-1.5">
+              <div className="space-y-1">
                 <div className="flex items-center justify-between">
-                  <label className="text-xs font-semibold uppercase tracking-wider text-[#777872]">
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-[#5A5D58]">
                     Password
                   </label>
                   <Link
                     href="/forgot-password"
-                    className="text-xs font-medium text-[#C76B4A] hover:text-[#AE593B]"
+                    className="text-xs font-semibold text-[#5A5D58] hover:text-[#252525] transition-colors"
                   >
                     Forgot password?
                   </Link>
                 </div>
-                <Input
+                <input
                   type="password"
                   placeholder="••••••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  className="flex h-12 w-full rounded-2xl border border-black/[0.08] bg-white px-4 py-3 text-sm text-[#252525] placeholder:text-[#8E928B] transition-all outline-none focus:border-[#C2B0DC] focus:ring-4 focus:ring-[#C2B0DC]/20 font-medium"
                   required
                 />
               </div>
 
               <Button
                 type="submit"
+                variant="lilac"
+                size="lg"
                 className="w-full mt-2"
                 isLoading={isLoading}
               >
@@ -141,15 +150,16 @@ export default function LoginPage() {
               </Button>
             </form>
 
-            {/* Quick Demo Credentials Selector */}
-            <div className="mt-6 pt-5 border-t border-[#EAE7E0]">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-semibold uppercase tracking-wider text-[#777872]">
-                  Quick Demo Access (Phase 1)
+            {/* Quick Demo Access Switcher */}
+            <div className="pt-4 border-t border-black/[0.06] space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-[#8E928B]">
+                  Quick Demo Access
                 </span>
-                <span className="text-[11px] text-[#A2A29A]">Click to test</span>
+                <span className="text-[10px] text-[#5A5D58] font-medium">Click to test</span>
               </div>
-              <div className="grid grid-cols-2 gap-2">
+
+              <div className="grid grid-cols-2 gap-2.5">
                 {demoAccounts.map((account) => {
                   const isSelected = login === account.email;
                   return (
@@ -157,30 +167,39 @@ export default function LoginPage() {
                       key={account.role}
                       type="button"
                       onClick={() => selectDemoAccount(account.email)}
-                      className={`text-left p-2.5 rounded-[10px] border transition-all text-xs cursor-pointer ${
+                      className={`text-left p-3 rounded-2xl border transition-all text-xs cursor-pointer ${
                         isSelected
-                          ? 'border-[#C76B4A] bg-[#F8EAE3] text-[#292B28]'
-                          : 'border-[#EAE7E0] bg-[#FAF8F4] hover:bg-[#F3F1EB] text-[#777872]'
+                          ? 'border-[#C2B0DC] bg-[#C2B0DC]/20 shadow-xs'
+                          : 'border-black/[0.06] bg-black/[0.02] hover:bg-black/[0.04]'
                       }`}
                     >
-                      <div className="flex items-center justify-between font-semibold text-[#292B28]">
-                        <span>{account.role}</span>
-                        {isSelected && <Check className="h-3 w-3 text-[#C76B4A]" />}
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-[#252525]">{account.role}</span>
+                        {isSelected && <Check className="h-3.5 w-3.5 text-[#252525]" />}
                       </div>
-                      <p className="text-[10px] text-[#777872] truncate mt-0.5">
+                      <span className="text-[10px] text-[#5A5D58] line-clamp-1 mt-0.5 font-medium">
                         {account.desc}
-                      </p>
+                      </span>
                     </button>
                   );
                 })}
               </div>
             </div>
+
+            <div className="text-center pt-2">
+              <Link
+                href="/"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#5A5D58] hover:text-[#252525] transition-colors"
+              >
+                <span>← Back to public website</span>
+              </Link>
+            </div>
           </CardContent>
         </Card>
 
-        {/* Footer info */}
-        <p className="text-center text-xs text-[#A2A29A]">
-          Restaurant OS v1.0 • Multi-Tenant RBAC Security • Phase 1 Deliverable
+        {/* System Footnote */}
+        <p className="text-center text-xs text-white/80 font-medium tracking-wide">
+          Restaurant OS · Multi-Tenant RBAC Security
         </p>
       </div>
     </div>

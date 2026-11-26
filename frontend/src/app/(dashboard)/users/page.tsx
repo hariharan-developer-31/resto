@@ -226,10 +226,10 @@ export default function UsersManagementPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="font-serif text-2xl sm:text-3xl font-semibold text-[#292B28]">
+          <h1 className="font-bold text-2xl sm:text-3xl font-semibold text-[#252525]">
             User & Staff Management
           </h1>
-          <p className="text-xs text-[#777872]">
+          <p className="text-xs text-[#5A5D58]">
             Provision staff, managers, waiters, cashiers, and assign multi-restaurant access
           </p>
         </div>
@@ -242,20 +242,20 @@ export default function UsersManagementPage() {
       {/* Filter and Search Bar */}
       <div className="flex flex-col sm:flex-row items-center gap-3">
         <div className="relative flex-1 w-full sm:max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#A2A29A]" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#8E928B]" />
           <input
             type="text"
             placeholder="Search by name, email, or username..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full h-10 pl-9 pr-4 rounded-[10px] border border-[#EAE7E0] bg-white text-sm text-[#292B28] placeholder:text-[#A2A29A] outline-none focus:border-[#C76B4A]"
+            className="w-full h-10 pl-9 pr-4 rounded-[10px] border border-black/[0.06] bg-white text-sm text-[#252525] placeholder:text-[#8E928B] outline-none focus:border-[#C2B0DC]"
           />
         </div>
 
         <select
           value={roleFilter}
           onChange={(e) => setRoleFilter(e.target.value)}
-          className="h-10 px-3 rounded-[10px] border border-[#EAE7E0] bg-white text-xs font-medium text-[#292B28] outline-none cursor-pointer"
+          className="h-10 px-3 rounded-[10px] border border-black/[0.06] bg-white text-xs font-medium text-[#252525] outline-none cursor-pointer"
         >
           <option value="">All Roles</option>
           {rolesList.map((r: any) => (
@@ -265,10 +265,10 @@ export default function UsersManagementPage() {
       </div>
 
       {/* Users Table */}
-      <Card className="border-[#EAE7E0] overflow-hidden">
+      <Card className="border-black/[0.06] overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="bg-[#FAF8F4] border-b border-[#EAE7E0] text-[#777872] uppercase font-semibold">
+            <thead className="bg-[#FAF9F6] border-b border-black/[0.06] text-[#5A5D58] uppercase font-semibold">
               <tr>
                 <th className="py-3 px-4">User</th>
                 <th className="py-3 px-4">Role</th>
@@ -278,16 +278,16 @@ export default function UsersManagementPage() {
                 <th className="py-3 px-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#F1EEE8]">
+            <tbody className="divide-y divide-black/[0.04]">
               {isLoading ? (
                 <tr>
-                  <td colSpan={6} className="py-8 text-center text-[#777872]">
+                  <td colSpan={6} className="py-8 text-center text-[#5A5D58]">
                     Loading user directory...
                   </td>
                 </tr>
               ) : users.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="py-8 text-center text-[#777872]">
+                  <td colSpan={6} className="py-8 text-center text-[#5A5D58]">
                     No users match your filters.
                   </td>
                 </tr>
@@ -297,17 +297,17 @@ export default function UsersManagementPage() {
                   const isCurrent = currentUser?.id === u.id;
 
                   return (
-                    <tr key={u.id} className="hover:bg-[#FAF8F4]/60 transition-colors">
+                    <tr key={u.id} className="hover:bg-[#FAF9F6]/60 transition-colors">
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-2.5">
-                          <div className="h-8 w-8 rounded-lg bg-[#F8EAE3] text-[#C76B4A] font-semibold flex items-center justify-center shrink-0">
+                          <div className="h-8 w-8 rounded-lg bg-[#C2B0DC]/20 text-[#C2B0DC] font-semibold flex items-center justify-center shrink-0">
                             {u.name.charAt(0)}
                           </div>
                           <div>
-                            <span className="font-semibold text-[#292B28] block">{u.name}</span>
-                            <span className="text-[11px] text-[#777872] block">{u.email}</span>
+                            <span className="font-semibold text-[#252525] block">{u.name}</span>
+                            <span className="text-[11px] text-[#5A5D58] block">{u.email}</span>
                             {u.username && (
-                              <span className="font-mono text-[10px] text-[#A2A29A]">@{u.username}</span>
+                              <span className="font-mono text-[10px] text-[#8E928B]">@{u.username}</span>
                             )}
                           </div>
                         </div>
@@ -332,7 +332,7 @@ export default function UsersManagementPage() {
 
                       <td className="py-3 px-4">
                         {roleName === 'Super Admin' ? (
-                          <span className="text-[11px] font-medium text-[#C76B4A]">
+                          <span className="text-[11px] font-medium text-[#C2B0DC]">
                             Universal (All Restaurants)
                           </span>
                         ) : u.restaurants && u.restaurants.length > 0 ? (
@@ -340,14 +340,14 @@ export default function UsersManagementPage() {
                             {u.restaurants.map((rest: any) => (
                               <span
                                 key={rest.id}
-                                className="inline-block px-2 py-0.5 rounded bg-[#FAF8F4] border border-[#EAE7E0] text-[10px] font-medium text-[#292B28]"
+                                className="inline-block px-2 py-0.5 rounded bg-[#FAF9F6] border border-black/[0.06] text-[10px] font-medium text-[#252525]"
                               >
                                 {rest.name}
                               </span>
                             ))}
                           </div>
                         ) : (
-                          <span className="text-[#A2A29A]">None assigned</span>
+                          <span className="text-[#8E928B]">None assigned</span>
                         )}
                       </td>
 
@@ -357,7 +357,7 @@ export default function UsersManagementPage() {
                         </Badge>
                       </td>
 
-                      <td className="py-3 px-4 text-[#777872] font-mono text-[11px]">
+                      <td className="py-3 px-4 text-[#5A5D58] font-mono text-[11px]">
                         {u.last_login_at ? new Date(u.last_login_at).toLocaleDateString() : 'Never'}
                       </td>
 
@@ -366,14 +366,14 @@ export default function UsersManagementPage() {
                           <button
                             onClick={() => openResetPasswordModal(u)}
                             title="Reset Password"
-                            className="p-1.5 rounded-lg border border-[#EAE7E0] text-[#777872] hover:text-[#C76B4A] hover:bg-white transition-colors"
+                            className="p-1.5 rounded-lg border border-black/[0.06] text-[#5A5D58] hover:text-[#C2B0DC] hover:bg-white transition-colors"
                           >
                             <KeyRound className="h-3.5 w-3.5" />
                           </button>
                           <button
                             onClick={() => openEditModal(u)}
                             title="Edit User"
-                            className="p-1.5 rounded-lg border border-[#EAE7E0] text-[#777872] hover:text-[#292B28] hover:bg-white transition-colors"
+                            className="p-1.5 rounded-lg border border-black/[0.06] text-[#5A5D58] hover:text-[#252525] hover:bg-white transition-colors"
                           >
                             <Edit className="h-3.5 w-3.5" />
                           </button>
@@ -384,8 +384,8 @@ export default function UsersManagementPage() {
                             className={`p-1.5 rounded-lg border transition-colors ${
                               isCurrent ? 'opacity-30 cursor-not-allowed' :
                               u.is_active
-                                ? 'text-[#39845C] border-[#D5EAD9] bg-[#EBF5EF] hover:bg-[#D5EAD9]'
-                                : 'text-[#A2A29A] border-[#EAE7E0] bg-white hover:bg-[#F3F1EB]'
+                                ? 'text-[#B4D58A] border-[#D5EAD9] bg-[#B4D58A]/20 hover:bg-[#D5EAD9]'
+                                : 'text-[#8E928B] border-black/[0.06] bg-white hover:bg-[#F3DA8A]/25'
                             }`}
                           >
                             <Power className="h-3.5 w-3.5" />
@@ -398,7 +398,7 @@ export default function UsersManagementPage() {
                               }
                             }}
                             title={isCurrent ? 'Cannot delete self' : 'Delete'}
-                            className={`p-1.5 rounded-lg border border-[#EAE7E0] text-[#C84D4D] hover:bg-[#FDF0F0] hover:border-[#F8DADA] transition-colors ${
+                            className={`p-1.5 rounded-lg border border-black/[0.06] text-[#F2AFC0] hover:bg-[#F2AFC0]/20 hover:border-[#F8DADA] transition-colors ${
                               isCurrent ? 'opacity-30 cursor-not-allowed' : ''
                             }`}
                           >
@@ -417,10 +417,10 @@ export default function UsersManagementPage() {
 
       {/* Create / Edit Modal */}
       {(isCreateModalOpen || isEditModalOpen) && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#292B28]/40 backdrop-blur-xs p-4">
-          <div className="w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl bg-white border border-[#EAE7E0] shadow-xl p-6 space-y-5">
-            <div className="flex items-center justify-between pb-3 border-b border-[#EAE7E0]">
-              <h2 className="font-serif text-xl font-semibold text-[#292B28]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#252525]/40 backdrop-blur-xs p-4">
+          <div className="w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl bg-white border border-black/[0.06] shadow-xl p-6 space-y-5">
+            <div className="flex items-center justify-between pb-3 border-b border-black/[0.06]">
+              <h2 className="font-bold text-xl font-semibold text-[#252525]">
                 {isEditModalOpen ? 'Edit Staff Profile' : 'Create Staff User'}
               </h2>
               <button
@@ -428,7 +428,7 @@ export default function UsersManagementPage() {
                   setIsCreateModalOpen(false);
                   setIsEditModalOpen(false);
                 }}
-                className="p-1.5 text-[#777872] hover:text-[#292B28] rounded-lg hover:bg-[#FAF8F4]"
+                className="p-1.5 text-[#5A5D58] hover:text-[#252525] rounded-lg hover:bg-[#FAF9F6]"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -479,13 +479,13 @@ export default function UsersManagementPage() {
                 />
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-semibold uppercase tracking-wider text-[#777872]">
+                  <label className="text-xs font-semibold uppercase tracking-wider text-[#5A5D58]">
                     User Role *
                   </label>
                   <select
                     value={role}
                     onChange={(e) => setRole(e.target.value)}
-                    className="w-full h-10 px-3 rounded-[10px] border border-[#EAE7E0] bg-white text-sm text-[#292B28] outline-none focus:border-[#C76B4A]"
+                    className="w-full h-10 px-3 rounded-[10px] border border-black/[0.06] bg-white text-sm text-[#252525] outline-none focus:border-[#C2B0DC]"
                     required
                   >
                     {rolesList.map((r: any) => (
@@ -508,11 +508,11 @@ export default function UsersManagementPage() {
 
               {/* Multi-Restaurant Assignment */}
               <div className="space-y-1.5 pt-2">
-                <label className="text-xs font-semibold uppercase tracking-wider text-[#777872]">
+                <label className="text-xs font-semibold uppercase tracking-wider text-[#5A5D58]">
                   Assigned Restaurants
                 </label>
-                <p className="text-[11px] text-[#A2A29A]">Select restaurants this user is authorized to access</p>
-                <div className="max-h-32 overflow-y-auto p-2 rounded-xl border border-[#EAE7E0] bg-[#FAF8F4] space-y-1">
+                <p className="text-[11px] text-[#8E928B]">Select restaurants this user is authorized to access</p>
+                <div className="max-h-32 overflow-y-auto p-2 rounded-xl border border-black/[0.06] bg-[#FAF9F6] space-y-1">
                   {availableRestaurants.map((rest: any) => {
                     const checked = selectedRestaurantIds.includes(rest.id);
                     return (
@@ -527,17 +527,17 @@ export default function UsersManagementPage() {
                               setSelectedRestaurantIds(selectedRestaurantIds.filter((id) => id !== rest.id));
                             }
                           }}
-                          className="rounded border-[#EAE7E0] text-[#C76B4A] focus:ring-[#C76B4A]"
+                          className="rounded border-black/[0.06] text-[#C2B0DC] focus:ring-[#C2B0DC]"
                         />
-                        <span className="font-medium text-[#292B28]">{rest.name}</span>
-                        <span className="text-[10px] text-[#777872]">({rest.slug})</span>
+                        <span className="font-medium text-[#252525]">{rest.name}</span>
+                        <span className="text-[10px] text-[#5A5D58]">({rest.slug})</span>
                       </label>
                     );
                   })}
                 </div>
               </div>
 
-              <div className="flex items-center justify-end gap-3 pt-3 border-t border-[#EAE7E0]">
+              <div className="flex items-center justify-end gap-3 pt-3 border-t border-black/[0.06]">
                 <Button
                   type="button"
                   variant="outline"
@@ -562,15 +562,15 @@ export default function UsersManagementPage() {
 
       {/* Admin Direct Password Reset Modal */}
       {isResetPasswordModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#292B28]/40 backdrop-blur-xs p-4">
-          <div className="w-full max-w-sm rounded-2xl bg-white border border-[#EAE7E0] shadow-xl p-6 space-y-4">
-            <div className="flex items-center justify-between pb-2 border-b border-[#EAE7E0]">
-              <h2 className="font-serif text-lg font-semibold text-[#292B28]">Reset Password</h2>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#252525]/40 backdrop-blur-xs p-4">
+          <div className="w-full max-w-sm rounded-2xl bg-white border border-black/[0.06] shadow-xl p-6 space-y-4">
+            <div className="flex items-center justify-between pb-2 border-b border-black/[0.06]">
+              <h2 className="font-bold text-lg font-semibold text-[#252525]">Reset Password</h2>
               <button onClick={() => setIsResetPasswordModalOpen(false)}>
-                <X className="h-5 w-5 text-[#777872]" />
+                <X className="h-5 w-5 text-[#5A5D58]" />
               </button>
             </div>
-            <p className="text-xs text-[#777872]">
+            <p className="text-xs text-[#5A5D58]">
               Set a new password directly for <strong>{selectedUser?.name}</strong>.
             </p>
             <form
