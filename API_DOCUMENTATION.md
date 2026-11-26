@@ -232,3 +232,77 @@
 
 - `GET /audit-logs?action=kds.item_status_updated&page=1` – Paginated audit events.
 - `GET /tenant/verify` – Tenant isolation verification header test.
+
+---
+
+## 10. Public Guest & Contactless QR Ordering Portal
+
+All endpoints under `/public/` do not require Sanctum user authentication.
+
+### 10.1 Restaurant Public Brand Profile
+- **Endpoint:** `GET /public/restaurant/{slugOrId}`
+- **Auth:** None (Public)
+- **Response `200 OK`:** Returns restaurant details, branding tokens, active branch addresses, phone numbers, opening hours, and active menu items grouped by category with variants and add-ons.
+
+### 10.2 Table QR Token Resolution
+- **Endpoint:** `GET /public/table/{qrToken}`
+- **Auth:** None (Public)
+- **Response `200 OK`:** Validates the 36-character random table token (`tbl_...`), returns the assigned restaurant, branch, table number, capacity, and any currently active order session on that table.
+
+### 10.3 Contactless Table Order Placement
+- **Endpoint:** `POST /public/table/{qrToken}/order`
+- **Auth:** None (Public)
+- **Request Body:**
+```json
+{
+  "customer_name": "Suresh Kumar",
+  "customer_phone": "9888877777",
+  "special_instructions": "Table guest order",
+  "items": [
+    {
+      "menu_item_id": 1,
+      "menu_variant_id": 2,
+      "quantity": 2,
+      "special_instructions": "Extra raita please",
+      "addon_ids": [1, 3]
+    }
+  ]
+}
+```
+- **Response `201 Created`:** Creates a new Dine-in Order or appends an additional order round (`Round 2`, `Round 3`) if the table is already occupied. Dispatches a new KOT number and updates table status to `occupied`.
+
+### 10.4 Live Order Preparation Tracking
+- **Endpoint:** `GET /public/orders/{orderNumber}/track`
+- **Auth:** None (Public)
+- **Response `200 OK`:** Returns real-time 4-stage cooking progress (`pending`, `preparing`, `ready`, `completed`), elapsed cooking time, current KOT, and list of round items with their individual preparation states.
+
+### 10.5 Digital Table Bell Service Request
+- **Endpoint:** `POST /public/table/{qrToken}/service-request`
+- **Auth:** None (Public)
+- **Request Body:**
+```json
+{
+  "request_type": "call_waiter", // "call_waiter", "water", "bill", "custom"
+  "message": "Need additional cutlery"
+}
+```
+- **Response `200 OK`:** Records service bell notification and logs audit event for floor staff.
+
+### 10.6 Table Reservation Booking
+- **Endpoint:** `POST /public/reservations`
+- **Auth:** None (Public)
+- **Request Body:**
+```json
+{
+  "restaurant_id": 1,
+  "branch_id": 1,
+  "customer_name": "Meera Krishnan",
+  "customer_phone": "+91 91234 56789",
+  "customer_email": "meera@example.com",
+  "guest_count": 4,
+  "reservation_date": "2026-11-27",
+  "reservation_time": "20:00",
+  "special_requests": "Quiet booth preferred"
+}
+```
+- **Response `201 Created`:** Confirms reservation with booking timestamp, branch, and guest details.

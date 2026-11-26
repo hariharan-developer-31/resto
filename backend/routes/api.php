@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\V1\CategoryController;
 use App\Http\Controllers\Api\V1\KdsController;
 use App\Http\Controllers\Api\V1\MenuItemController;
 use App\Http\Controllers\Api\V1\OrderController;
+use App\Http\Controllers\Api\V1\PublicGuestController;
 use App\Http\Controllers\Api\V1\RestaurantController;
 use App\Http\Controllers\Api\V1\RolePermissionController;
 use App\Http\Controllers\Api\V1\SuperAdminController;
@@ -26,6 +27,16 @@ Route::prefix('v1')->group(function () {
     // Public System & Health Routes
     Route::get('/health', [SystemController::class, 'health']);
     Route::get('/bootstrap', [SystemController::class, 'bootstrap']);
+
+    // Public Customer & Contactless QR Routes
+    Route::prefix('public')->group(function () {
+        Route::get('/restaurants/{slug}', [PublicGuestController::class, 'restaurantDetails']);
+        Route::get('/table/{qrToken}', [PublicGuestController::class, 'resolveTable']);
+        Route::post('/table/{qrToken}/order', [PublicGuestController::class, 'placeTableOrder']);
+        Route::get('/orders/{orderNumber}/track', [PublicGuestController::class, 'trackOrder']);
+        Route::post('/table/{qrToken}/service-request', [PublicGuestController::class, 'serviceRequest']);
+        Route::post('/reservations', [PublicGuestController::class, 'createReservation']);
+    });
 
     // Authentication Routes (Rate limited)
     Route::prefix('auth')->middleware(['throttle:60,1'])->group(function () {

@@ -130,8 +130,12 @@ class Order extends Model
     /**
      * Recalculate order subtotal, tax and grand total
      */
-    public function recalculateTotals(float $discount = 0.00, float $serviceCharge = 0.00, float $packagingCharge = 0.00): void
+    public function recalculateTotals(?float $discount = 0.00, ?float $serviceCharge = 0.00, ?float $packagingCharge = 0.00): void
     {
+        $discount = (float) ($discount ?? 0.00);
+        $serviceCharge = (float) ($serviceCharge ?? 0.00);
+        $packagingCharge = (float) ($packagingCharge ?? 0.00);
+
         $subtotal = $this->items()->where('status', '!=', 'cancelled')->sum('total_price');
         $taxAmount = $this->items()->where('status', '!=', 'cancelled')->sum('tax_amount');
         

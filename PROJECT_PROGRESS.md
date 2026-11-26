@@ -1,58 +1,48 @@
 # RESTAURANT OS - PROJECT PROGRESS & ARCHITECTURE AUDIT
 
 **Project Type:** Full-stack, Multi-tenant Restaurant Management System (Restaurant OS)  
-**Current Phase:** Phase 5 Completed (Kitchen Display System, Station Routing, Timers, Urgency Alerts & KDS Metrics)  
+**Current Phase:** Phase 6 Completed (Customer Website, Brand Portal, Contactless Table QR Ordering, Multi-round Cart & Live Prep Tracker, Table Bell Service Requests, and Online Table Reservations)  
 **Frontend Deployment Target:** Vercel (Next.js 16 App Router, TypeScript, Tailwind CSS v4, Recharts, qrcode.react)  
 **Backend Deployment Target:** Railway (Laravel 13 REST API, PHP 8.3, Sanctum, Spatie Permission)  
 **Future Final Target:** Hostinger Unlimited Shared Hosting (Zero-daemon architecture, PHP + MySQL 8)  
 
 ---
 
-## 1. Executive Summary of Phase 5 Deliverables
+## 1. Executive Summary of Phase 6 Deliverables
 
-Phase 5 introduces the high-contrast **Kitchen Display System (KDS)**, connecting floor operations and waitstaff directly with chefs across specialized kitchen preparation stations.
+Phase 6 delivers the customer-facing experience for Restaurant OS, enabling diners to explore brand stories, book reservations, and order directly from their table via contactless QR codes without downloading an app or creating an account.
 
 ### Completed Features:
 
-- [x] **Kitchen Display System Interface (`/kitchen`)**
-  - **High-Contrast Dark-on-White Kitchen Layout:** Built specifically for chef visibility and quick touch interactions in busy kitchen environments.
-  - **Station Routing Tabs:** Allows locking any kitchen display screen into a specific prep station or viewing the master kitchen queue:
-    - `All Stations` (Master Kitchen Controller)
-    - `Main Curries` (`main`)
-    - `Dum Biryani` (`biryani`)
-    - `Clay Tandoor` (`tandoor`)
-    - `Grill & Kebabs` (`grill`)
-    - `Bar & Beverages` (`beverage`)
-    - `Desserts & Sweets` (`dessert`)
-  - **Live Station Summary Metrics:** Header bar displaying real-time counts for pending dishes, currently cooking items, ready-for-pickup dishes, and overdue tickets.
+- [x] **Luxury Public Restaurant Brand Portal (`/`)**
+  - **Editorial Hero & Heritage Story:** Styled using **DM Serif Display** editorial typography, warm terracotta (`#C76B4A`), and off-white backgrounds (`#FAF8F4`).
+  - **Live Digital Menu Explorer:** Categorized dish browsing with allergen tags, spice meters (🌶️), vegetarian/non-vegetarian indicators, price formatting in INR (₹), and dietary filter chips.
+  - **Multi-Branch Locator:** Displays location addresses, phone contacts, email, operating hours, and active dining tables count.
+  - **Embedded Reservation Modal:** Guests can initiate booking directly from the homepage with instant date, time, and party size selection.
 
-- [x] **Preparation Timers & Color-Coded Urgency**
-  - **Elapsed Time Tracking:** Dynamic clock tracking minutes elapsed since each ticket was fired by POS or Waitstaff.
-  - **3-Tier Urgency Thresholds:**
-    - **Normal (< 10 mins):** Subtle border (`#EAE7E0`), green timer badge (`#39845C`).
-    - **Attention (10–20 mins):** Amber warning border (`#D69A3A`) and amber timer badge.
-    - **Overdue (> 20 mins):** High-visibility red alert border (`#C84D4D`), red timer badge with visual pulse.
+- [x] **Dedicated Reservation Booking System (`/reserve`)**
+  - **Date & Time Picker:** Select booking date, dining time slots (lunch & dinner service), and guest party size (1–12 guests).
+  - **Special Seating Preferences:** Dietary notes, high-chair requests, quiet booth preferences, or anniversary celebrations.
+  - **Instant Confirmation:** Generates a real-time reservation record, confirms booking status, and logs guest contact details.
 
-- [x] **Ticket Layout & Dish Preparation Stepper**
-  - **Ticket Cards:** Displays KOT number (monospace font), Table number (or Takeaway / Delivery badge), Table location, Server name, and incremental Round Badges (`ROUND 2` in bold terracotta).
-  - **Item Details:** Large bold quantity multiplier, portion size badge (e.g. *Family Pack*), customizable add-ons list.
-  - **Cooking Notes Banner:** High-visibility amber banner highlighting guest allergies and preferences (e.g. *"⚠️ Note: Less spicy, no coriander"*).
-  - **Step-by-Step Status Flow:**
-    - Tap **`Start Prep`** (`pending` -> `preparing` with cooking flame icon).
-    - Tap **`Cooking...`** (`preparing` -> `ready` with checkmark icon).
-    - Automatically updates the master order status and notifies floor waitstaff.
-  - **One-Click Batch "Mark Whole Ticket Ready":** Completes all pending dishes on the ticket simultaneously and alerts the waitstaff for pickup.
-
-- [x] **Synthesizer Kitchen Chime & Recall Mode**
-  - **Zero-Dependency Audio Chime:** Built-in Web Audio API synthesizer that chimes when new tickets are fired to the kitchen.
-  - **Recall Completed Mode:** Toggle to inspect recently completed or served tickets from the past 4 hours in case of customer or waitstaff queries.
-  - **Real-Time Polling:** Synchronizes live kitchen state every 5 seconds.
+- [x] **Contactless Table QR Ordering Portal (`/order/[qrToken]`)**
+  - **Token Resolution & Table Context:** Securely decodes the 36-character unguessable table token (`tbl_...`), instantly identifying the restaurant, branch, table number, seating zone, and current active order.
+  - **Digital Menu Catalog:** Full menu exploration grouped by category with dietary filters and instant search.
+  - **Portion & Variant Customization Drawer:** Modal for choosing portion sizes (Half, Full, Family Pack), spicy level overrides, and optional add-ons with cumulative price calculation.
+  - **Slide-over Guest Cart:** Live order summary with subtotal, tax calculation, and special cooking instructions.
+  - **Seamless Multi-Round Ordering:** When ordering from an already occupied table, automatically appends items to the ongoing dining session as an additional round (`Round 2`, `Round 3`) and dispatches a dedicated KOT without splitting the bill.
+  - **Real-Time 4-Stage Preparation Tracker:** Live status stepper (Order Placed -> Kitchen Preparing -> Ready -> Served) with elapsed minutes, KOT number, and itemized round breakdown.
+  - **Digital Table Bell Service Requests:** Diners can tap quick request buttons right from their phone:
+    - 🔔 *Call Waiter* (Notifies floor staff with table number)
+    - 💧 *Request Water* (Requests water refill)
+    - 🧾 *Request Bill* (Alerts cashier to prepare the check)
+    - 💬 *Custom Message* (Free-text inquiry or assistance note)
 
 ---
 
 ## 2. Default Seeded Test Personas
 
-All accounts use password: `password123`
+All staff accounts use password: `password123`
 
 | Role | Email | Assigned Scope | Key Capabilities |
 | :--- | :--- | :--- | :--- |
@@ -62,6 +52,7 @@ All accounts use password: `password123`
 | **Cashier / POS** | `cashier@grandfeast.com` | Downtown Flagship | POS ordering, table billing, payment collection |
 | **Waiter** | `waiter@grandfeast.com` | Downtown Flagship | Handheld order pad, assigned tables, mark served |
 | **Kitchen Chef** | `kitchen@grandfeast.com` | Downtown Flagship | Kitchen KDS queue, station routing, mark ready |
+| **Guest / Diner** | *Public / No Login* | Table QR Token | View menu, place orders, digital table bell, reserve |
 
 ---
 
@@ -99,9 +90,9 @@ erDiagram
 
 ```
 Backend Test Suite (PHPUnit 12.5 / Laravel 13):
-Tests: 39 passed, 0 failed (100% pass rate)
-Assertions: 186
-Duration: 18.26s
+Tests: 47 passed, 0 failed (100% pass rate)
+Assertions: 215
+Duration: 24.10s
 
 Feature Test Breakdown:
 Phase 1: Authentication & Tenant Isolation
@@ -153,39 +144,52 @@ Phase 5: Kitchen Display System (KDS)
   ✓ test_chef_can_batch_mark_entire_ticket_as_ready
   ✓ test_kds_summary_metrics
 
-Frontend Build (Next.js 16 Turbopack):
+Phase 6: Customer Website & QR Ordering Portal
+  ✓ test_guest_can_retrieve_restaurant_public_profile
+  ✓ test_guest_can_resolve_table_via_qr_token
+  ✓ test_guest_can_place_order_via_qr_token
+  ✓ test_guest_can_add_additional_round_via_qr_token
+  ✓ test_guest_can_track_order_live_progress
+  ✓ test_guest_can_send_table_service_request
+  ✓ test_guest_can_book_table_reservation
+  ✓ test_invalid_table_qr_returns_not_found
+
+Frontend Build (Next.js 16.4.6 Turbopack):
   ✓ TypeScript type check passed (0 errors)
-  ✓ Compiled routes:
-      ○ /
+  ✓ Compiled routes (20/20 routes passing):
+      ○ /                       [Phase 6 Public Brand Portal]
       ○ /_not-found
       ○ /audit-logs
       ○ /dashboard
       ○ /forgot-password
-      ○ /kitchen        [Phase 5 Kitchen Display System]
+      ○ /kitchen                [Phase 5 Kitchen Display System]
       ○ /login
       ○ /menu
-      ○ /pos            [Phase 4 POS Terminal]
+      ◐ /order/[qrToken]        [Phase 6 Contactless Table QR Ordering]
+      ○ /pos                    [Phase 4 POS Terminal]
+      ○ /reserve                [Phase 6 Online Table Reservations]
       ○ /reset-password
       ○ /restaurants
       ◐ /restaurants/[id]/branches
       ○ /roles
       ○ /tables
       ○ /users
-      ○ /waiter         [Phase 4 Waiter Station]
+      ○ /waiter                 [Phase 4 Waiter Station]
 ```
 
 ---
 
-## 5. Next Phase: Phase 6 Scope
+## 5. Next Phase: Phase 7 Scope
 
-**Phase 6: Customer Website & QR Ordering Portal**
-- Public customer restaurant website (`/` and `/[restaurantSlug]`) with DM Serif Display branding.
-- Contactless Table QR Ordering (`/order/[qrToken]`):
-  - Direct customer menu browsing without login required.
-  - Portions, variants, and addon selection.
-  - Cart drawer and instant table order placement.
-  - Real-time customer order tracking screen (Order Placed -> Kitchen Preparing -> Ready -> Served).
-  - Digital Table Bell ("Call Waiter", "Request Water", "Request Bill").
-- Table Reservation Portal (`/reserve`):
-  - Date & time picker, guest count, seating preferences.
-  - Instant booking confirmation.
+**Phase 7: Table Reservations, Inventory & Stock Management**
+- Table Reservation Management:
+  - Table allocation and auto-assignment based on guest party size.
+  - Reservation status transitions (pending -> confirmed -> checked_in -> seated -> completed -> cancelled / no-show).
+  - Conflict prevention for double bookings.
+- Inventory & Raw Material Tracking:
+  - Raw ingredients / inventory items table with units of measurement (kg, g, L, ml, pcs).
+  - Current stock levels, safety stock thresholds, and minimum reorder points.
+  - Low stock visual indicators and automated low stock alerts.
+  - Recipe / Bill of Materials (BOM) linking menu items to ingredient deductions.
+  - Supplier profiles and purchase order stock intake.
+  - Stock adjustment logs with wastage, breakage, and audit tracking.
