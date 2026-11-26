@@ -111,9 +111,6 @@ export default function SubscriptionManagementPage() {
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-bold tracking-tight text-[#252525]">SaaS Subscription & Plan Quotas</h1>
-            <Badge variant="outline" className="text-[#B4D58A] border-[#B4D58A]/20 bg-[#FAF9F6]">
-              Phase 8
-            </Badge>
           </div>
           <p className="text-sm text-[#5A5D58] mt-1">
             Manage your restaurant tier, monitor capacity limits, and unlock multi-branch operating features.
@@ -132,6 +129,18 @@ export default function SubscriptionManagementPage() {
       </div>
 
       {/* Active Subscription Overview Card */}
+      {isCurrentLoading ? (
+        <Card className="border-black/[0.06] bg-white shadow-xs p-6">
+          <div className="animate-pulse space-y-4">
+            <div className="h-6 bg-black/[0.06] rounded w-1/3" />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="h-24 bg-black/[0.04] rounded-xl" />
+              <div className="h-24 bg-black/[0.04] rounded-xl" />
+              <div className="h-24 bg-black/[0.04] rounded-xl" />
+            </div>
+          </div>
+        </Card>
+      ) : (
       <Card className="border-black/[0.06] bg-white shadow-xs overflow-hidden">
         <div className="bg-[#FAF9F6] p-6 border-b border-black/[0.06] flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
@@ -140,14 +149,18 @@ export default function SubscriptionManagementPage() {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-lg font-bold text-[#252525]">{currentPlan?.name || 'Growth Pro'}</h3>
+                <h3 className="text-lg font-bold text-[#252525]">{currentPlan?.name || 'No Active Plan'}</h3>
                 <Badge className="bg-[#B4D58A]/25 text-[#B4D58A] border-[#D6DFC9] capitalize text-xs">
-                  {currentData?.status || 'Active'}
+                  {currentData?.status || 'Inactive'}
                 </Badge>
               </div>
               <p className="text-xs text-[#5A5D58] mt-0.5">
-                Current cycle: <strong className="capitalize">{subDetails?.billing_cycle}</strong> | Renews on{' '}
-                <strong>{subDetails?.renews_at}</strong>
+                Current cycle: <strong className="capitalize">{subDetails?.billing_cycle || '—'}</strong>
+                {subDetails?.renews_at ? (
+                  <>
+                    {' '}| Renews on <strong>{subDetails.renews_at}</strong>
+                  </>
+                ) : null}
               </p>
             </div>
           </div>
@@ -155,7 +168,7 @@ export default function SubscriptionManagementPage() {
           <div className="text-right">
             <p className="text-xs text-[#5A5D58]">Active Investment</p>
             <h4 className="text-2xl font-bold text-[#252525]">
-              ₹{Number(subDetails?.amount_paid || 4999).toLocaleString()}{' '}
+              ₹{Number(subDetails?.amount_paid ?? 0).toLocaleString()}{' '}
               <span className="text-xs font-normal text-[#5A5D58]">/{subDetails?.billing_cycle === 'annual' ? 'yr' : 'mo'}</span>
             </h4>
           </div>
@@ -172,19 +185,23 @@ export default function SubscriptionManagementPage() {
                   <Building2 className="w-4 h-4 text-[#B4D58A]" /> Branch Locations
                 </span>
                 <span className="text-xs font-bold text-[#252525]">
-                  {quotas?.branches?.current || 1} / {quotas?.branches?.max || 3}
+                  {quotas?.branches?.current ?? 0} / {quotas?.branches?.max ?? 0}
                 </span>
               </div>
               <div className="w-full bg-black/[0.06] rounded-full h-2">
                 <div
                   className="bg-[#B4D58A] h-2 rounded-full transition-all"
                   style={{
-                    width: `${Math.min(100, ((quotas?.branches?.current || 1) / (quotas?.branches?.max || 3)) * 100)}%`,
+                    width: `${
+                      (quotas?.branches?.max ?? 0) > 0
+                        ? Math.min(100, ((quotas?.branches?.current ?? 0) / quotas.branches.max) * 100)
+                        : 0
+                    }%`,
                   }}
                 />
               </div>
               <p className="text-[11px] text-[#5A5D58] mt-2">
-                {quotas?.branches?.remaining ?? 2} branch slots remaining
+                {quotas?.branches?.remaining ?? 0} branch slots remaining
               </p>
             </div>
 
@@ -195,19 +212,23 @@ export default function SubscriptionManagementPage() {
                   <Grid className="w-4 h-4 text-[#B4D58A]" /> Dining Tables
                 </span>
                 <span className="text-xs font-bold text-[#252525]">
-                  {quotas?.tables?.current || 6} / {quotas?.tables?.max || 30}
+                  {quotas?.tables?.current ?? 0} / {quotas?.tables?.max ?? 0}
                 </span>
               </div>
               <div className="w-full bg-black/[0.06] rounded-full h-2">
                 <div
                   className="bg-[#B4D58A] h-2 rounded-full transition-all"
                   style={{
-                    width: `${Math.min(100, ((quotas?.tables?.current || 6) / (quotas?.tables?.max || 30)) * 100)}%`,
+                    width: `${
+                      (quotas?.tables?.max ?? 0) > 0
+                        ? Math.min(100, ((quotas?.tables?.current ?? 0) / quotas.tables.max) * 100)
+                        : 0
+                    }%`,
                   }}
                 />
               </div>
               <p className="text-[11px] text-[#5A5D58] mt-2">
-                Up to {quotas?.tables?.max_per_branch ?? 30} tables per branch location
+                Up to {quotas?.tables?.max_per_branch ?? 0} tables per branch location
               </p>
             </div>
 
@@ -218,14 +239,18 @@ export default function SubscriptionManagementPage() {
                   <Users className="w-4 h-4 text-[#B4D58A]" /> Team Members & Staff
                 </span>
                 <span className="text-xs font-bold text-[#252525]">
-                  {quotas?.staff?.current || 6} / {quotas?.staff?.max || 20}
+                  {quotas?.staff?.current ?? 0} / {quotas?.staff?.max ?? 0}
                 </span>
               </div>
               <div className="w-full bg-black/[0.06] rounded-full h-2">
                 <div
                   className="bg-[#B4D58A] h-2 rounded-full transition-all"
                   style={{
-                    width: `${Math.min(100, ((quotas?.staff?.current || 6) / (quotas?.staff?.max || 20)) * 100)}%`,
+                    width: `${
+                      (quotas?.staff?.max ?? 0) > 0
+                        ? Math.min(100, ((quotas?.staff?.current ?? 0) / quotas.staff.max) * 100)
+                        : 0
+                    }%`,
                   }}
                 />
               </div>
@@ -236,6 +261,7 @@ export default function SubscriptionManagementPage() {
           </div>
         </CardContent>
       </Card>
+      )}
 
       {/* Plan Switcher & Billing Cycle Selector */}
       <div className="text-center space-y-3 pt-4">
@@ -266,11 +292,27 @@ export default function SubscriptionManagementPage() {
       </div>
 
       {/* Plans Pricing Grid */}
+      {isPlansLoading ? (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-80 rounded-xl bg-black/[0.04] animate-pulse" />
+          ))}
+        </div>
+      ) : (
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {plans.map((plan) => {
-          const isCurrent = currentPlan?.slug === plan.slug;
+          const isSameTier = currentPlan?.slug === plan.slug;
+          const activeCycle = subDetails?.billing_cycle || 'monthly';
+          const isCurrent = isSameTier && activeCycle === billingCycle;
           const price = billingCycle === 'annual' ? plan.annual_price : plan.monthly_price;
           const isPro = plan.slug === 'pro';
+          const currentMonthly = Number(currentPlan?.monthly_price ?? 0);
+          const planMonthly = Number(plan.monthly_price ?? 0);
+          const ctaLabel = isSameTier
+            ? `Switch to ${billingCycle === 'annual' ? 'Annual' : 'Monthly'}`
+            : planMonthly > currentMonthly
+            ? `Upgrade to ${plan.name}`
+            : `Switch to ${plan.name}`;
 
           return (
             <Card
@@ -344,7 +386,7 @@ export default function SubscriptionManagementPage() {
                           : 'bg-[#FAF9F6] text-[#252525] hover:bg-[#B4D58A]/20 border border-black/[0.06]'
                       }`}
                     >
-                      <span>Upgrade to {plan.name}</span>
+                      <span>{ctaLabel}</span>
                       <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
                     </Button>
                   )}
@@ -354,6 +396,7 @@ export default function SubscriptionManagementPage() {
           );
         })}
       </div>
+      )}
 
       {/* Upgrade Modal */}
       {isUpgradeModalOpen && selectedPlanForUpgrade && (
@@ -365,7 +408,7 @@ export default function SubscriptionManagementPage() {
                   <Sparkles className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-[#252525]">Confirm Plan Upgrade</h3>
+                  <h3 className="font-bold text-[#252525]">Confirm Plan Change</h3>
                   <p className="text-xs text-[#5A5D58]">Switching to {selectedPlanForUpgrade.name}</p>
                 </div>
               </div>
@@ -412,7 +455,7 @@ export default function SubscriptionManagementPage() {
                 disabled={upgradeMutation.isPending}
                 className="text-xs bg-[#B4D58A] hover:bg-[#9EC271] text-white"
               >
-                {upgradeMutation.isPending ? 'Processing...' : 'Confirm Upgrade'}
+                {upgradeMutation.isPending ? 'Processing...' : 'Confirm Change'}
               </Button>
             </div>
           </div>

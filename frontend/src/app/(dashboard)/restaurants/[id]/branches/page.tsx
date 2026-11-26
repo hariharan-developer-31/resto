@@ -32,6 +32,23 @@ export default function RestaurantBranchesPage() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const restaurantId = Number(params.id);
+  const user = useAuthStore((s) => s.user);
+  const hasPermission = useAuthStore((s) => s.hasPermission);
+  const isSuperAdmin = user?.is_super_admin ?? false;
+  const canCreate = isSuperAdmin || hasPermission('branches.create');
+  const canEdit = isSuperAdmin || hasPermission('branches.edit');
+  const canDelete = isSuperAdmin || hasPermission('branches.delete');
+
+  const refreshAuthContext = async () => {
+    try {
+      const me = await apiRequest('auth/me');
+      if (me?.data) {
+        useAuthStore.getState().updateUser(me.data);
+      }
+    } catch {
+      // non-fatal
+    }
+  };
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingBranch, setEditingBranch] = useState<any | null>(null);
@@ -61,7 +78,7 @@ export default function RestaurantBranchesPage() {
   });
 
   // Fetch Branches
-  const { data: branches = [], isLoading } = useQuery({
+  const { data: branches = [], isLoading, isError, error } = useQuery({
     queryKey: ['branches', restaurantId],
     queryFn: async () => {
       const res = await apiRequest(`restaurants/${restaurantId}/branches`);
@@ -73,7 +90,7 @@ export default function RestaurantBranchesPage() {
   const openCreateModal = () => {
     setEditingBranch(null);
     setName('');
-    setCode('BR-0' + (branches.length + 1));
+    setCode('BR-' + String(branches.length + 1).padStart(2, '0'));
     setPhone('');
     setEmail('');
     setAddress('');
@@ -137,6 +154,7 @@ export default function RestaurantBranchesPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['branches', restaurantId] });
       queryClient.invalidateQueries({ queryKey: ['restaurants'] });
+      refreshAuthContext();
       toast.success(editingBranch ? 'Branch updated!' : 'Branch created successfully!');
       setIsModalOpen(false);
     },
@@ -171,6 +189,7 @@ export default function RestaurantBranchesPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['branches', restaurantId] });
       queryClient.invalidateQueries({ queryKey: ['restaurants'] });
+      refreshAuthContext();
       toast.success('Branch archived successfully.');
     },
     onError: (err: any) => {
@@ -208,9 +227,11 @@ export default function RestaurantBranchesPage() {
               <ArrowLeft className="h-4 w-4" /> Back to Restaurants
             </Button>
           </Link>
-          <Button onClick={openCreateModal} size="sm" className="gap-2">
-            <Plus className="h-4 w-4" /> Add Branch
-          </Button>
+          {canCreate && (
+            <Button onClick={openCreateModal} size="sm" className="gap-2">
+              <Plus className="h-4 w-4" /> Add Branch
+            </Button>
+          )}
         </div>
       </div>
 
@@ -219,6 +240,13 @@ export default function RestaurantBranchesPage() {
         <div className="py-16 text-center text-sm text-[#5A5D58]">
           Loading branches...
         </div>
+      ) : isError ? (
+        <Card className="border-black/[0.06] p-12 text-center">
+          <h3 className="font-bold text-lg text-[#C94A6A]">Unable to Load Branches</h3>
+          <p className="text-xs text-[#5A5D58] mt-1">
+            {(error as any)?.message || 'You may not have access to this restaurant or it does not exist.'}
+          </p>
+        </Card>
       ) : branches.length === 0 ? (
         <Card className="border-black/[0.06] p-12 text-center">
           <GitBranch className="h-12 w-12 text-[#8E928B] mx-auto mb-3" />
@@ -226,9 +254,11 @@ export default function RestaurantBranchesPage() {
           <p className="text-xs text-[#5A5D58] mt-1">
             Every restaurant requires at least one operating branch for tables, orders, and staff.
           </p>
-          <Button onClick={openCreateModal} size="sm" className="mt-4 gap-2">
-            <Plus className="h-4 w-4" /> Add First Branch
-          </Button>
+          {canCreate && (
+            <Button onClick={openCreateModal} size="sm" className="mt-4 gap-2">
+              <Plus className="h-4 w-4" /> Add First Branch
+            </Button>
+          )}
         </Card>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -287,37 +317,45 @@ export default function RestaurantBranchesPage() {
               </div>
 
               {/* Footer */}
+              {(canEdit || canDelete) && (
               <div className="p-4 border-t border-black/[0.04] bg-[#FAF9F6]/50 flex items-center justify-end gap-1.5 rounded-b-2xl">
-                <button
-                  onClick={() => toggleMutation.mutate(b.id)}
-                  title={b.is_active ? 'Deactivate Branch' : 'Activate Branch'}
-                  className={`p-1.5 rounded-lg border transition-colors ${
-                    b.is_active 
-                      ? 'text-[#B4D58A] border-[#D5EAD9] bg-[#B4D58A]/20 hover:bg-[#D5EAD9]' 
-                      : 'text-[#8E928B] border-black/[0.06] bg-white hover:bg-[#F3DA8A]/25'
-                  }`}
-                >
-                  <Power className="h-3.5 w-3.5" />
-                </button>
-                <button
-                  onClick={() => openEditModal(b)}
-                  title="Edit Branch"
-                  className="p-1.5 rounded-lg border border-black/[0.06] text-[#5A5D58] hover:text-[#252525] hover:bg-white transition-colors"
-                >
-                  <Edit className="h-3.5 w-3.5" />
-                </button>
-                <button
-                  onClick={() => {
-                    if (confirm(`Archive branch "${b.name}"?`)) {
-                      deleteMutation.mutate(b.id);
-                    }
-                  }}
-                  title="Archive Branch"
-                  className="p-1.5 rounded-lg border border-black/[0.06] text-[#F2AFC0] hover:bg-[#F2AFC0]/20 hover:border-[#F8DADA] transition-colors"
-                >
-                  <Trash2 className="h-3.5 w-3.5" />
-                </button>
+                {canEdit && (
+                  <>
+                    <button
+                      onClick={() => toggleMutation.mutate(b.id)}
+                      title={b.is_active ? 'Deactivate Branch' : 'Activate Branch'}
+                      className={`p-1.5 rounded-lg border transition-colors ${
+                        b.is_active 
+                          ? 'text-[#B4D58A] border-[#D5EAD9] bg-[#B4D58A]/20 hover:bg-[#D5EAD9]' 
+                          : 'text-[#8E928B] border-black/[0.06] bg-white hover:bg-[#F3DA8A]/25'
+                      }`}
+                    >
+                      <Power className="h-3.5 w-3.5" />
+                    </button>
+                    <button
+                      onClick={() => openEditModal(b)}
+                      title="Edit Branch"
+                      className="p-1.5 rounded-lg border border-black/[0.06] text-[#5A5D58] hover:text-[#252525] hover:bg-white transition-colors"
+                    >
+                      <Edit className="h-3.5 w-3.5" />
+                    </button>
+                  </>
+                )}
+                {canDelete && (
+                  <button
+                    onClick={() => {
+                      if (confirm(`Archive branch "${b.name}"?`)) {
+                        deleteMutation.mutate(b.id);
+                      }
+                    }}
+                    title="Archive Branch"
+                    className="p-1.5 rounded-lg border border-black/[0.06] text-[#F2AFC0] hover:bg-[#F2AFC0]/20 hover:border-[#F8DADA] transition-colors"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </button>
+                )}
               </div>
+              )}
             </Card>
           ))}
         </div>

@@ -118,9 +118,21 @@ class TableController extends Controller
             $branchId = Branch::first()?->id;
         }
 
-        $branch = Branch::find($branchId);
+        $branch = Branch::with('restaurant')->find($branchId);
         if (!$branch) {
             return $this->errorResponse('Branch not found.', 404);
+        }
+
+        if (!$user->hasRestaurantAccess($branch->restaurant_id)) {
+            return $this->errorResponse('Unauthorized access to this branch.', 403);
+        }
+
+        if ($branch->restaurant && !$branch->restaurant->canAddTable($branch->id)) {
+            $plan = $branch->restaurant->getActivePlan();
+            return $this->errorResponse(
+                "Table limit reached for your {$plan->name} plan (max {$plan->max_tables_per_branch} tables per branch). Upgrade your subscription to add more.",
+                422
+            );
         }
 
         $validated = $request->validate([

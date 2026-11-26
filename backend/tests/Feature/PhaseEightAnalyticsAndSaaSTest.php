@@ -280,4 +280,69 @@ class PhaseEightAnalyticsAndSaaSTest extends TestCase
             ->expectsOutputToContain('Hostinger maintenance cycle completed successfully.')
             ->assertExitCode(0);
     }
+
+    /**
+     * Test SaaS subscription quotas are enforced on branch, table, and staff creation.
+     */
+    public function test_saas_quotas_enforce_branch_table_and_staff_limits(): void
+    {
+        $starterPlan = SubscriptionPlan::where('slug', 'starter')->firstOrFail();
+        $this->restaurant->update(['current_plan_id' => $starterPlan->id]);
+
+        // Starter allows 1 branch; seeded restaurant already has >= 1 branch
+        $branchRes = $this->actingAs($this->manager)
+            ->withHeaders(['X-Restaurant-ID' => $this->restaurant->id])
+            ->postJson("/api/v1/restaurants/{$this->restaurant->id}/branches", [
+                'name' => 'Quota Overflow Branch',
+            ]);
+        $branchRes->assertStatus(422);
+
+        // Starter allows 10 tables per branch; fill up to limit and verify next fails
+        $existingTables = DiningTable::where('branch_id', $this->branch->id)->count();
+        for ($i = $existingTables; $i < $starterPlan->max_tables_per_branch; $i++) {
+            DiningTable::create([
+                'restaurant_id' => $this->restaurant->id,
+                'branch_id' => $this->branch->id,
+                'table_number' => 'QT-' . ($i + 1),
+                'seating_capacity' => 4,
+                'location' => 'Indoor',
+                'status' => 'available',
+                'qr_token' => 'tbl_quota_' . $i . '_' . uniqid(),
+            ]);
+        }
+
+        $tableRes = $this->actingAs($this->manager)
+            ->withHeaders([
+                'X-Restaurant-ID' => $this->restaurant->id,
+                'X-Branch-ID' => $this->branch->id,
+            ])
+            ->postJson('/api/v1/tables', [
+                'table_number' => 'QT-OVERFLOW',
+                'seating_capacity' => 4,
+            ]);
+        $tableRes->assertStatus(422);
+
+        // Starter allows 5 staff members; seeded restaurant already has >= 5 staff
+        $staffRes = $this->actingAs($this->manager)
+            ->withHeaders(['X-Restaurant-ID' => $this->restaurant->id])
+            ->postJson('/api/v1/users', [
+                'name' => 'Quota Overflow Staff',
+                'email' => 'overflow.staff@grandfeast.com',
+                'password' => 'SecurePass123!',
+                'role' => 'Waiter',
+                'restaurant_ids' => [$this->restaurant->id],
+            ]);
+        $staffRes->assertStatus(422);
+
+        // Upgrading to Enterprise lifts the quota immediately
+        $enterprisePlan = SubscriptionPlan::where('slug', 'enterprise')->firstOrFail();
+        $this->restaurant->update(['current_plan_id' => $enterprisePlan->id]);
+
+        $allowedBranchRes = $this->actingAs($this->manager)
+            ->withHeaders(['X-Restaurant-ID' => $this->restaurant->id])
+            ->postJson("/api/v1/restaurants/{$this->restaurant->id}/branches", [
+                'name' => 'Enterprise Branch',
+            ]);
+        $allowedBranchRes->assertStatus(201);
+    }
 }

@@ -3,25 +3,34 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/api-client';
+import { useAuthStore } from '@/lib/auth-store';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { History, ShieldAlert, ArrowLeft, RefreshCw, Filter } from 'lucide-react';
+import { History, ShieldAlert, ArrowLeft, RefreshCw, Filter, Eye, X } from 'lucide-react';
 import Link from 'next/link';
 
 export default function AuditLogsPage() {
+  const activeRestaurant = useAuthStore((s) => s.activeRestaurant);
+  const isSuperAdmin = useAuthStore((s) => s.user?.is_super_admin ?? false);
   const [actionFilter, setActionFilter] = useState('');
   const [page, setPage] = useState(1);
+  const [selectedLog, setSelectedLog] = useState<any | null>(null);
 
-  const { data, isLoading, refetch, isFetching } = useQuery({
-    queryKey: ['audit-logs', actionFilter, page],
+  const { data, isLoading, isError, error, refetch, isFetching } = useQuery({
+    queryKey: ['audit-logs', activeRestaurant?.id, isSuperAdmin, actionFilter, page],
     queryFn: async () => {
       const params = new URLSearchParams();
       if (actionFilter) params.append('action', actionFilter);
+      if (!isSuperAdmin && activeRestaurant?.id) {
+        params.append('restaurant_id', String(activeRestaurant.id));
+      }
       params.append('page', String(page));
 
-      const res = await apiRequest(`audit-logs?${params.toString()}`);
+      const res = await apiRequest(`audit-logs?${params.toString()}`, {
+        restaurantId: activeRestaurant?.id,
+      });
       return res.data;
     },
   });
@@ -90,6 +99,12 @@ export default function AuditLogsPage() {
                     Loading audit trail records...
                   </td>
                 </tr>
+              ) : isError ? (
+                <tr>
+                  <td colSpan={6} className="py-8 text-center text-[#C94A6A]">
+                    {(error as any)?.message || 'Failed to load audit logs. You may not have permission to view this trail.'}
+                  </td>
+                </tr>
               ) : logs.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="py-8 text-center text-[#5A5D58]">
@@ -115,10 +130,14 @@ export default function AuditLogsPage() {
                       {new Date(log.created_at).toLocaleString()}
                     </td>
                     <td className="py-3 px-4">
-                      {log.new_values ? (
-                        <span className="font-mono text-[10px] text-[#252525] bg-[#F3DA8A]/25 px-1.5 py-0.5 rounded">
-                          {JSON.stringify(log.new_values).substring(0, 40)}...
-                        </span>
+                      {log.new_values || log.old_values ? (
+                        <button
+                          onClick={() => setSelectedLog(log)}
+                          className="inline-flex items-center gap-1 font-mono text-[10px] text-[#252525] bg-[#F3DA8A]/25 hover:bg-[#F3DA8A]/40 px-2 py-1 rounded transition-colors cursor-pointer"
+                        >
+                          <Eye className="h-3 w-3" />
+                          Inspect JSON
+                        </button>
                       ) : (
                         <span className="text-[#8E928B]">—</span>
                       )}
@@ -157,6 +176,58 @@ export default function AuditLogsPage() {
           </div>
         )}
       </Card>
+
+      {/* Audit Payload Diff Modal */}
+      {selectedLog && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#252525]/40 backdrop-blur-xs p-4">
+          <div className="w-full max-w-2xl max-h-[85vh] overflow-y-auto rounded-2xl bg-white border border-black/[0.06] shadow-xl p-6 space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-black/[0.06]">
+              <div>
+                <h2 className="font-bold text-lg text-[#252525] font-mono">{selectedLog.action}</h2>
+                <p className="text-xs text-[#5A5D58]">
+                  By {selectedLog.user?.name || selectedLog.user?.email || 'System'} •{' '}
+                  {new Date(selectedLog.created_at).toLocaleString()} • IP {selectedLog.ip_address || '127.0.0.1'}
+                </p>
+              </div>
+              <button
+                onClick={() => setSelectedLog(null)}
+                className="p-1.5 text-[#5A5D58] hover:text-[#252525] rounded-lg hover:bg-[#FAF9F6]"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {selectedLog.old_values && (
+                <div className="space-y-1.5">
+                  <span className="text-[11px] font-semibold uppercase tracking-wider text-[#5A5D58]">
+                    Previous Values
+                  </span>
+                  <pre className="p-3 rounded-xl bg-[#FAF9F6] border border-black/[0.06] text-[11px] font-mono text-[#252525] overflow-x-auto max-h-80">
+                    {JSON.stringify(selectedLog.old_values, null, 2)}
+                  </pre>
+                </div>
+              )}
+              {selectedLog.new_values && (
+                <div className={`space-y-1.5 ${!selectedLog.old_values ? 'md:col-span-2' : ''}`}>
+                  <span className="text-[11px] font-semibold uppercase tracking-wider text-[#5A5D58]">
+                    New Values
+                  </span>
+                  <pre className="p-3 rounded-xl bg-[#FAF9F6] border border-black/[0.06] text-[11px] font-mono text-[#252525] overflow-x-auto max-h-80">
+                    {JSON.stringify(selectedLog.new_values, null, 2)}
+                  </pre>
+                </div>
+              )}
+            </div>
+
+            <div className="flex justify-end pt-2 border-t border-black/[0.06]">
+              <Button variant="outline" size="sm" onClick={() => setSelectedLog(null)}>
+                Close
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

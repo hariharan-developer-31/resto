@@ -79,7 +79,7 @@ export default function ReportsAndAnalyticsPage() {
   });
 
   // 2. Fetch Menu Engineering
-  const { data: menuData } = useQuery({
+  const { data: menuData, refetch: refetchMenu } = useQuery({
     queryKey: ['analytics-menu', activeRestaurant?.id, activeBranch?.id],
     queryFn: async () => {
       const res = await apiRequest('analytics/menu-engineering', {
@@ -92,7 +92,7 @@ export default function ReportsAndAnalyticsPage() {
   });
 
   // 3. Fetch Table Efficiency
-  const { data: tableData } = useQuery({
+  const { data: tableData, refetch: refetchTables } = useQuery({
     queryKey: ['analytics-tables', activeRestaurant?.id, activeBranch?.id],
     queryFn: async () => {
       const res = await apiRequest('analytics/table-efficiency', {
@@ -118,7 +118,7 @@ export default function ReportsAndAnalyticsPage() {
   });
 
   // 5. Fetch Tax Report
-  const { data: taxReportData } = useQuery({
+  const { data: taxReportData, refetch: refetchTax } = useQuery({
     queryKey: ['reports-tax', activeRestaurant?.id, startDate, endDate],
     queryFn: async () => {
       const params = new URLSearchParams();
@@ -139,6 +139,14 @@ export default function ReportsAndAnalyticsPage() {
   const paymentModes = overviewData?.payment_modes;
   const hourlyRush = overviewData?.hourly_rush || [];
 
+  const handleRefresh = () => {
+    if (activeTab === 'overview') refetchOverview();
+    else if (activeTab === 'menu') refetchMenu();
+    else if (activeTab === 'efficiency') refetchTables();
+    else if (activeTab === 'eod') refetchEod();
+    else if (activeTab === 'tax') refetchTax();
+  };
+
   const handlePrintZReport = () => {
     window.print();
   };
@@ -146,13 +154,10 @@ export default function ReportsAndAnalyticsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="no-print flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-bold tracking-tight text-[#252525]">Executive Reports & Analytics</h1>
-            <Badge variant="outline" className="text-[#B4D58A] border-[#B4D58A]/20 bg-[#FAF9F6]">
-              Phase 8
-            </Badge>
           </div>
           <p className="text-sm text-[#5A5D58] mt-1">
             Revenue trends, menu engineering, table turnover duration, and End-of-Day Z-Reports.
@@ -163,7 +168,7 @@ export default function ReportsAndAnalyticsPage() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => refetchOverview()}
+            onClick={handleRefresh}
             className="border-black/[0.06] hover:bg-[#F3DA8A]/25 text-[#252525]"
           >
             <RefreshCw className="w-4 h-4 mr-2" />
@@ -182,7 +187,7 @@ export default function ReportsAndAnalyticsPage() {
       </div>
 
       {/* Tabs Bar */}
-      <div className="border-b border-black/[0.06] flex items-center gap-6 overflow-x-auto">
+      <div className="no-print border-b border-black/[0.06] flex items-center gap-6 overflow-x-auto">
         <button
           onClick={() => setActiveTab('overview')}
           className={`pb-3 text-sm font-semibold flex items-center gap-2 border-b-2 whitespace-nowrap transition-colors ${
@@ -336,12 +341,12 @@ export default function ReportsAndAnalyticsPage() {
                         <stop offset="95%" stopColor="#B4D58A" stopOpacity={0.0} />
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="black/[0.04]" vertical={false} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.06)" vertical={false} />
                     <XAxis dataKey="day" stroke="#8E928B" fontSize={11} tickLine={false} />
                     <YAxis stroke="#8E928B" fontSize={11} tickLine={false} tickFormatter={(v) => `₹${v}`} />
                     <Tooltip
                       formatter={(val: any) => [`₹${val}`, 'Revenue']}
-                      contentStyle={{ backgroundColor: '#FFFFFF', borderColor: 'black/[0.06]', borderRadius: '8px' }}
+                      contentStyle={{ backgroundColor: '#FFFFFF', borderColor: 'rgba(0,0,0,0.08)', borderRadius: '8px' }}
                     />
                     <Area type="monotone" dataKey="revenue" stroke="#B4D58A" strokeWidth={2.5} fillOpacity={1} fill="url(#colorRevenue)" />
                   </AreaChart>
@@ -434,14 +439,16 @@ export default function ReportsAndAnalyticsPage() {
                 <div className="h-36 w-full">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={hourlyRush.filter((_: any, idx: number) => idx >= 11 && idx <= 23)}>
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="black/[0.04]" />
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(0,0,0,0.06)" />
                       <XAxis dataKey="hour" fontSize={10} stroke="#8E928B" tickLine={false} />
                       <Tooltip formatter={(val: any) => [`${val} orders`, 'Volume']} />
                       <Bar dataKey="orders" fill="#B4D58A" radius={[4, 4, 0, 0]} />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
-                <p className="text-[11px] text-center text-[#5A5D58] mt-2">Peak rush concentrated between 1:00 PM – 3:00 PM and 8:00 PM – 10:00 PM.</p>
+                <p className="text-[11px] text-center text-[#5A5D58] mt-2">
+                  Hourly order volume across service hours (11:00 – 23:00).
+                </p>
               </CardContent>
             </Card>
           </div>
@@ -531,7 +538,9 @@ export default function ReportsAndAnalyticsPage() {
               <CardContent className="p-4 flex items-center justify-between">
                 <div>
                   <p className="text-xs font-medium text-[#5A5D58]">Avg Table Turnaround</p>
-                  <h3 className="text-2xl font-bold text-[#B4D58A] mt-1">{tableData?.average_turnaround_minutes || 45} mins</h3>
+                  <h3 className="text-2xl font-bold text-[#B4D58A] mt-1">
+                    {tableData?.average_turnaround_minutes != null ? `${tableData.average_turnaround_minutes} mins` : '—'}
+                  </h3>
                   <p className="text-[11px] text-[#5A5D58] mt-0.5">Seated to bill settled</p>
                 </div>
                 <div className="w-10 h-10 rounded-full bg-[#B4D58A]/20 text-[#B4D58A] flex items-center justify-center">
@@ -557,7 +566,7 @@ export default function ReportsAndAnalyticsPage() {
               <CardContent className="p-4 flex items-center justify-between">
                 <div>
                   <p className="text-xs font-medium text-[#5A5D58]">Active Dining Floor</p>
-                  <h3 className="text-2xl font-bold text-[#252525] mt-1">{activeBranch?.name || 'Downtown'}</h3>
+                  <h3 className="text-2xl font-bold text-[#252525] mt-1">{activeBranch?.name || 'All Branches'}</h3>
                   <p className="text-[11px] text-[#5A5D58] mt-0.5">{tableData?.total_tables || 0} active tables</p>
                 </div>
                 <div className="w-10 h-10 rounded-full bg-[#FAF9F6] text-[#B4D58A] flex items-center justify-center">
@@ -596,7 +605,7 @@ export default function ReportsAndAnalyticsPage() {
       {/* Tab 4: End-of-Day (EOD) Z-Report */}
       {activeTab === 'eod' && (
         <div className="space-y-4">
-          <Card className="border-black/[0.06] bg-white shadow-xs">
+          <Card className="no-print border-black/[0.06] bg-white shadow-xs">
             <CardContent className="p-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <label className="text-xs font-semibold text-[#252525]">Z-Report Date:</label>
@@ -619,14 +628,21 @@ export default function ReportsAndAnalyticsPage() {
           </Card>
 
           {/* Printable Register Sheet */}
-          <div ref={printRef} className="max-w-xl mx-auto bg-white p-8 rounded-xl border border-black/[0.06] shadow-sm font-mono text-xs text-[#252525] space-y-4">
+          <div ref={printRef} className="print-area max-w-xl mx-auto bg-white p-8 rounded-xl border border-black/[0.06] shadow-sm font-mono text-xs text-[#252525] space-y-4">
             <div className="text-center pb-4 border-b border-dashed border-black/[0.06]">
-              <h2 className="text-lg font-bold uppercase">{eodReportData?.report_metadata?.restaurant_name || 'RESTAURANT OS'}</h2>
-              <p className="text-[11px] text-[#5A5D58]">{eodReportData?.report_metadata?.branch_name}</p>
-              <p className="text-[11px] text-[#5A5D58]">{eodReportData?.report_metadata?.branch_address}</p>
-              <p className="text-[11px] font-semibold mt-1">GSTIN: {eodReportData?.report_metadata?.gst_number || '27AAAAA0000A1Z5'}</p>
+              <h2 className="text-lg font-bold uppercase">{eodReportData?.report_metadata?.restaurant_name || activeRestaurant?.name || 'RESTAURANT OS'}</h2>
+              <p className="text-[11px] text-[#5A5D58]">{eodReportData?.report_metadata?.branch_name || activeBranch?.name}</p>
+              {eodReportData?.report_metadata?.branch_address && (
+                <p className="text-[11px] text-[#5A5D58]">{eodReportData.report_metadata.branch_address}</p>
+              )}
+              <p className="text-[11px] font-semibold mt-1">
+                GSTIN: {eodReportData?.report_metadata?.gst_number || 'Not Registered'}
+              </p>
               <h3 className="font-bold text-sm mt-2 text-[#B4D58A]">*** END-OF-DAY Z-REPORT ***</h3>
-              <p className="text-[10px] text-[#8E928B]">Date: {eodReportData?.report_metadata?.report_date} | Generated: {new Date().toLocaleTimeString()}</p>
+              <p className="text-[10px] text-[#8E928B]">
+                Date: {eodReportData?.report_metadata?.report_date || eodDate} | Generated:{' '}
+                {eodReportData?.report_metadata?.generated_at || '—'}
+              </p>
             </div>
 
             {/* Financial Summary */}
@@ -703,34 +719,60 @@ export default function ReportsAndAnalyticsPage() {
 
       {/* Tab 5: GST & Tax Ledger */}
       {activeTab === 'tax' && (
-        <Card className="border-black/[0.06] bg-white shadow-xs p-6 space-y-4">
-          <CardHeader className="p-0 pb-4 border-b border-black/[0.06]">
-            <CardTitle className="text-base text-[#252525]">GST Compliance & Tax Summary Ledger</CardTitle>
-            <CardDescription className="text-xs text-[#5A5D58]">
-              Monthly tax breakdown calculated according to Indian GST regulations (5% standard restaurant rate)
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="p-0 pt-4">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="p-4 rounded-xl border border-black/[0.06] bg-[#FAF9F6]">
-                <p className="text-xs text-[#5A5D58]">Taxable Value</p>
-                <h3 className="text-xl font-bold text-[#252525] mt-1">₹{Number(taxReportData?.taxable_amount || 0).toFixed(2)}</h3>
+        <div className="space-y-4">
+          <Card className="border-black/[0.06] bg-white shadow-xs">
+            <CardContent className="p-4 flex flex-col md:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-2 text-xs font-semibold text-[#252525]">
+                <Calendar className="w-4 h-4 text-[#B4D58A]" />
+                <span>Tax Period:</span>
               </div>
-              <div className="p-4 rounded-xl border border-black/[0.06] bg-[#FAF9F6]">
-                <p className="text-xs text-[#5A5D58]">Central GST (CGST 2.5%)</p>
-                <h3 className="text-xl font-bold text-[#252525] mt-1">₹{Number(taxReportData?.cgst_2_5_pct || 0).toFixed(2)}</h3>
+              <div className="flex items-center gap-2">
+                <Input
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  className="h-8 text-xs border-black/[0.06] bg-[#FAF9F6]"
+                />
+                <span className="text-xs text-[#5A5D58]">to</span>
+                <Input
+                  type="date"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  className="h-8 text-xs border-black/[0.06] bg-[#FAF9F6]"
+                />
               </div>
-              <div className="p-4 rounded-xl border border-black/[0.06] bg-[#FAF9F6]">
-                <p className="text-xs text-[#5A5D58]">State GST (SGST 2.5%)</p>
-                <h3 className="text-xl font-bold text-[#252525] mt-1">₹{Number(taxReportData?.sgst_2_5_pct || 0).toFixed(2)}</h3>
+            </CardContent>
+          </Card>
+
+          <Card className="border-black/[0.06] bg-white shadow-xs p-6 space-y-4">
+            <CardHeader className="p-0 pb-4 border-b border-black/[0.06]">
+              <CardTitle className="text-base text-[#252525]">GST Compliance & Tax Summary Ledger</CardTitle>
+              <CardDescription className="text-xs text-[#5A5D58]">
+                Tax breakdown calculated according to Indian GST regulations (5% standard restaurant rate)
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="p-0 pt-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="p-4 rounded-xl border border-black/[0.06] bg-[#FAF9F6]">
+                  <p className="text-xs text-[#5A5D58]">Taxable Value</p>
+                  <h3 className="text-xl font-bold text-[#252525] mt-1">₹{Number(taxReportData?.taxable_amount || 0).toFixed(2)}</h3>
+                </div>
+                <div className="p-4 rounded-xl border border-black/[0.06] bg-[#FAF9F6]">
+                  <p className="text-xs text-[#5A5D58]">Central GST (CGST 2.5%)</p>
+                  <h3 className="text-xl font-bold text-[#252525] mt-1">₹{Number(taxReportData?.cgst_2_5_pct || 0).toFixed(2)}</h3>
+                </div>
+                <div className="p-4 rounded-xl border border-black/[0.06] bg-[#FAF9F6]">
+                  <p className="text-xs text-[#5A5D58]">State GST (SGST 2.5%)</p>
+                  <h3 className="text-xl font-bold text-[#252525] mt-1">₹{Number(taxReportData?.sgst_2_5_pct || 0).toFixed(2)}</h3>
+                </div>
+                <div className="p-4 rounded-xl border border-black/[0.06] bg-[#FAF9F6]">
+                  <p className="text-xs text-[#5A5D58]">Total Tax Liability</p>
+                  <h3 className="text-xl font-bold text-[#B4D58A] mt-1">₹{Number(taxReportData?.total_tax_liability || 0).toFixed(2)}</h3>
+                </div>
               </div>
-              <div className="p-4 rounded-xl border border-black/[0.06] bg-[#FAF9F6]">
-                <p className="text-xs text-[#5A5D58]">Total Tax Liability</p>
-                <h3 className="text-xl font-bold text-[#B4D58A] mt-1">₹{Number(taxReportData?.total_tax_liability || 0).toFixed(2)}</h3>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </div>
       )}
     </div>
   );

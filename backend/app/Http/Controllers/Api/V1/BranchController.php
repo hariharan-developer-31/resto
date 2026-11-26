@@ -67,6 +67,14 @@ class BranchController extends Controller
             return $this->errorResponse('Restaurant not found.', 404);
         }
 
+        if (!$restaurant->canAddBranch()) {
+            $plan = $restaurant->getActivePlan();
+            return $this->errorResponse(
+                "Branch limit reached for your {$plan->name} plan (max {$plan->max_branches} branches). Upgrade your subscription to add more.",
+                422
+            );
+        }
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'code' => 'nullable|string|max:32',

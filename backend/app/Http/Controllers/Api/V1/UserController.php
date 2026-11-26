@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Models\AuditLog;
 use App\Models\Branch;
+use App\Models\Restaurant;
 use App\Models\User;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
@@ -166,6 +167,20 @@ class UserController extends Controller
             $defaultRestaurantId = $currentUser->restaurants()->first()?->id;
             if ($defaultRestaurantId) {
                 $restaurantIds = [$defaultRestaurantId];
+            }
+        }
+
+        // Enforce SaaS staff quota for each assigned restaurant (excluding Super Admin accounts)
+        if ($validated['role'] !== 'Super Admin' && !empty($restaurantIds)) {
+            $targetRestaurants = Restaurant::whereIn('id', $restaurantIds)->get();
+            foreach ($targetRestaurants as $targetRestaurant) {
+                if (!$targetRestaurant->canAddStaff()) {
+                    $plan = $targetRestaurant->getActivePlan();
+                    return $this->errorResponse(
+                        "Staff limit reached for {$targetRestaurant->name} on the {$plan->name} plan (max {$plan->max_staff_members} staff members). Upgrade your subscription to add more.",
+                        422
+                    );
+                }
             }
         }
 

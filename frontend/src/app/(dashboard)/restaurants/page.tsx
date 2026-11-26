@@ -32,11 +32,27 @@ import {
 export default function RestaurantsPage() {
   const queryClient = useQueryClient();
   const user = useAuthStore((s) => s.user);
+  const hasPermission = useAuthStore((s) => s.hasPermission);
   const isSuperAdmin = user?.is_super_admin ?? false;
+  const canCreate = isSuperAdmin || hasPermission('restaurants.create');
+  const canEdit = isSuperAdmin || hasPermission('restaurants.edit');
+  const canDelete = isSuperAdmin || hasPermission('restaurants.delete');
 
   const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingRestaurant, setEditingRestaurant] = useState<any | null>(null);
+
+  const refreshAuthContext = async () => {
+    try {
+      const me = await apiRequest('auth/me');
+      if (me?.data) {
+        useAuthStore.getState().updateUser(me.data);
+      }
+    } catch {
+      // non-fatal
+    }
+  };
 
   // Form State
   const [name, setName] = useState('');
@@ -53,10 +69,11 @@ export default function RestaurantsPage() {
 
   // Fetch restaurants
   const { data, isLoading } = useQuery({
-    queryKey: ['restaurants', search],
+    queryKey: ['restaurants', search, page],
     queryFn: async () => {
       const params = new URLSearchParams();
       if (search) params.append('search', search);
+      params.append('page', String(page));
       const res = await apiRequest(`restaurants?${params.toString()}`);
       return res.data;
     },
@@ -128,6 +145,7 @@ export default function RestaurantsPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['restaurants'] });
       queryClient.invalidateQueries({ queryKey: ['system-bootstrap'] });
+      refreshAuthContext();
       toast.success(editingRestaurant ? 'Restaurant updated!' : 'Restaurant created successfully!');
       setIsModalOpen(false);
     },
@@ -157,6 +175,7 @@ export default function RestaurantsPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['restaurants'] });
+      refreshAuthContext();
       toast.success('Restaurant archived successfully.');
     },
     onError: (err: any) => {
@@ -183,7 +202,7 @@ export default function RestaurantsPage() {
           </p>
         </div>
 
-        {(isSuperAdmin || user?.permissions?.includes('restaurants.create')) && (
+        {canCreate && (
           <Button onClick={openCreateModal} className="gap-2 shadow-xs">
             <Plus className="h-4 w-4" />
             Add Restaurant
@@ -199,7 +218,10 @@ export default function RestaurantsPage() {
             type="text"
             placeholder="Search restaurants by name, slug or email..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setPage(1);
+            }}
             className="w-full h-10 pl-9 pr-4 rounded-[10px] border border-black/[0.06] bg-white text-sm text-[#252525] placeholder:text-[#8E928B] outline-none focus:border-[#B4D58A]"
           />
         </div>
@@ -217,9 +239,11 @@ export default function RestaurantsPage() {
           <p className="text-xs text-[#5A5D58] mt-1 max-w-sm mx-auto">
             {search ? 'No restaurant records match your search criteria.' : 'Create your first restaurant to begin multi-tenant operations.'}
           </p>
-          <Button onClick={openCreateModal} variant="outline" size="sm" className="mt-4 gap-2">
-            <Plus className="h-4 w-4" /> Create Restaurant
-          </Button>
+          {canCreate && (
+            <Button onClick={openCreateModal} variant="outline" size="sm" className="mt-4 gap-2">
+              <Plus className="h-4 w-4" /> Create Restaurant
+            </Button>
+          )}
         </Card>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -289,35 +313,71 @@ export default function RestaurantsPage() {
                 </Link>
 
                 <div className="flex items-center gap-1">
-                  <button
-                    onClick={() => toggleMutation.mutate(r.id)}
-                    title={r.is_active ? 'Deactivate' : 'Activate'}
-                    className={`p-1.5 rounded-lg border transition-colors ${
-                      r.is_active 
-                        ? 'text-[#B4D58A] border-[#D5EAD9] bg-[#B4D58A]/20 hover:bg-[#D5EAD9]' 
-                        : 'text-[#8E928B] border-black/[0.06] bg-white hover:bg-[#F3DA8A]/25'
-                    }`}
-                  >
-                    <Power className="h-3.5 w-3.5" />
-                  </button>
-                  <button
-                    onClick={() => openEditModal(r)}
-                    title="Edit"
-                    className="p-1.5 rounded-lg border border-black/[0.06] text-[#5A5D58] hover:text-[#252525] hover:bg-white transition-colors"
-                  >
-                    <Edit className="h-3.5 w-3.5" />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(r.id, r.name)}
-                    title="Archive"
-                    className="p-1.5 rounded-lg border border-black/[0.06] text-[#F2AFC0] hover:bg-[#F2AFC0]/20 hover:border-[#F8DADA] transition-colors"
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </button>
+                  {canEdit && (
+                    <>
+                      <button
+                        onClick={() => toggleMutation.mutate(r.id)}
+                        title={r.is_active ? 'Deactivate' : 'Activate'}
+                        className={`p-1.5 rounded-lg border transition-colors ${
+                          r.is_active 
+                            ? 'text-[#B4D58A] border-[#D5EAD9] bg-[#B4D58A]/20 hover:bg-[#D5EAD9]' 
+                            : 'text-[#8E928B] border-black/[0.06] bg-white hover:bg-[#F3DA8A]/25'
+                        }`}
+                      >
+                        <Power className="h-3.5 w-3.5" />
+                      </button>
+                      <button
+                        onClick={() => openEditModal(r)}
+                        title="Edit"
+                        className="p-1.5 rounded-lg border border-black/[0.06] text-[#5A5D58] hover:text-[#252525] hover:bg-white transition-colors"
+                      >
+                        <Edit className="h-3.5 w-3.5" />
+                      </button>
+                    </>
+                  )}
+                  {canDelete && (
+                    <button
+                      onClick={() => handleDelete(r.id, r.name)}
+                      title="Archive"
+                      className="p-1.5 rounded-lg border border-black/[0.06] text-[#F2AFC0] hover:bg-[#F2AFC0]/20 hover:border-[#F8DADA] transition-colors"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
+                  )}
                 </div>
               </div>
             </Card>
           ))}
+        </div>
+      )}
+
+      {/* Pagination */}
+      {data && data.last_page > 1 && (
+        <div className="flex items-center justify-between pt-2 text-xs">
+          <span className="text-[#5A5D58]">
+            Showing {data.from || 0} to {data.to || 0} of {data.total || 0} restaurants
+          </span>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page <= 1}
+            >
+              Previous
+            </Button>
+            <span className="text-[#5A5D58]">
+              Page {data.current_page || page} of {data.last_page}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage((p) => p + 1)}
+              disabled={page >= data.last_page}
+            >
+              Next
+            </Button>
+          </div>
         </div>
       )}
 
