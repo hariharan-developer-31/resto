@@ -1,42 +1,47 @@
 # RESTAURANT OS - PROJECT PROGRESS & ARCHITECTURE AUDIT
 
 **Project Type:** Full-stack, Multi-tenant Restaurant Management System (Restaurant OS)  
-**Current Phase:** Phase 6 Completed (Customer Website, Brand Portal, Contactless Table QR Ordering, Multi-round Cart & Live Prep Tracker, Table Bell Service Requests, and Online Table Reservations)  
+**Current Phase:** Phase 7 Completed (Table Reservations Management, Real-time Conflict Safeguards, Inventory & Stock Tracking, Recipe BOMs, Suppliers & Purchase Orders Intake)  
 **Frontend Deployment Target:** Vercel (Next.js 16 App Router, TypeScript, Tailwind CSS v4, Recharts, qrcode.react)  
 **Backend Deployment Target:** Railway (Laravel 13 REST API, PHP 8.3, Sanctum, Spatie Permission)  
 **Future Final Target:** Hostinger Unlimited Shared Hosting (Zero-daemon architecture, PHP + MySQL 8)  
 
 ---
 
-## 1. Executive Summary of Phase 6 Deliverables
+## 1. Executive Summary of Phase 7 Deliverables
 
-Phase 6 delivers the customer-facing experience for Restaurant OS, enabling diners to explore brand stories, book reservations, and order directly from their table via contactless QR codes without downloading an app or creating an account.
+Phase 7 delivers end-to-end Table Reservations and Inventory / Supply Chain management for Restaurant OS.
 
 ### Completed Features:
 
-- [x] **Luxury Public Restaurant Brand Portal (`/`)**
-  - **Editorial Hero & Heritage Story:** Styled using **DM Serif Display** editorial typography, warm terracotta (`#C76B4A`), and off-white backgrounds (`#FAF8F4`).
-  - **Live Digital Menu Explorer:** Categorized dish browsing with allergen tags, spice meters (🌶️), vegetarian/non-vegetarian indicators, price formatting in INR (₹), and dietary filter chips.
-  - **Multi-Branch Locator:** Displays location addresses, phone contacts, email, operating hours, and active dining tables count.
-  - **Embedded Reservation Modal:** Guests can initiate booking directly from the homepage with instant date, time, and party size selection.
+- [x] **Table Reservations Management Interface (`/reservations`)**
+  - **Comprehensive Operational Views:** Filter reservations by dining date, active branch, and status (`confirmed`, `checked_in`, `seated`, `completed`, `cancelled`, `no_show`).
+  - **Live Search & Summary Metrics:** Quick filtering by guest name, phone, or email. Displays metrics for Today's Total Bookings, Confirmed/Upcoming, Currently Seated, and Expected Guest Count.
+  - **One-Tap Guest Seating & Door Operations:** Instant "Seat Guest" action updates the reservation to `seated`, stamps `seated_at`, and automatically marks the dining table as `occupied`.
+  - **Dynamic Table Assignment Modal:** Validates seating capacity against party size, displays current table status, and flags capacity fits.
+  - **Time-Slot Conflict Prevention Engine:** Automated check verifies that no active booking overlaps on the same table within a 90-minute service buffer, preventing double bookings.
+  - **Staff Booking Modal:** Allows restaurant staff to manually book phone-in or walk-in reservations directly into the system.
 
-- [x] **Dedicated Reservation Booking System (`/reserve`)**
-  - **Date & Time Picker:** Select booking date, dining time slots (lunch & dinner service), and guest party size (1–12 guests).
-  - **Special Seating Preferences:** Dietary notes, high-chair requests, quiet booth preferences, or anniversary celebrations.
-  - **Instant Confirmation:** Generates a real-time reservation record, confirms booking status, and logs guest contact details.
+- [x] **Inventory & Raw Materials Operating System (`/inventory`)**
+  - **Multi-Tab Workspace:** Fast switching across Stock Items, Low Stock Alerts, Suppliers Directory, and Purchase Orders.
+  - **Raw Material Tracking:** Categorized ingredient inventory (produce, meat, poultry, seafood, dairy, spices, dry goods, beverages, packaging) with units of measurement (`kg`, `g`, `l`, `ml`, `pcs`, `pack`, `box`).
+  - **Stock Health & Automatic Status:** Real-time stock status computation:
+    - `in_stock`: Healthy stock above safety thresholds.
+    - `low_stock`: Dips below configured minimum reorder point.
+    - `out_of_stock`: Depleted or zero quantity.
+  - **Dedicated Low Stock Alerts View:** Highlights critical shortages with calculated deficit quantities and one-click purchase order triggers.
+  - **Audited Stock Movements Ledger:** All additions, kitchen wastage, spoilage, audit count corrections, and supplier returns are recorded with delta, new balance, unit costs, reason, and auditor notes.
 
-- [x] **Contactless Table QR Ordering Portal (`/order/[qrToken]`)**
-  - **Token Resolution & Table Context:** Securely decodes the 36-character unguessable table token (`tbl_...`), instantly identifying the restaurant, branch, table number, seating zone, and current active order.
-  - **Digital Menu Catalog:** Full menu exploration grouped by category with dietary filters and instant search.
-  - **Portion & Variant Customization Drawer:** Modal for choosing portion sizes (Half, Full, Family Pack), spicy level overrides, and optional add-ons with cumulative price calculation.
-  - **Slide-over Guest Cart:** Live order summary with subtotal, tax calculation, and special cooking instructions.
-  - **Seamless Multi-Round Ordering:** When ordering from an already occupied table, automatically appends items to the ongoing dining session as an additional round (`Round 2`, `Round 3`) and dispatches a dedicated KOT without splitting the bill.
-  - **Real-Time 4-Stage Preparation Tracker:** Live status stepper (Order Placed -> Kitchen Preparing -> Ready -> Served) with elapsed minutes, KOT number, and itemized round breakdown.
-  - **Digital Table Bell Service Requests:** Diners can tap quick request buttons right from their phone:
-    - 🔔 *Call Waiter* (Notifies floor staff with table number)
-    - 💧 *Request Water* (Requests water refill)
-    - 🧾 *Request Bill* (Alerts cashier to prepare the check)
-    - 💬 *Custom Message* (Free-text inquiry or assistance note)
+- [x] **Suppliers Directory & Vendor Management**
+  - **Vendor Profiles:** Complete management of suppliers with business name, representative contact, phone, email, warehouse address, GST/tax number, and credit payment terms (`net_15`, `net_30`, `cod`, `advance`).
+  - **Supplier Association:** Associates raw ingredients and purchase orders with designated vendors.
+
+- [x] **Purchase Orders & Goods Intake Automation**
+  - **Purchase Order Generator:** Generates unique PO numbers (`PO-YYYYMMDD-XXXX`), order date, expected delivery date, multi-item line rows, subtotal, and 5% input GST.
+  - **Interactive Shipment Intake Modal:** Receiving goods against a PO immediately updates item received quantities, automatically increments the inventory `current_stock` balance, recalculates stock status, and logs a `purchase_in` stock movement.
+
+- [x] **Recipe Bill of Materials (BOM) System**
+  - **Ingredient Deductions Engine:** Connects menu dishes and their variants to raw ingredient quantities.
 
 ---
 
@@ -48,7 +53,7 @@ All staff accounts use password: `password123`
 | :--- | :--- | :--- | :--- |
 | **Super Admin** | `superadmin@resto.com` | Universal (All Tenants) | Full platform administration, analytics, tenant creation |
 | **Restaurant Admin** | `admin@grandfeast.com` | The Grand Feast | Branch creation, menu catalog, staff assignment |
-| **Branch Manager** | `manager@grandfeast.com` | Downtown Flagship | Branch operations, waiter assignment, daily sales |
+| **Branch Manager** | `manager@grandfeast.com` | Downtown Flagship | Branch operations, reservations, inventory, daily sales |
 | **Cashier / POS** | `cashier@grandfeast.com` | Downtown Flagship | POS ordering, table billing, payment collection |
 | **Waiter** | `waiter@grandfeast.com` | Downtown Flagship | Handheld order pad, assigned tables, mark served |
 | **Kitchen Chef** | `kitchen@grandfeast.com` | Downtown Flagship | Kitchen KDS queue, station routing, mark ready |
@@ -63,10 +68,14 @@ erDiagram
     RESTAURANTS ||--o{ BRANCHES : has
     RESTAURANTS ||--o{ CATEGORIES : organizes
     RESTAURANTS ||--o{ ADDONS : defines
+    RESTAURANTS ||--o{ SUPPLIERS : registers
     CATEGORIES ||--o{ MENU_ITEMS : contains
     MENU_ITEMS ||--o{ MENU_VARIANTS : has_sizes
     MENU_ITEMS ||--o{ MENU_ITEM_ADDONS : allows
-    ADDONS ||--o{ MENU_ITEM_ADDONS : attached_to
+    MENU_ITEMS ||--o{ RECIPE_INGREDIENTS : consumes
+    INVENTORY_ITEMS ||--o{ RECIPE_INGREDIENTS : used_in
+    BRANCHES ||--o{ INVENTORY_ITEMS : stocks
+    SUPPLIERS ||--o{ INVENTORY_ITEMS : supplies
     BRANCHES ||--o{ DINING_TABLES : contains
     USERS ||--o{ DINING_TABLES : assigned_waiter
     RESTAURANTS ||--o{ ORDERS : has
@@ -81,6 +90,12 @@ erDiagram
     ORDERS ||--o{ PAYMENTS : settles_with
     USERS ||--o{ PAYMENTS : received_by
     BRANCHES ||--o{ RESERVATIONS : books
+    DINING_TABLES ||--o{ RESERVATIONS : assigned_to
+    BRANCHES ||--o{ PURCHASE_ORDERS : orders
+    SUPPLIERS ||--o{ PURCHASE_ORDERS : fulfills
+    PURCHASE_ORDERS ||--o{ PURCHASE_ORDER_ITEMS : contains
+    INVENTORY_ITEMS ||--o{ PURCHASE_ORDER_ITEMS : item_in
+    INVENTORY_ITEMS ||--o{ STOCK_MOVEMENTS : audited_in
     USERS ||--o{ AUDIT_LOGS : performs
 ```
 
@@ -90,9 +105,9 @@ erDiagram
 
 ```
 Backend Test Suite (PHPUnit 12.5 / Laravel 13):
-Tests: 47 passed, 0 failed (100% pass rate)
-Assertions: 215
-Duration: 24.10s
+Tests: 56 passed, 0 failed (100% pass rate)
+Assertions: 250
+Duration: 45.71s
 
 Feature Test Breakdown:
 Phase 1: Authentication & Tenant Isolation
@@ -154,19 +169,32 @@ Phase 6: Customer Website & QR Ordering Portal
   ✓ test_guest_can_book_table_reservation
   ✓ test_invalid_table_qr_returns_not_found
 
+Phase 7: Table Reservations, Inventory & Stock Management
+  ✓ test_staff_can_list_and_filter_reservations
+  ✓ test_staff_can_create_reservation_with_table
+  ✓ test_cannot_assign_table_with_conflicting_time_slot
+  ✓ test_staff_can_seat_guest_and_occupy_table
+  ✓ test_supplier_crud_lifecycle
+  ✓ test_inventory_item_creation_and_minimum_stock_alerting
+  ✓ test_stock_adjustment_creates_movement_and_updates_status
+  ✓ test_purchase_order_creation_and_stock_receipt_intake
+  ✓ test_recipe_bom_ingredients_save_and_retrieve
+
 Frontend Build (Next.js 16.4.6 Turbopack):
   ✓ TypeScript type check passed (0 errors)
-  ✓ Compiled routes (20/20 routes passing):
+  ✓ Compiled routes (22/22 routes passing):
       ○ /                       [Phase 6 Public Brand Portal]
       ○ /_not-found
       ○ /audit-logs
       ○ /dashboard
       ○ /forgot-password
+      ○ /inventory              [Phase 7 Raw Materials, Alerts, Suppliers & POs]
       ○ /kitchen                [Phase 5 Kitchen Display System]
       ○ /login
       ○ /menu
       ◐ /order/[qrToken]        [Phase 6 Contactless Table QR Ordering]
       ○ /pos                    [Phase 4 POS Terminal]
+      ○ /reservations           [Phase 7 Table Reservations & Seating]
       ○ /reserve                [Phase 6 Online Table Reservations]
       ○ /reset-password
       ○ /restaurants
@@ -179,17 +207,20 @@ Frontend Build (Next.js 16.4.6 Turbopack):
 
 ---
 
-## 5. Next Phase: Phase 7 Scope
+## 5. Next Phase: Phase 8 Scope
 
-**Phase 7: Table Reservations, Inventory & Stock Management**
-- Table Reservation Management:
-  - Table allocation and auto-assignment based on guest party size.
-  - Reservation status transitions (pending -> confirmed -> checked_in -> seated -> completed -> cancelled / no-show).
-  - Conflict prevention for double bookings.
-- Inventory & Raw Material Tracking:
-  - Raw ingredients / inventory items table with units of measurement (kg, g, L, ml, pcs).
-  - Current stock levels, safety stock thresholds, and minimum reorder points.
-  - Low stock visual indicators and automated low stock alerts.
-  - Recipe / Bill of Materials (BOM) linking menu items to ingredient deductions.
-  - Supplier profiles and purchase order stock intake.
-  - Stock adjustment logs with wastage, breakage, and audit tracking.
+**Phase 8: Business Analytics, Reports, Multi-Restaurant SaaS Commercialization & Final Hostinger Deployment Prep**
+- Advanced Business Analytics:
+  - Daily, weekly, and monthly revenue trends.
+  - Category and item-level profitability analysis.
+  - Table turnaround time and floor occupancy rate.
+  - Waitstaff sales attribution and tips ledger.
+  - Customer retention & repeat dining frequency.
+- Exportable Reports:
+  - End-of-Day (EOD) Z-Reports for Cashier balancing.
+  - Tax & GST summary reports (CGST / SGST breakdown).
+  - Inventory consumption & wastage audit reports.
+- Multi-Restaurant SaaS Commercialization:
+  - Restaurant subscription tiers & plan limits (e.g. Starter, Pro, Enterprise).
+  - Tenant feature flags.
+  - Hostinger Unlimited Shared Hosting deployment scripts and zero-daemon scheduler configuration (`cron.php` / Artisan scheduler triggers).

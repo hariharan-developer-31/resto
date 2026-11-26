@@ -306,3 +306,42 @@ All endpoints under `/public/` do not require Sanctum user authentication.
 }
 ```
 - **Response `201 Created`:** Confirms reservation with booking timestamp, branch, and guest details.
+
+---
+
+## 11. Table Reservations & Inventory Management (Phase 7)
+
+### 11.1 Table Reservations Management
+- `GET /reservations` – List reservations with filtering (`date`, `branch_id`, `status`, `search`).
+- `POST /reservations` – Create reservation with party size, time slot, and table conflict validation.
+- `GET /reservations/{id}` – View single reservation with table and branch details.
+- `PUT /reservations/{id}` – Update reservation details.
+- `PATCH /reservations/{id}/status` – Transition status (`confirmed`, `checked_in`, `seated`, `completed`, `cancelled`, `no_show`). Automatically marks table `occupied` on `seated`.
+- `POST /reservations/{id}/assign-table` – Assign dining table with seating capacity fit check and 90-minute time-slot conflict safeguard.
+- `DELETE /reservations/{id}` – Soft delete reservation.
+
+### 11.2 Suppliers Directory
+- `GET /suppliers` – List suppliers with active item counts and payment terms.
+- `POST /suppliers` – Register new vendor (`name`, `contact_person`, `phone`, `email`, `address`, `tax_number`, `payment_terms`).
+- `GET /suppliers/{id}` – View supplier with supplied inventory items and purchase orders.
+- `PUT /suppliers/{id}` – Update supplier attributes.
+- `DELETE /suppliers/{id}` – Soft delete supplier.
+
+### 11.3 Raw Materials & Stock Management
+- `GET /inventory` – List inventory items with category filter, stock status filter, and pagination.
+- `POST /inventory` – Register raw material / ingredient (`name`, `sku`, `category`, `unit`, `current_stock`, `minimum_stock`, `unit_cost`, `storage_location`, `supplier_id`).
+- `GET /inventory/alerts` – Fast query for critical shortages where `current_stock <= minimum_stock`.
+- `POST /inventory/adjust` – Record manual stock movement (`audit_adjustment`, `wastage`, `spoilage`, `purchase_in`, `return`) with delta quantity, reason, and notes.
+- `GET /inventory/{id}` – Item details with 20 most recent audited stock movements.
+- `PUT /inventory/{id}` – Update item specifications and thresholds.
+- `DELETE /inventory/{id}` – Soft delete item.
+
+### 11.4 Recipe Bill of Materials (BOM)
+- `GET /menu-items/{id}/recipe` – Retrieve recipe ingredients and consumed quantities per portion.
+- `POST /menu-items/{id}/recipe` – Save / replace recipe ingredients array (`inventory_item_id`, `menu_variant_id`, `quantity_required`, `unit`).
+
+### 11.5 Purchase Orders & Goods Intake
+- `GET /purchase-orders` – List purchase orders with status filtering.
+- `POST /purchase-orders` – Issue PO with line items (`inventory_item_id`, `quantity_ordered`, `unit_cost`), computes subtotal + 5% input GST.
+- `GET /purchase-orders/{id}` – View PO with items and supplier details.
+- `POST /purchase-orders/{id}/receive` – Receive shipment goods. Updates received quantities, marks PO as `received` (or `partially_received`), automatically increments inventory `current_stock`, and records audited `purchase_in` stock movements.

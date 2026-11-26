@@ -57,14 +57,23 @@ class AuditLog extends Model
         ?Model $auditable = null,
         ?array $oldValues = null,
         ?array $newValues = null,
-        ?int $restaurantId = null,
+        $restaurantId = null,
         ?int $branchId = null,
         ?int $userId = null
     ): self {
+        if ($restaurantId instanceof User) {
+            $userId = $restaurantId->id;
+            $restaurantId = null;
+        }
+
+        $resId = is_numeric($restaurantId) ? (int) $restaurantId : ($auditable?->restaurant_id ?? auth()->user()?->restaurants()->first()?->id);
+        $brId = is_numeric($branchId) ? (int) $branchId : ($auditable?->branch_id ?? auth()->user()?->branches()->first()?->id);
+        $uId = is_numeric($userId) ? (int) $userId : auth()->id();
+
         return self::create([
-            'restaurant_id' => $restaurantId ?? auth()->user()?->restaurants()->first()?->id,
-            'branch_id' => $branchId ?? auth()->user()?->branches()->first()?->id,
-            'user_id' => $userId ?? auth()->id(),
+            'restaurant_id' => $resId,
+            'branch_id' => $brId,
+            'user_id' => $uId,
             'action' => $action,
             'auditable_type' => $auditable ? get_class($auditable) : null,
             'auditable_id' => $auditable?->getKey(),
@@ -80,7 +89,7 @@ class AuditLog extends Model
         ?Model $auditable = null,
         ?array $oldValues = null,
         ?array $newValues = null,
-        ?int $restaurantId = null,
+        $restaurantId = null,
         ?int $branchId = null,
         ?int $userId = null
     ): self {

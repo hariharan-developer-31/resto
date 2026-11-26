@@ -581,6 +581,142 @@ class DatabaseSeeder extends Seeder
             ['restaurant_id' => $restaurant->id, 'seating_capacity' => 2, 'location' => 'Bar Counter', 'status' => 'cleaning', 'qr_token' => 'tbl_' . \Illuminate\Support\Str::random(32), 'qr_generated_at' => now()]
         );
 
+        // 13. Seed Suppliers (Phase 7)
+        $supMeat = \App\Models\Supplier::firstOrCreate(
+            ['restaurant_id' => $restaurant->id, 'name' => 'Apex Farm Fresh Meats'],
+            [
+                'contact_person' => 'Rajesh Sharma',
+                'phone' => '+91 98200 11223',
+                'email' => 'rajesh@apexmeats.example.com',
+                'address' => 'Gala 14, Wholesale APMC Market, Vashi',
+                'tax_number' => '27AAACA1234A1Z5',
+                'payment_terms' => 'net_30',
+                'status' => 'active',
+            ]
+        );
+
+        $supDairy = \App\Models\Supplier::firstOrCreate(
+            ['restaurant_id' => $restaurant->id, 'name' => 'Heritage Dairy & Spices Ltd'],
+            [
+                'contact_person' => 'Kavita Patel',
+                'phone' => '+91 98300 44556',
+                'email' => 'orders@heritagedairy.example.com',
+                'address' => 'Plot 88, Industrial Food Park, Chakan',
+                'tax_number' => '27AABCH9988C1Z2',
+                'payment_terms' => 'net_15',
+                'status' => 'active',
+            ]
+        );
+
+        // 14. Seed Inventory Items (Phase 7)
+        $itemRice = \App\Models\InventoryItem::firstOrCreate(
+            ['branch_id' => $branch1->id, 'sku' => 'ING-RICE-01'],
+            [
+                'restaurant_id' => $restaurant->id,
+                'supplier_id' => $supDairy->id,
+                'name' => 'Royal Daawat Basmati Rice (Aged 2 Yrs)',
+                'category' => 'dry_goods',
+                'unit' => 'kg',
+                'current_stock' => 50.000,
+                'minimum_stock' => 20.000,
+                'unit_cost' => 95.00,
+                'storage_location' => 'Dry Store Room A',
+                'status' => 'in_stock',
+            ]
+        );
+
+        $itemChicken = \App\Models\InventoryItem::firstOrCreate(
+            ['branch_id' => $branch1->id, 'sku' => 'ING-CHIK-01'],
+            [
+                'restaurant_id' => $restaurant->id,
+                'supplier_id' => $supMeat->id,
+                'name' => 'Tender Chicken Breast Boneless',
+                'category' => 'poultry',
+                'unit' => 'kg',
+                'current_stock' => 6.500,
+                'minimum_stock' => 15.000,
+                'unit_cost' => 260.00,
+                'storage_location' => 'Walk-in Chiller #2',
+                'status' => 'low_stock',
+            ]
+        );
+
+        $itemPaneer = \App\Models\InventoryItem::firstOrCreate(
+            ['branch_id' => $branch1->id, 'sku' => 'ING-PAN-01'],
+            [
+                'restaurant_id' => $restaurant->id,
+                'supplier_id' => $supDairy->id,
+                'name' => 'Artisanal Malai Paneer Blocks',
+                'category' => 'dairy',
+                'unit' => 'kg',
+                'current_stock' => 0.000,
+                'minimum_stock' => 8.000,
+                'unit_cost' => 340.00,
+                'storage_location' => 'Walk-in Chiller #1',
+                'status' => 'out_of_stock',
+            ]
+        );
+
+        $itemGhee = \App\Models\InventoryItem::firstOrCreate(
+            ['branch_id' => $branch1->id, 'sku' => 'ING-GHEE-01'],
+            [
+                'restaurant_id' => $restaurant->id,
+                'supplier_id' => $supDairy->id,
+                'name' => 'Bilona Cow Ghee Pure',
+                'category' => 'dairy',
+                'unit' => 'l',
+                'current_stock' => 18.000,
+                'minimum_stock' => 5.000,
+                'unit_cost' => 750.00,
+                'storage_location' => 'Chef Prep Station Counter',
+                'status' => 'in_stock',
+            ]
+        );
+
+        // 15. Seed Recipe BOM for Biryani Item
+        if ($biryaniItem) {
+            \App\Models\RecipeIngredient::firstOrCreate(
+                ['menu_item_id' => $biryaniItem->id, 'inventory_item_id' => $itemRice->id, 'menu_variant_id' => null],
+                ['quantity_required' => 0.300, 'unit' => 'kg']
+            );
+            \App\Models\RecipeIngredient::firstOrCreate(
+                ['menu_item_id' => $biryaniItem->id, 'inventory_item_id' => $itemChicken->id, 'menu_variant_id' => null],
+                ['quantity_required' => 0.400, 'unit' => 'kg']
+            );
+            \App\Models\RecipeIngredient::firstOrCreate(
+                ['menu_item_id' => $biryaniItem->id, 'inventory_item_id' => $itemGhee->id, 'menu_variant_id' => null],
+                ['quantity_required' => 0.050, 'unit' => 'l']
+            );
+        }
+
+        // 16. Seed Purchase Order
+        $po = \App\Models\PurchaseOrder::firstOrCreate(
+            ['po_number' => 'PO-20261126-001'],
+            [
+                'restaurant_id' => $restaurant->id,
+                'branch_id' => $branch1->id,
+                'supplier_id' => $supMeat->id,
+                'order_date' => now()->toDateString(),
+                'expected_delivery_date' => now()->addDay()->toDateString(),
+                'status' => 'ordered',
+                'subtotal' => 5200.00,
+                'tax_amount' => 260.00,
+                'total_amount' => 5460.00,
+                'notes' => 'Urgent replenishment for weekend biryani service',
+                'created_by' => $superAdmin->id,
+            ]
+        );
+
+        \App\Models\PurchaseOrderItem::firstOrCreate(
+            ['purchase_order_id' => $po->id, 'inventory_item_id' => $itemChicken->id],
+            [
+                'quantity_ordered' => 20.000,
+                'quantity_received' => 0.000,
+                'unit_cost' => 260.00,
+                'total_price' => 5200.00,
+            ]
+        );
+
         // Audit log of system initial setup
         AuditLog::create([
             'restaurant_id' => $restaurant->id,

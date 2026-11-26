@@ -4,13 +4,18 @@ use App\Http\Controllers\Api\V1\AddonController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\BranchController;
 use App\Http\Controllers\Api\V1\CategoryController;
+use App\Http\Controllers\Api\V1\InventoryController;
 use App\Http\Controllers\Api\V1\KdsController;
 use App\Http\Controllers\Api\V1\MenuItemController;
 use App\Http\Controllers\Api\V1\OrderController;
 use App\Http\Controllers\Api\V1\PublicGuestController;
+use App\Http\Controllers\Api\V1\PurchaseOrderController;
+use App\Http\Controllers\Api\V1\RecipeController;
+use App\Http\Controllers\Api\V1\ReservationController;
 use App\Http\Controllers\Api\V1\RestaurantController;
 use App\Http\Controllers\Api\V1\RolePermissionController;
 use App\Http\Controllers\Api\V1\SuperAdminController;
+use App\Http\Controllers\Api\V1\SupplierController;
 use App\Http\Controllers\Api\V1\SystemController;
 use App\Http\Controllers\Api\V1\TableController;
 use App\Http\Controllers\Api\V1\UserController;
@@ -112,6 +117,25 @@ Route::prefix('v1')->group(function () {
         Route::get('/kds/summary', [KdsController::class, 'summary']);
         Route::patch('/kds/items/{id}/status', [KdsController::class, 'updateItemStatus']);
         Route::post('/kds/tickets/{kot}/ready', [KdsController::class, 'markTicketReady']);
+
+        // Table Reservations Management
+        Route::apiResource('reservations', ReservationController::class);
+        Route::patch('/reservations/{id}/status', [ReservationController::class, 'updateStatus']);
+        Route::post('/reservations/{id}/assign-table', [ReservationController::class, 'assignTable']);
+
+        // Inventory, Stock & Suppliers
+        Route::apiResource('suppliers', SupplierController::class);
+        Route::get('/inventory/alerts', [InventoryController::class, 'alerts']);
+        Route::post('/inventory/adjust', [InventoryController::class, 'adjustStock']);
+        Route::apiResource('inventory', InventoryController::class);
+
+        // Recipe / Bill of Materials (BOM)
+        Route::get('/menu-items/{id}/recipe', [RecipeController::class, 'getRecipe']);
+        Route::post('/menu-items/{id}/recipe', [RecipeController::class, 'saveRecipe']);
+
+        // Purchase Orders
+        Route::apiResource('purchase-orders', PurchaseOrderController::class)->except(['destroy']);
+        Route::post('/purchase-orders/{id}/receive', [PurchaseOrderController::class, 'receive']);
 
         // Audit Logs Explorer
         Route::get('/audit-logs', [SystemController::class, 'auditLogs']);
