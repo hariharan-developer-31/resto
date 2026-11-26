@@ -74,4 +74,16 @@ class AuditLog extends Model
             'user_agent' => request()->userAgent(),
         ]);
     }
+
+    public static function record(
+        string $action,
+        ?Model $auditable = null,
+        ?array $oldValues = null,
+        ?array $newValues = null,
+        ?int $restaurantId = null,
+        ?int $branchId = null,
+        ?int $userId = null
+    ): self {
+        return self::log($action, $auditable, $oldValues, $newValues, $restaurantId, $branchId, $userId);
+    }
 }

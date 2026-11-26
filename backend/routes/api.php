@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\BranchController;
 use App\Http\Controllers\Api\V1\CategoryController;
 use App\Http\Controllers\Api\V1\MenuItemController;
+use App\Http\Controllers\Api\V1\OrderController;
 use App\Http\Controllers\Api\V1\RestaurantController;
 use App\Http\Controllers\Api\V1\RolePermissionController;
 use App\Http\Controllers\Api\V1\SuperAdminController;
@@ -87,6 +88,12 @@ Route::prefix('v1')->group(function () {
         Route::patch('/tables/{id}/waiter', [TableController::class, 'assignWaiter']);
         Route::post('/tables/{id}/status', [TableController::class, 'updateStatus']);
         Route::patch('/tables/{id}/status', [TableController::class, 'updateStatus']);
+
+        // Orders, POS & KOT Operations
+        Route::apiResource('orders', OrderController::class);
+        Route::patch('/order-items/{id}/status', [OrderController::class, 'updateItemStatus']);
+        Route::post('/orders/{id}/settle', [OrderController::class, 'settleBill']);
+        Route::post('/orders/{id}/cancel', [OrderController::class, 'cancel']);
 
         // Audit Logs Explorer
         Route::get('/audit-logs', [SystemController::class, 'auditLogs']);

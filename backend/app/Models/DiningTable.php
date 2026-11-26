@@ -53,6 +53,13 @@ class DiningTable extends Model
         return $this->hasMany(Order::class, 'table_id');
     }
 
+    public function activeOrder()
+    {
+        return $this->hasOne(Order::class, 'table_id')
+            ->whereIn('order_status', ['pending', 'preparing', 'ready'])
+            ->latestOfMany();
+    }
+
     public function reservations(): HasMany
     {
         return $this->hasMany(Reservation::class, 'table_id');
