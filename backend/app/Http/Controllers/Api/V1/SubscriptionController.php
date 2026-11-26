@@ -50,6 +50,10 @@ class SubscriptionController extends Controller
             return $this->errorResponse('Please specify an active restaurant context.', 400);
         }
 
+        if (!$user->hasRestaurantAccess((int) $restaurantId)) {
+            return $this->errorResponse('Unauthorized access to this restaurant.', 403);
+        }
+
         $restaurant = Restaurant::with('currentPlan')->findOrFail($restaurantId);
         $plan = $restaurant->getActivePlan();
 
@@ -128,11 +132,24 @@ class SubscriptionController extends Controller
             $restaurantId = Branch::first()?->restaurant_id;
         }
 
+        if (!$restaurantId || (!$user->isSuperAdmin() && (!$user->can('settings.edit') || !$user->hasRestaurantAccess((int) $restaurantId)))) {
+            return $this->errorResponse('Unauthorized to manage subscriptions for this restaurant.', 403);
+        }
+
         $restaurant = Restaurant::findOrFail($restaurantId);
         $plan = SubscriptionPlan::findOrFail($validated['plan_id']);
 
         $amount = $validated['billing_cycle'] === 'annual' ? (float) $plan->annual_price : (float) $plan->monthly_price;
         $renewalDuration = $validated['billing_cycle'] === 'annual' ? 365 : 30;
+
+        // Mark prior active subscriptions as cancelled before creating the new active tier
+        RestaurantSubscription::where('restaurant_id', $restaurant->id)
+            ->where('status', 'active')
+            ->update([
+                'status' => 'cancelled',
+                'cancelled_at' => now(),
+                'cancellation_reason' => 'Replaced by plan change',
+            ]);
 
         $subscription = RestaurantSubscription::create([
             'restaurant_id' => $restaurant->id,
@@ -146,10 +163,10 @@ class SubscriptionController extends Controller
             'payment_reference' => $validated['payment_reference'] ?? 'SUB-' . strtoupper(Str::random(10)),
         ]);
 
-        $restaurant->update([
+        $restaurant->forceFill([
             'current_plan_id' => $plan->id,
             'subscription_status' => 'active',
-        ]);
+        ])->save();
 
         AuditLog::log(
             'subscription.upgraded',
@@ -171,6 +188,9 @@ class SubscriptionController extends Controller
     public function storePlan(Request $request): JsonResponse
     {
         $user = $request->user();
+        if (!$user->isSuperAdmin()) {
+            return $this->errorResponse('Only a Super Admin can create subscription plans.', 403);
+        }
 
         $validated = $request->validate([
             'name' => 'required|string|max:100',

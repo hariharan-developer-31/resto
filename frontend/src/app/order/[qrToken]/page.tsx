@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -97,6 +98,13 @@ function TableQrOrderContent() {
   // Table Bell Service Modal
   const [bellModalOpen, setBellModalOpen] = useState(false);
   const [bellFeedback, setBellFeedback] = useState<string | null>(null);
+  const bellTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (bellTimerRef.current) clearTimeout(bellTimerRef.current);
+    };
+  }, []);
 
   // Fetch Table & Digital Menu
   const { data: tableData, isLoading: tableLoading, error: tableError } = useQuery({
@@ -178,7 +186,7 @@ function TableQrOrderContent() {
     addons: Addon[],
     note: string
   ) => {
-    const cartItemId = `${item.id}-${variant?.id || 'base'}-${addons.map((a) => a.id).sort().join(',')}`;
+    const cartItemId = `${item.id}-${variant?.id || 'base'}-${addons.map((a) => a.id).sort().join(',')}-${note.trim().toLowerCase()}`;
 
     setCart((prev) => {
       const existing = prev.find((i) => i.cartItemId === cartItemId);
@@ -238,11 +246,16 @@ function TableQrOrderContent() {
       });
       return res.data;
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       setCart([]);
+      setTableInstructions('');
       setCartOpen(false);
       setActiveTab('track');
+      toast.success('Order sent to kitchen!');
       queryClient.invalidateQueries({ queryKey: ['table-qr', qrToken] });
+    },
+    onError: (err: any) => {
+      toast.error(err?.message || 'Could not place your order. Please try again.');
     },
   });
 
@@ -256,10 +269,14 @@ function TableQrOrderContent() {
     },
     onSuccess: (data) => {
       setBellFeedback(data.message);
-      setTimeout(() => {
+      if (bellTimerRef.current) clearTimeout(bellTimerRef.current);
+      bellTimerRef.current = setTimeout(() => {
         setBellModalOpen(false);
         setBellFeedback(null);
       }, 3000);
+    },
+    onError: (err: any) => {
+      toast.error(err?.message || 'Failed to notify staff. Please try again.');
     },
   });
 
@@ -353,7 +370,17 @@ function TableQrOrderContent() {
       )}
 
       {/* 3. VIEW: LIVE ORDER TRACKER */}
-      {activeTab === 'track' && trackingData ? (
+      {activeTab === 'track' ? (
+        !trackingData ? (
+          <div className="max-w-md mx-auto w-full p-6 text-center">
+            <div className="bg-white rounded-2xl border border-black/[0.06] p-8 shadow-xs space-y-2">
+              <Clock className="h-8 w-8 text-[#B4D58A] animate-spin mx-auto" />
+              <p className="text-xs font-semibold text-[#5A5D58]">
+                Loading live kitchen status...
+              </p>
+            </div>
+          </div>
+        ) : (
         <div className="max-w-md mx-auto w-full p-4 space-y-4">
           {/* Progress Tracker Card */}
           <div className="bg-white rounded-2xl border border-black/[0.06] p-5 shadow-xs space-y-4">
@@ -364,7 +391,7 @@ function TableQrOrderContent() {
                 </span>
                 <h3 className="font-bold text-sm text-[#252525]">{trackingData.order_number}</h3>
               </div>
-              <Badge variant="success" className="text-[10px] uppercase">
+              <Badge variant={trackingData.stage === 0 ? 'danger' : 'success'} className="text-[10px] uppercase">
                 {trackingData.stage_label}
               </Badge>
             </div>
@@ -451,6 +478,7 @@ function TableQrOrderContent() {
             </Button>
           </div>
         </div>
+        )
       ) : (
         /* 4. VIEW: FOOD MENU & BROWSING */
         <div className="max-w-md mx-auto w-full p-4 space-y-3">
@@ -701,6 +729,12 @@ function TableQrOrderContent() {
                   className="h-9 text-xs bg-white"
                 />
               </div>
+              <Input
+                placeholder="Table instructions (e.g. serve starters first, allergies)"
+                value={tableInstructions}
+                onChange={(e) => setTableInstructions(e.target.value)}
+                className="h-9 text-xs bg-white"
+              />
 
               <div className="space-y-1 text-xs text-[#5A5D58]">
                 <div className="flex justify-between">
@@ -789,6 +823,17 @@ function TableQrOrderContent() {
                 })}
               </div>
             )}
+
+            {/* Dish Cooking Note */}
+            <div className="space-y-1">
+              <span className="text-[11px] font-bold text-[#5A5D58] uppercase">Cooking Note (Optional)</span>
+              <Input
+                placeholder="e.g. Less spicy, no onion, extra crispy"
+                value={itemNote}
+                onChange={(e) => setItemNote(e.target.value)}
+                className="h-9 text-xs"
+              />
+            </div>
 
             <Button
               onClick={() =>

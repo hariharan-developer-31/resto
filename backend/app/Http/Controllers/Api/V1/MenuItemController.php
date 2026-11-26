@@ -65,7 +65,8 @@ class MenuItemController extends Controller
             $query->where('kitchen_station', $station);
         }
 
-        $items = $query->paginate($request->input('per_page', 20));
+        $perPage = min(max((int) $request->input('per_page', 20), 1), 100);
+        $items = $query->paginate($perPage);
 
         return $this->successResponse($items, 'Menu items retrieved successfully.');
     }
@@ -172,12 +173,16 @@ class MenuItemController extends Controller
     /**
      * Display the specified menu item.
      */
-    public function show(int $id): JsonResponse
+    public function show(Request $request, int $id): JsonResponse
     {
         $item = MenuItem::with(['category', 'variants', 'addons'])->find($id);
 
         if (!$item) {
             return $this->errorResponse('Menu item not found.', 404);
+        }
+
+        if (!$request->user()->hasRestaurantAccess($item->restaurant_id)) {
+            return $this->errorResponse('Unauthorized access to this menu item.', 403);
         }
 
         return $this->successResponse($item, 'Menu item details retrieved.');
@@ -196,6 +201,10 @@ class MenuItemController extends Controller
         $item = MenuItem::find($id);
         if (!$item) {
             return $this->errorResponse('Menu item not found.', 404);
+        }
+
+        if (!$user->hasRestaurantAccess($item->restaurant_id)) {
+            return $this->errorResponse('Unauthorized access to this menu item.', 403);
         }
 
         $validated = $request->validate([
@@ -273,6 +282,10 @@ class MenuItemController extends Controller
             return $this->errorResponse('Menu item not found.', 404);
         }
 
+        if (!$user->hasRestaurantAccess($item->restaurant_id)) {
+            return $this->errorResponse('Unauthorized access to this menu item.', 403);
+        }
+
         $item->delete();
 
         AuditLog::log(
@@ -298,6 +311,10 @@ class MenuItemController extends Controller
         $item = MenuItem::find($id);
         if (!$item) {
             return $this->errorResponse('Menu item not found.', 404);
+        }
+
+        if (!$user->hasRestaurantAccess($item->restaurant_id)) {
+            return $this->errorResponse('Unauthorized access to this menu item.', 403);
         }
 
         $item->update(['is_available' => !$item->is_available]);

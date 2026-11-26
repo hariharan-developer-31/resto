@@ -55,7 +55,8 @@ class Reservation extends Model
     }
 
     /**
-     * Check if a dining table has a conflicting active reservation at the requested time slot (+/- 90 mins)
+     * Check if a dining table has a conflicting active reservation at the requested time slot (+/- 90 mins).
+     * Midnight-safe using Carbon minute difference instead of string BETWEEN.
      */
     public static function hasTableConflict(
         int $tableId,
@@ -64,20 +65,33 @@ class Reservation extends Model
         ?int $ignoreReservationId = null,
         int $bufferMinutes = 90
     ): bool {
-        $requestedTime = Carbon::parse($time);
-        $windowStart = $requestedTime->copy()->subMinutes($bufferMinutes)->format('H:i');
-        $windowEnd = $requestedTime->copy()->addMinutes($bufferMinutes)->format('H:i');
+        $requestedDateTime = Carbon::parse("{$date} {$time}");
 
         $query = static::where('table_id', $tableId)
             ->whereDate('reservation_date', $date)
-            ->whereIn('status', ['confirmed', 'checked_in', 'seated'])
-            ->whereBetween('reservation_time', [$windowStart, $windowEnd]);
+            ->whereIn('status', ['pending', 'confirmed', 'checked_in', 'seated']);
 
         if ($ignoreReservationId) {
             $query->where('id', '!=', $ignoreReservationId);
         }
 
-        return $query->exists();
+        $existingReservations = $query->get(['id', 'reservation_date', 'reservation_time']);
+
+        foreach ($existingReservations as $existing) {
+            $existingDate = $existing->reservation_date instanceof \DateTimeInterface
+                ? $existing->reservation_date->format('Y-m-d')
+                : (string) $existing->reservation_date;
+            try {
+                $existingDateTime = Carbon::parse("{$existingDate} {$existing->reservation_time}");
+                if (abs($requestedDateTime->diffInMinutes($existingDateTime)) < $bufferMinutes) {
+                    return true;
+                }
+            } catch (\Throwable) {
+                continue;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -114,11 +128,24 @@ class Reservation extends Model
     }
 
     /**
-     * Mark reservation completed and free table if assigned
+     * Mark reservation completed and free table if assigned and has no active unpaid order
      */
     public function completeReservation(): void
     {
         $this->update(['status' => 'completed']);
+
+        if ($this->table_id) {
+            $table = DiningTable::find($this->table_id);
+            if ($table && in_array($table->status, ['occupied', 'reserved'], true)) {
+                $hasActiveOrder = Order::where('table_id', $table->id)
+                    ->whereIn('order_status', ['pending', 'preparing', 'ready'])
+                    ->where('payment_status', '!=', 'paid')
+                    ->exists();
+                if (!$hasActiveOrder) {
+                    $table->update(['status' => 'available']);
+                }
+            }
+        }
     }
 
     /**

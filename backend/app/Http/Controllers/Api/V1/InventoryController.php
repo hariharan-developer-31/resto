@@ -144,7 +144,7 @@ class InventoryController extends Controller
     /**
      * Display single inventory item details with recent movements.
      */
-    public function show(int $id): JsonResponse
+    public function show(Request $request, int $id): JsonResponse
     {
         $item = InventoryItem::with([
             'supplier',
@@ -153,6 +153,10 @@ class InventoryController extends Controller
                 $q->with('user:id,name')->latest()->take(20);
             },
         ])->findOrFail($id);
+
+        if (!$request->user()->hasRestaurantAccess($item->restaurant_id)) {
+            return $this->errorResponse('Unauthorized access to this inventory item.', 403);
+        }
 
         return $this->successResponse($item, 'Inventory item details retrieved.');
     }
@@ -164,6 +168,9 @@ class InventoryController extends Controller
     {
         $user = $request->user();
         $item = InventoryItem::findOrFail($id);
+        if (!$user->hasRestaurantAccess($item->restaurant_id)) {
+            return $this->errorResponse('Unauthorized access to this inventory item.', 403);
+        }
 
         $validated = $request->validate([
             'supplier_id' => 'nullable|exists:suppliers,id',
@@ -214,9 +221,19 @@ class InventoryController extends Controller
         ]);
 
         $item = InventoryItem::findOrFail($validated['inventory_item_id']);
+        if (!$user->hasRestaurantAccess($item->restaurant_id)) {
+            return $this->errorResponse('Unauthorized access to this inventory item.', 403);
+        }
+
+        $delta = (float) $validated['quantity'];
+        if (in_array($validated['movement_type'], ['wastage', 'spoilage'], true)) {
+            $delta = -abs($delta);
+        } elseif ($validated['movement_type'] === 'purchase_in') {
+            $delta = abs($delta);
+        }
 
         $movement = $item->adjustStock(
-            (float) $validated['quantity'],
+            $delta,
             $validated['movement_type'],
             $user->id,
             $validated['reason'],
@@ -279,6 +296,9 @@ class InventoryController extends Controller
     {
         $user = $request->user();
         $item = InventoryItem::findOrFail($id);
+        if (!$user->hasRestaurantAccess($item->restaurant_id)) {
+            return $this->errorResponse('Unauthorized access to this inventory item.', 403);
+        }
 
         AuditLog::log('inventory.item_deleted', $item, $item->toArray(), null, $user);
         $item->delete();

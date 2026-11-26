@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\V1\CategoryController;
 use App\Http\Controllers\Api\V1\InventoryController;
 use App\Http\Controllers\Api\V1\KdsController;
 use App\Http\Controllers\Api\V1\MenuItemController;
+use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\OrderController;
 use App\Http\Controllers\Api\V1\PublicGuestController;
 use App\Http\Controllers\Api\V1\PurchaseOrderController;
@@ -39,20 +40,25 @@ Route::prefix('v1')->group(function () {
     Route::prefix('public')->group(function () {
         Route::get('/restaurants/{slug}', [PublicGuestController::class, 'restaurantDetails']);
         Route::get('/table/{qrToken}', [PublicGuestController::class, 'resolveTable']);
-        Route::post('/table/{qrToken}/order', [PublicGuestController::class, 'placeTableOrder']);
         Route::get('/orders/{orderNumber}/track', [PublicGuestController::class, 'trackOrder']);
-        Route::post('/table/{qrToken}/service-request', [PublicGuestController::class, 'serviceRequest']);
-        Route::post('/reservations', [PublicGuestController::class, 'createReservation']);
+
+        Route::middleware(['throttle:30,1'])->group(function () {
+            Route::post('/table/{qrToken}/order', [PublicGuestController::class, 'placeTableOrder']);
+            Route::post('/table/{qrToken}/service-request', [PublicGuestController::class, 'serviceRequest']);
+            Route::post('/reservations', [PublicGuestController::class, 'createReservation']);
+        });
     });
 
     // Authentication Routes (Rate limited)
-    Route::prefix('auth')->middleware(['throttle:60,1'])->group(function () {
-        Route::post('/login', [AuthController::class, 'login']);
-        Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
-        Route::post('/reset-password', [AuthController::class, 'resetPassword']);
+    Route::prefix('auth')->group(function () {
+        Route::middleware(['throttle:10,1'])->group(function () {
+            Route::post('/login', [AuthController::class, 'login']);
+            Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
+            Route::post('/reset-password', [AuthController::class, 'resetPassword']);
+        });
 
         // Authenticated Auth Endpoints
-        Route::middleware('auth:sanctum')->group(function () {
+        Route::middleware(['auth:sanctum', 'active'])->group(function () {
             Route::get('/me', [AuthController::class, 'me']);
             Route::post('/logout', [AuthController::class, 'logout']);
             Route::post('/change-password', [AuthController::class, 'changePassword']);
@@ -60,9 +66,10 @@ Route::prefix('v1')->group(function () {
     });
 
     // Protected Authenticated System Routes
-    Route::middleware('auth:sanctum')->group(function () {
-        // Super Admin Global Analytics
+    Route::middleware(['auth:sanctum', 'active', 'tenant'])->group(function () {
+        // Super Admin Global Analytics & Tenant Scoped Dashboard
         Route::get('/super-admin/dashboard', [SuperAdminController::class, 'dashboardStats']);
+        Route::get('/dashboard', [SuperAdminController::class, 'tenantDashboardStats']);
 
         // Restaurant Management
         Route::apiResource('restaurants', RestaurantController::class);
@@ -109,7 +116,7 @@ Route::prefix('v1')->group(function () {
         Route::patch('/tables/{id}/status', [TableController::class, 'updateStatus']);
 
         // Orders, POS & KOT Operations
-        Route::apiResource('orders', OrderController::class);
+        Route::apiResource('orders', OrderController::class)->only(['index', 'store', 'show']);
         Route::patch('/order-items/{id}/status', [OrderController::class, 'updateItemStatus']);
         Route::post('/orders/{id}/settle', [OrderController::class, 'settleBill']);
         Route::post('/orders/{id}/cancel', [OrderController::class, 'cancel']);
@@ -136,7 +143,7 @@ Route::prefix('v1')->group(function () {
         Route::post('/menu-items/{id}/recipe', [RecipeController::class, 'saveRecipe']);
 
         // Purchase Orders
-        Route::apiResource('purchase-orders', PurchaseOrderController::class)->except(['destroy']);
+        Route::apiResource('purchase-orders', PurchaseOrderController::class)->only(['index', 'store', 'show']);
         Route::post('/purchase-orders/{id}/receive', [PurchaseOrderController::class, 'receive']);
 
         // Business Analytics & Executive Reports (Phase 8)
@@ -152,8 +159,11 @@ Route::prefix('v1')->group(function () {
         Route::post('/subscription/upgrade', [SubscriptionController::class, 'upgrade']);
         Route::post('/super-admin/plans', [SubscriptionController::class, 'storePlan']);
 
-        // Audit Logs Explorer
+        // Audit Logs Explorer & Staff Notifications
         Route::get('/audit-logs', [SystemController::class, 'auditLogs']);
+        Route::get('/notifications', [NotificationController::class, 'index']);
+        Route::patch('/notifications/{id}/read', [NotificationController::class, 'markRead']);
+        Route::post('/notifications/read-all', [NotificationController::class, 'markAllRead']);
 
         // Tenant Scoped Verification Route
         Route::middleware('tenant')->group(function () {

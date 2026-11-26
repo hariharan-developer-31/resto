@@ -32,13 +32,15 @@ class RestaurantController extends Controller
             $query->whereIn('id', $permittedIds);
         }
 
-        // Search by name or slug
+        // Search by name, slug, email, or branch city
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
                   ->orWhere('slug', 'like', "%{$search}%")
                   ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhere('city', 'like', "%{$search}%");
+                  ->orWhereHas('branches', function ($bq) use ($search) {
+                      $bq->where('city', 'like', "%{$search}%");
+                  });
             });
         }
 
@@ -47,7 +49,8 @@ class RestaurantController extends Controller
             $query->where('is_active', filter_var($request->input('is_active'), FILTER_VALIDATE_BOOLEAN));
         }
 
-        $restaurants = $query->paginate($request->input('per_page', 10));
+        $perPage = min(max((int) $request->input('per_page', 10), 1), 100);
+        $restaurants = $query->paginate($perPage);
 
         return $this->successResponse($restaurants, 'Restaurants retrieved successfully.');
     }
@@ -167,6 +170,10 @@ class RestaurantController extends Controller
             return $this->errorResponse('Restaurant not found.', 404);
         }
 
+        if (!$user->hasRestaurantAccess($restaurant->id)) {
+            return $this->errorResponse('Unauthorized access to this restaurant.', 403);
+        }
+
         $validated = $request->validate([
             'name' => 'sometimes|required|string|max:255',
             'slug' => 'sometimes|nullable|string|max:255|unique:restaurants,slug,' . $id,
@@ -224,6 +231,10 @@ class RestaurantController extends Controller
             return $this->errorResponse('Restaurant not found.', 404);
         }
 
+        if (!$user->hasRestaurantAccess($restaurant->id)) {
+            return $this->errorResponse('Unauthorized access to this restaurant.', 403);
+        }
+
         // Safeguard: Check if there are active, unpaid orders
         $hasActiveOrders = Order::where('restaurant_id', $id)
             ->whereIn('order_status', ['pending', 'preparing', 'ready'])
@@ -258,6 +269,10 @@ class RestaurantController extends Controller
         $restaurant = Restaurant::find($id);
         if (!$restaurant) {
             return $this->errorResponse('Restaurant not found.', 404);
+        }
+
+        if (!$user->hasRestaurantAccess($restaurant->id)) {
+            return $this->errorResponse('Unauthorized access to this restaurant.', 403);
         }
 
         $restaurant->update(['is_active' => !$restaurant->is_active]);

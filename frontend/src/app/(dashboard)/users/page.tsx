@@ -28,7 +28,12 @@ import {
 export default function UsersManagementPage() {
   const queryClient = useQueryClient();
   const currentUser = useAuthStore((s) => s.user);
+  const activeRestaurant = useAuthStore((s) => s.activeRestaurant);
+  const hasPermission = useAuthStore((s) => s.hasPermission);
   const isSuperAdmin = currentUser?.is_super_admin ?? false;
+  const canCreate = isSuperAdmin || hasPermission('users.create');
+  const canEdit = isSuperAdmin || hasPermission('users.edit');
+  const canDelete = isSuperAdmin || hasPermission('users.delete');
 
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState('');
@@ -53,13 +58,18 @@ export default function UsersManagementPage() {
 
   // Fetch users
   const { data: usersData, isLoading } = useQuery({
-    queryKey: ['users', search, roleFilter, page],
+    queryKey: ['users', search, roleFilter, page, activeRestaurant?.id, isSuperAdmin],
     queryFn: async () => {
       const params = new URLSearchParams();
       if (search) params.append('search', search);
       if (roleFilter) params.append('role', roleFilter);
+      if (!isSuperAdmin && activeRestaurant?.id) {
+        params.append('restaurant_id', String(activeRestaurant.id));
+      }
       params.append('page', String(page));
-      const res = await apiRequest(`users?${params.toString()}`);
+      const res = await apiRequest(`users?${params.toString()}`, {
+        restaurantId: activeRestaurant?.id,
+      });
       return res.data;
     },
   });
@@ -71,6 +81,25 @@ export default function UsersManagementPage() {
       const res = await apiRequest('restaurants?per_page=100');
       return res.data?.data || [];
     },
+  });
+
+  // Fetch Branches for selected restaurants in modal
+  const { data: availableBranches = [] } = useQuery({
+    queryKey: ['assignment-branches', selectedRestaurantIds],
+    queryFn: async () => {
+      const collected: any[] = [];
+      for (const rid of selectedRestaurantIds) {
+        try {
+          const res = await apiRequest(`restaurants/${rid}/branches`, { restaurantId: rid });
+          const list = Array.isArray(res.data) ? res.data : res.data?.data || [];
+          list.forEach((b: any) => collected.push({ ...b, restaurant_id: rid }));
+        } catch {
+          // ignore unauthorized restaurant branch fetch
+        }
+      }
+      return collected;
+    },
+    enabled: (isCreateModalOpen || isEditModalOpen) && selectedRestaurantIds.length > 0,
   });
 
   // Fetch Roles list
@@ -85,6 +114,7 @@ export default function UsersManagementPage() {
   const users = usersData?.data || [];
   const availableRestaurants = restaurantsData || [];
   const rolesList = rolesData || [];
+  const assignableRoles = rolesList.filter((r: any) => isSuperAdmin || r.name !== 'Super Admin');
 
   const openCreateModal = () => {
     setSelectedUser(null);
@@ -92,9 +122,10 @@ export default function UsersManagementPage() {
     setEmail('');
     setUsername('');
     setPhone('');
-    setPassword('password123');
+    setPassword('');
     setRole('Waiter');
-    setSelectedRestaurantIds(availableRestaurants[0] ? [availableRestaurants[0].id] : []);
+    const defaultRestId = activeRestaurant?.id || availableRestaurants[0]?.id;
+    setSelectedRestaurantIds(defaultRestId ? [defaultRestId] : []);
     setSelectedBranchIds([]);
     setIsCreateModalOpen(true);
   };
@@ -232,9 +263,11 @@ export default function UsersManagementPage() {
           </p>
         </div>
 
-        <Button onClick={openCreateModal} className="gap-2 shadow-xs">
-          <Plus className="h-4 w-4" /> Add User
-        </Button>
+        {canCreate && (
+          <Button onClick={openCreateModal} className="gap-2 shadow-xs">
+            <Plus className="h-4 w-4" /> Add User
+          </Button>
+        )}
       </div>
 
       {/* Filter and Search Bar */}
@@ -245,14 +278,20 @@ export default function UsersManagementPage() {
             type="text"
             placeholder="Search by name, email, or username..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setPage(1);
+            }}
             className="w-full h-10 pl-9 pr-4 rounded-[10px] border border-black/[0.06] bg-white text-sm text-[#252525] placeholder:text-[#8E928B] outline-none focus:border-[#B4D58A]"
           />
         </div>
 
         <select
           value={roleFilter}
-          onChange={(e) => setRoleFilter(e.target.value)}
+          onChange={(e) => {
+            setRoleFilter(e.target.value);
+            setPage(1);
+          }}
           className="h-10 px-3 rounded-[10px] border border-black/[0.06] bg-white text-xs font-medium text-[#252525] outline-none cursor-pointer"
         >
           <option value="">All Roles</option>
@@ -334,15 +373,30 @@ export default function UsersManagementPage() {
                             Universal (All Restaurants)
                           </span>
                         ) : u.restaurants && u.restaurants.length > 0 ? (
-                          <div className="flex flex-wrap gap-1">
-                            {u.restaurants.map((rest: any) => (
-                              <span
-                                key={rest.id}
-                                className="inline-block px-2 py-0.5 rounded bg-[#FAF9F6] border border-black/[0.06] text-[10px] font-medium text-[#252525]"
-                              >
-                                {rest.name}
-                              </span>
-                            ))}
+                          <div className="space-y-1">
+                            <div className="flex flex-wrap gap-1">
+                              {u.restaurants.map((rest: any) => (
+                                <span
+                                  key={rest.id}
+                                  className="inline-block px-2 py-0.5 rounded bg-[#FAF9F6] border border-black/[0.06] text-[10px] font-medium text-[#252525]"
+                                >
+                                  {rest.name}
+                                </span>
+                              ))}
+                            </div>
+                            {u.branches && u.branches.length > 0 && (
+                              <div className="flex flex-wrap gap-1">
+                                {u.branches.map((br: any) => (
+                                  <span
+                                    key={br.id}
+                                    className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-[#B4D58A]/15 text-[10px] text-[#5A5D58]"
+                                  >
+                                    <GitBranch className="h-2.5 w-2.5 text-[#B4D58A]" />
+                                    {br.name}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
                           </div>
                         ) : (
                           <span className="text-[#8E928B]">None assigned</span>
@@ -361,47 +415,53 @@ export default function UsersManagementPage() {
 
                       <td className="py-3 px-4 text-right">
                         <div className="flex items-center justify-end gap-1">
-                          <button
-                            onClick={() => openResetPasswordModal(u)}
-                            title="Reset Password"
-                            className="p-1.5 rounded-lg border border-black/[0.06] text-[#5A5D58] hover:text-[#B4D58A] hover:bg-white transition-colors"
-                          >
-                            <KeyRound className="h-3.5 w-3.5" />
-                          </button>
-                          <button
-                            onClick={() => openEditModal(u)}
-                            title="Edit User"
-                            className="p-1.5 rounded-lg border border-black/[0.06] text-[#5A5D58] hover:text-[#252525] hover:bg-white transition-colors"
-                          >
-                            <Edit className="h-3.5 w-3.5" />
-                          </button>
-                          <button
-                            disabled={isCurrent}
-                            onClick={() => toggleMutation.mutate(u.id)}
-                            title={isCurrent ? 'Cannot deactivate self' : u.is_active ? 'Deactivate' : 'Activate'}
-                            className={`p-1.5 rounded-lg border transition-colors ${
-                              isCurrent ? 'opacity-30 cursor-not-allowed' :
-                              u.is_active
-                                ? 'text-[#B4D58A] border-[#D5EAD9] bg-[#B4D58A]/20 hover:bg-[#D5EAD9]'
-                                : 'text-[#8E928B] border-black/[0.06] bg-white hover:bg-[#F3DA8A]/25'
-                            }`}
-                          >
-                            <Power className="h-3.5 w-3.5" />
-                          </button>
-                          <button
-                            disabled={isCurrent}
-                            onClick={() => {
-                              if (confirm(`Delete user "${u.name}"?`)) {
-                                deleteMutation.mutate(u.id);
-                              }
-                            }}
-                            title={isCurrent ? 'Cannot delete self' : 'Delete'}
-                            className={`p-1.5 rounded-lg border border-black/[0.06] text-[#F2AFC0] hover:bg-[#F2AFC0]/20 hover:border-[#F8DADA] transition-colors ${
-                              isCurrent ? 'opacity-30 cursor-not-allowed' : ''
-                            }`}
-                          >
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </button>
+                          {canEdit && (
+                            <>
+                              <button
+                                onClick={() => openResetPasswordModal(u)}
+                                title="Reset Password"
+                                className="p-1.5 rounded-lg border border-black/[0.06] text-[#5A5D58] hover:text-[#B4D58A] hover:bg-white transition-colors"
+                              >
+                                <KeyRound className="h-3.5 w-3.5" />
+                              </button>
+                              <button
+                                onClick={() => openEditModal(u)}
+                                title="Edit User"
+                                className="p-1.5 rounded-lg border border-black/[0.06] text-[#5A5D58] hover:text-[#252525] hover:bg-white transition-colors"
+                              >
+                                <Edit className="h-3.5 w-3.5" />
+                              </button>
+                              <button
+                                disabled={isCurrent}
+                                onClick={() => toggleMutation.mutate(u.id)}
+                                title={isCurrent ? 'Cannot deactivate self' : u.is_active ? 'Deactivate' : 'Activate'}
+                                className={`p-1.5 rounded-lg border transition-colors ${
+                                  isCurrent ? 'opacity-30 cursor-not-allowed' :
+                                  u.is_active
+                                    ? 'text-[#B4D58A] border-[#D5EAD9] bg-[#B4D58A]/20 hover:bg-[#D5EAD9]'
+                                    : 'text-[#8E928B] border-black/[0.06] bg-white hover:bg-[#F3DA8A]/25'
+                                }`}
+                              >
+                                <Power className="h-3.5 w-3.5" />
+                              </button>
+                            </>
+                          )}
+                          {canDelete && (
+                            <button
+                              disabled={isCurrent}
+                              onClick={() => {
+                                if (confirm(`Delete user "${u.name}"?`)) {
+                                  deleteMutation.mutate(u.id);
+                                }
+                              }}
+                              title={isCurrent ? 'Cannot delete self' : 'Delete'}
+                              className={`p-1.5 rounded-lg border border-black/[0.06] text-[#F2AFC0] hover:bg-[#F2AFC0]/20 hover:border-[#F8DADA] transition-colors ${
+                                isCurrent ? 'opacity-30 cursor-not-allowed' : ''
+                              }`}
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -411,6 +471,36 @@ export default function UsersManagementPage() {
             </tbody>
           </table>
         </div>
+
+        {/* Pagination */}
+        {usersData && usersData.last_page > 1 && (
+          <div className="flex items-center justify-between p-4 border-t border-black/[0.06] bg-[#FAF9F6]/40 text-xs">
+            <span className="text-[#5A5D58]">
+              Showing {usersData.from || 0} to {usersData.to || 0} of {usersData.total || 0} users
+            </span>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={page <= 1}
+              >
+                Previous
+              </Button>
+              <span className="text-[#5A5D58]">
+                Page {usersData.current_page || page} of {usersData.last_page}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage((p) => p + 1)}
+                disabled={page >= usersData.last_page}
+              >
+                Next
+              </Button>
+            </div>
+          </div>
+        )}
       </Card>
 
       {/* Create / Edit Modal */}
@@ -486,7 +576,7 @@ export default function UsersManagementPage() {
                     className="w-full h-10 px-3 rounded-[10px] border border-black/[0.06] bg-white text-sm text-[#252525] outline-none focus:border-[#B4D58A]"
                     required
                   >
-                    {rolesList.map((r: any) => (
+                    {assignableRoles.map((r: any) => (
                       <option key={r.id} value={r.name}>{r.name}</option>
                     ))}
                   </select>
@@ -523,6 +613,12 @@ export default function UsersManagementPage() {
                               setSelectedRestaurantIds([...selectedRestaurantIds, rest.id]);
                             } else {
                               setSelectedRestaurantIds(selectedRestaurantIds.filter((id) => id !== rest.id));
+                              const droppedBranchIds = new Set(
+                                availableBranches
+                                  .filter((b: any) => b.restaurant_id === rest.id)
+                                  .map((b: any) => b.id)
+                              );
+                              setSelectedBranchIds((prev) => prev.filter((id) => !droppedBranchIds.has(id)));
                             }
                           }}
                           className="rounded border-black/[0.06] text-[#B4D58A] focus:ring-[#B4D58A]"
@@ -532,6 +628,45 @@ export default function UsersManagementPage() {
                       </label>
                     );
                   })}
+                </div>
+              </div>
+
+              {/* Branch Assignment */}
+              <div className="space-y-1.5 pt-1">
+                <label className="text-xs font-semibold uppercase tracking-wider text-[#5A5D58]">
+                  Assigned Branches
+                </label>
+                <p className="text-[11px] text-[#8E928B]">
+                  Select physical branches this staff member can operate in
+                </p>
+                <div className="max-h-32 overflow-y-auto p-2 rounded-xl border border-black/[0.06] bg-[#FAF9F6] space-y-1">
+                  {selectedRestaurantIds.length === 0 ? (
+                    <p className="text-[11px] text-[#8E928B] p-1">Select a restaurant first to load its branches.</p>
+                  ) : availableBranches.length === 0 ? (
+                    <p className="text-[11px] text-[#8E928B] p-1">No branches available for selected restaurant(s).</p>
+                  ) : (
+                    availableBranches.map((br: any) => {
+                      const checked = selectedBranchIds.includes(br.id);
+                      return (
+                        <label key={br.id} className="flex items-center gap-2 p-1.5 rounded hover:bg-white text-xs cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={checked}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setSelectedBranchIds([...selectedBranchIds, br.id]);
+                              } else {
+                                setSelectedBranchIds(selectedBranchIds.filter((id) => id !== br.id));
+                              }
+                            }}
+                            className="rounded border-black/[0.06] text-[#B4D58A] focus:ring-[#B4D58A]"
+                          />
+                          <span className="font-medium text-[#252525]">{br.name}</span>
+                          {br.code && <span className="font-mono text-[10px] text-[#5A5D58]">({br.code})</span>}
+                        </label>
+                      );
+                    })
+                  )}
                 </div>
               </div>
 

@@ -3,6 +3,8 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
+import { useAuthStore } from '@/lib/auth-store';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -54,11 +56,22 @@ interface KdsTicket {
 
 export default function KitchenPage() {
   const queryClient = useQueryClient();
+  const activeBranch = useAuthStore((s) => s.activeBranch);
 
   const [selectedStation, setSelectedStation] = useState<string>('all');
   const [viewMode, setViewMode] = useState<'active' | 'completed'>('active');
   const [soundEnabled, setSoundEnabled] = useState(false);
-  const previousTicketsCountRef = useRef<number>(0);
+  const seenKotsRef = useRef<Set<string>>(new Set());
+  const initializedKotsRef = useRef<boolean>(false);
+  const audioCtxRef = useRef<AudioContext | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (audioCtxRef.current && audioCtxRef.current.state !== 'closed') {
+        audioCtxRef.current.close().catch(() => {});
+      }
+    };
+  }, []);
 
   // Stations definitions
   const stations = [
@@ -71,10 +84,18 @@ export default function KitchenPage() {
     { id: 'dessert', label: 'Desserts' },
   ];
 
-  // Web Audio chime synthesizer (zero external audio file dependency)
+  // Reusable Web Audio chime synthesizer (prevents AudioContext leaks)
   const playKitchenChime = () => {
     try {
-      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      if (!audioCtxRef.current || audioCtxRef.current.state === 'closed') {
+        audioCtxRef.current = new AudioCtx();
+      }
+      const audioCtx = audioCtxRef.current;
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume().catch(() => {});
+      }
+
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
 
@@ -97,7 +118,7 @@ export default function KitchenPage() {
 
   // Fetch KDS Tickets (Fast Polling every 5s)
   const { data: ticketsData, isLoading: ticketsLoading } = useQuery({
-    queryKey: ['kds-tickets', selectedStation, viewMode],
+    queryKey: ['kds-tickets', activeBranch?.id, selectedStation, viewMode],
     queryFn: async () => {
       const res = await apiClient.get<any>(
         `/kds/tickets?station=${selectedStation}&mode=${viewMode}`
@@ -109,7 +130,7 @@ export default function KitchenPage() {
 
   // Fetch KDS Station Summary
   const { data: summaryData } = useQuery({
-    queryKey: ['kds-summary'],
+    queryKey: ['kds-summary', activeBranch?.id],
     queryFn: async () => {
       const res = await apiClient.get<any>('/kds/summary');
       return res.data;
@@ -121,16 +142,22 @@ export default function KitchenPage() {
     return ticketsData?.tickets || [];
   }, [ticketsData]);
 
-  // Play sound when new tickets arrive
+  // Play chime whenever any unseen KOT arrives in active mode (including 0 -> 1)
   useEffect(() => {
-    if (soundEnabled && viewMode === 'active') {
-      const currentCount = tickets.length;
-      if (currentCount > previousTicketsCountRef.current && previousTicketsCountRef.current > 0) {
-        playKitchenChime();
-      }
-      previousTicketsCountRef.current = currentCount;
+    if (viewMode !== 'active') return;
+    const currentKots = tickets.map((t) => t.kot_number);
+    if (!initializedKotsRef.current) {
+      seenKotsRef.current = new Set(currentKots);
+      initializedKotsRef.current = true;
+      return;
     }
-  }, [tickets.length, soundEnabled, viewMode]);
+
+    const hasNewKot = currentKots.some((kot) => !seenKotsRef.current.has(kot));
+    if (hasNewKot && soundEnabled) {
+      playKitchenChime();
+    }
+    seenKotsRef.current = new Set(currentKots);
+  }, [tickets, soundEnabled, viewMode]);
 
   // Mutations
   const updateItemStatusMutation = useMutation({
@@ -142,6 +169,9 @@ export default function KitchenPage() {
       queryClient.invalidateQueries({ queryKey: ['kds-tickets'] });
       queryClient.invalidateQueries({ queryKey: ['kds-summary'] });
     },
+    onError: (err: any) => {
+      toast.error(err?.message || 'Failed to update dish status.');
+    },
   });
 
   const markTicketReadyMutation = useMutation({
@@ -152,8 +182,12 @@ export default function KitchenPage() {
       return res.data;
     },
     onSuccess: () => {
+      toast.success('Ticket marked ready for pickup');
       queryClient.invalidateQueries({ queryKey: ['kds-tickets'] });
       queryClient.invalidateQueries({ queryKey: ['kds-summary'] });
+    },
+    onError: (err: any) => {
+      toast.error(err?.message || 'Failed to mark ticket ready.');
     },
   });
 

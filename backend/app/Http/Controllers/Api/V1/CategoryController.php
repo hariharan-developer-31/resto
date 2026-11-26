@@ -113,13 +113,17 @@ class CategoryController extends Controller
     /**
      * Display the specified category.
      */
-    public function show(int $id): JsonResponse
+    public function show(Request $request, int $id): JsonResponse
     {
         $category = Category::with(['children', 'menuItems.variants', 'menuItems.addons'])
             ->find($id);
 
         if (!$category) {
             return $this->errorResponse('Category not found.', 404);
+        }
+
+        if (!$request->user()->hasRestaurantAccess($category->restaurant_id)) {
+            return $this->errorResponse('Unauthorized access to this category.', 403);
         }
 
         return $this->successResponse($category, 'Category details retrieved.');
@@ -138,6 +142,10 @@ class CategoryController extends Controller
         $category = Category::find($id);
         if (!$category) {
             return $this->errorResponse('Category not found.', 404);
+        }
+
+        if (!$user->hasRestaurantAccess($category->restaurant_id)) {
+            return $this->errorResponse('Unauthorized access to this category.', 403);
         }
 
         $validated = $request->validate([
@@ -178,6 +186,10 @@ class CategoryController extends Controller
         $category = Category::withCount('menuItems')->find($id);
         if (!$category) {
             return $this->errorResponse('Category not found.', 404);
+        }
+
+        if (!$user->hasRestaurantAccess($category->restaurant_id)) {
+            return $this->errorResponse('Unauthorized access to this category.', 403);
         }
 
         if ($category->menu_items_count > 0) {

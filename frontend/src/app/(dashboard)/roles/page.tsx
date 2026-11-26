@@ -19,17 +19,21 @@ import {
   Layers,
   Sparkles,
   Info,
+  Trash2,
 } from 'lucide-react';
 
 export default function RolesPermissionsPage() {
   const queryClient = useQueryClient();
   const user = useAuthStore((s) => s.user);
+  const hasPermission = useAuthStore((s) => s.hasPermission);
   const isSuperAdmin = user?.is_super_admin ?? false;
+  const canManageRoles = isSuperAdmin || hasPermission('roles.manage');
 
   const [selectedRoleId, setSelectedRoleId] = useState<number | null>(null);
   const [activePermissions, setActivePermissions] = useState<string[]>([]);
   const [isCreateRoleModalOpen, setIsCreateRoleModalOpen] = useState(false);
   const [newRoleName, setNewRoleName] = useState('');
+  const lastSyncedRoleIdRef = React.useRef<number | null>(null);
 
   // Fetch roles & grouped permissions
   const { data, isLoading } = useQuery({
@@ -43,12 +47,13 @@ export default function RolesPermissionsPage() {
   const roles = data?.roles || [];
   const groupedPermissions: Record<string, any[]> = data?.grouped_permissions || {};
 
-  // When roles load or selected role changes, set active permissions
+  // When roles load or selected role changes, set active permissions (without clobbering unsaved edits on background refetch)
   const currentRole = roles.find((r: any) => r.id === selectedRoleId) || roles[0];
 
   React.useEffect(() => {
-    if (currentRole) {
-      if (!selectedRoleId) {
+    if (currentRole && currentRole.id !== lastSyncedRoleIdRef.current) {
+      lastSyncedRoleIdRef.current = currentRole.id;
+      if (selectedRoleId !== currentRole.id) {
         setSelectedRoleId(currentRole.id);
       }
       setActivePermissions(currentRole.permissions || []);
@@ -66,6 +71,7 @@ export default function RolesPermissionsPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['roles-matrix'] });
+      queryClient.invalidateQueries({ queryKey: ['roles-list'] });
       toast.success(`Permissions updated for role: ${currentRole?.name}`);
     },
     onError: (err: any) => {
@@ -83,13 +89,34 @@ export default function RolesPermissionsPage() {
     },
     onSuccess: (res) => {
       queryClient.invalidateQueries({ queryKey: ['roles-matrix'] });
+      queryClient.invalidateQueries({ queryKey: ['roles-list'] });
       toast.success(`Custom role "${newRoleName}" created!`);
       setNewRoleName('');
       setIsCreateRoleModalOpen(false);
-      if (res.data?.id) setSelectedRoleId(res.data.id);
+      if (res.data?.id) {
+        lastSyncedRoleIdRef.current = null;
+        setSelectedRoleId(res.data.id);
+      }
     },
     onError: (err: any) => {
       toast.error(err.message || 'Failed to create role.');
+    },
+  });
+
+  // Delete Custom Role Mutation
+  const deleteRoleMutation = useMutation({
+    mutationFn: async (roleId: number) => {
+      return await apiRequest(`roles/${roleId}`, { method: 'DELETE' });
+    },
+    onSuccess: () => {
+      lastSyncedRoleIdRef.current = null;
+      setSelectedRoleId(null);
+      queryClient.invalidateQueries({ queryKey: ['roles-matrix'] });
+      queryClient.invalidateQueries({ queryKey: ['roles-list'] });
+      toast.success('Custom role deleted.');
+    },
+    onError: (err: any) => {
+      toast.error(err.message || 'Failed to delete role.');
     },
   });
 
@@ -132,7 +159,7 @@ export default function RolesPermissionsPage() {
         </div>
 
         <div className="flex items-center gap-2">
-          {isSuperAdmin && (
+          {canManageRoles && (
             <Button
               onClick={() => setIsCreateRoleModalOpen(true)}
               variant="outline"
@@ -143,17 +170,39 @@ export default function RolesPermissionsPage() {
             </Button>
           )}
 
-          <Button
-            onClick={() => updatePermissionsMutation.mutate()}
-            disabled={currentRole?.name === 'Super Admin' || updatePermissionsMutation.isPending}
-            size="sm"
-            className="gap-2 shadow-xs"
-          >
-            <Save className="h-4 w-4" /> Save Changes
-          </Button>
+          {canManageRoles && currentRole && !currentRole.is_system_role && currentRole.name !== 'Super Admin' && (
+            <Button
+              onClick={() => {
+                if (confirm(`Delete custom role "${currentRole.name}"?`)) {
+                  deleteRoleMutation.mutate(currentRole.id);
+                }
+              }}
+              variant="outline"
+              size="sm"
+              disabled={deleteRoleMutation.isPending}
+              className="gap-1.5 text-[#C94A6A] border-[#F8DADA] hover:bg-[#F2AFC0]/20"
+            >
+              <Trash2 className="h-4 w-4" /> Delete Role
+            </Button>
+          )}
+
+          {canManageRoles && (
+            <Button
+              onClick={() => updatePermissionsMutation.mutate()}
+              disabled={currentRole?.name === 'Super Admin' || updatePermissionsMutation.isPending}
+              size="sm"
+              className="gap-2 shadow-xs"
+            >
+              <Save className="h-4 w-4" /> Save Changes
+            </Button>
+          )}
         </div>
       </div>
 
+      {isLoading ? (
+        <div className="py-16 text-center text-sm text-[#5A5D58]">Loading roles & permission matrix...</div>
+      ) : (
+        <>
       {/* Role Selector Tabs */}
       <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-black/[0.06]">
         {roles.map((r: any) => {
@@ -162,6 +211,7 @@ export default function RolesPermissionsPage() {
             <button
               key={r.id}
               onClick={() => {
+                lastSyncedRoleIdRef.current = r.id;
                 setSelectedRoleId(r.id);
                 setActivePermissions(r.permissions || []);
               }}
@@ -246,6 +296,8 @@ export default function RolesPermissionsPage() {
           );
         })}
       </div>
+        </>
+      )}
 
       {/* Create Custom Role Modal */}
       {isCreateRoleModalOpen && (

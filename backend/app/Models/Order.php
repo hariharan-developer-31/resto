@@ -20,6 +20,7 @@ class Order extends Model
         'waiter_id',
         'customer_name',
         'customer_phone',
+        'guest_count',
         'order_number',
         'order_type',
         'order_status',
@@ -34,6 +35,7 @@ class Order extends Model
         'paid_amount',
         'change_amount',
         'invoice_number',
+        'settled_at',
         'special_instructions',
         'cancellation_reason',
         'cancelled_at',
@@ -51,6 +53,8 @@ class Order extends Model
             'paid_amount' => 'decimal:2',
             'change_amount' => 'decimal:2',
             'round_count' => 'integer',
+            'guest_count' => 'integer',
+            'settled_at' => 'datetime',
             'cancelled_at' => 'datetime',
         ];
     }
@@ -86,49 +90,75 @@ class Order extends Model
     }
 
     /**
-     * Generate unique sequential order number for branch
+     * Generate unique branch-prefixed sequential order number (safe across branches & concurrency).
      */
     public static function generateOrderNumber(int $branchId): string
     {
         $today = date('Ymd');
-        $count = static::where('branch_id', $branchId)
+        $seq = static::withTrashed()
+            ->where('branch_id', $branchId)
             ->whereDate('created_at', today())
+            ->lockForUpdate()
             ->count() + 1;
 
-        return sprintf('ORD-%s-%04d', $today, $count);
+        do {
+            $candidate = sprintf('ORD-B%d-%s-%04d', $branchId, $today, $seq);
+            $seq++;
+        } while (static::withTrashed()->where('order_number', $candidate)->exists());
+
+        return $candidate;
     }
 
     /**
-     * Generate unique sequential KOT ticket number
+     * Generate unique branch-prefixed sequential KOT ticket number.
      */
     public static function generateKotNumber(int $branchId): string
     {
         $today = date('Ymd');
-        $count = OrderItem::whereHas('order', function ($q) use ($branchId) {
-            $q->where('branch_id', $branchId);
-        })->whereDate('created_at', today())
+        $seq = OrderItem::withTrashed()
+            ->whereHas('order', function ($q) use ($branchId) {
+                $q->withTrashed()->where('branch_id', $branchId);
+            })
+            ->whereDate('created_at', today())
             ->distinct('kot_number')
             ->count('kot_number') + 1;
 
-        return sprintf('KOT-%s-%03d', $today, $count);
+        do {
+            $candidate = sprintf('KOT-B%d-%s-%03d', $branchId, $today, $seq);
+            $seq++;
+        } while (OrderItem::withTrashed()->where('kot_number', $candidate)->exists());
+
+        return $candidate;
     }
 
     /**
-     * Generate unique tax invoice number upon settlement
+     * Generate unique branch-prefixed tax invoice number upon settlement.
      */
     public static function generateInvoiceNumber(int $branchId): string
     {
         $today = date('Ymd');
-        $count = static::where('branch_id', $branchId)
+        $seq = static::withTrashed()
+            ->where('branch_id', $branchId)
             ->whereNotNull('invoice_number')
-            ->whereDate('created_at', today())
+            ->where(function ($q) {
+                $q->whereDate('settled_at', today())
+                  ->orWhere(function ($q2) {
+                      $q2->whereNull('settled_at')->whereDate('updated_at', today());
+                  });
+            })
+            ->lockForUpdate()
             ->count() + 1;
 
-        return sprintf('INV-%s-%04d', $today, $count);
+        do {
+            $candidate = sprintf('INV-B%d-%s-%04d', $branchId, $today, $seq);
+            $seq++;
+        } while (static::withTrashed()->where('invoice_number', $candidate)->exists());
+
+        return $candidate;
     }
 
     /**
-     * Recalculate order subtotal, tax and grand total
+     * Recalculate order pre-tax subtotal, tax, and grand total (no double-taxation).
      */
     public function recalculateTotals(?float $discount = 0.00, ?float $serviceCharge = 0.00, ?float $packagingCharge = 0.00): void
     {
@@ -136,10 +166,11 @@ class Order extends Model
         $serviceCharge = (float) ($serviceCharge ?? 0.00);
         $packagingCharge = (float) ($packagingCharge ?? 0.00);
 
-        $subtotal = $this->items()->where('status', '!=', 'cancelled')->sum('total_price');
-        $taxAmount = $this->items()->where('status', '!=', 'cancelled')->sum('tax_amount');
-        
-        $total = max(0.00, $subtotal + $taxAmount + $serviceCharge + $packagingCharge - $discount);
+        $activeItems = $this->items()->where('status', '!=', 'cancelled');
+        $subtotal = round((float) (clone $activeItems)->sum('subtotal'), 2);
+        $taxAmount = round((float) (clone $activeItems)->sum('tax_amount'), 2);
+
+        $total = max(0.00, round($subtotal + $taxAmount + $serviceCharge + $packagingCharge - $discount, 2));
 
         $this->update([
             'subtotal' => $subtotal,

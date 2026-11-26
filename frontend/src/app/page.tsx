@@ -100,11 +100,14 @@ export default function RestaurantWebsite() {
   const reservationMutation = useMutation({
     mutationFn: async () => {
       setResError(null);
+      if (!resName.trim() || !resPhone.trim()) {
+        throw new Error('Please enter your name and phone number.');
+      }
       const res = await apiClient.post<any>('/public/reservations', {
         restaurant_id: restaurant.id || 1,
         branch_id: resBranchId,
-        customer_name: resName,
-        customer_phone: resPhone,
+        customer_name: resName.trim(),
+        customer_phone: resPhone.trim(),
         customer_email: resEmail || undefined,
         guest_count: resGuests,
         reservation_date: resDate,
@@ -118,7 +121,7 @@ export default function RestaurantWebsite() {
       setReservationModalOpen(false);
     },
     onError: (err: any) => {
-      setResError(err.response?.data?.message || err.message || 'Failed to book reservation.');
+      setResError(err?.message || 'Failed to book reservation.');
     },
   });
 
@@ -640,7 +643,7 @@ export default function RestaurantWebsite() {
             <p className="text-sm text-[#5A5D58]">
               Your table booking code is{' '}
               <span className="font-extrabold text-[#252525] bg-[#F3DA8A]/40 px-2 py-0.5 rounded-lg">
-                {reservationSuccess.booking_code || 'RES-CONFIRMED'}
+                {reservationSuccess.booking_code || (reservationSuccess.id ? `RES-${String(reservationSuccess.id).padStart(5, '0')}` : 'CONFIRMED')}
               </span>
               . We look forward to serving you!
             </p>

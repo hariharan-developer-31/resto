@@ -75,7 +75,7 @@ class KdsController extends Controller
             $firstItem = $ticketItems->first();
             $order = $firstItem->order;
             $createdAt = $firstItem->created_at;
-            $elapsedMinutes = (int) now()->diffInMinutes($createdAt);
+            $elapsedMinutes = max(0, (int) $createdAt->diffInMinutes(now()));
 
             // Urgency thresholds
             $urgency = 'normal';
@@ -139,19 +139,40 @@ class KdsController extends Controller
             return $this->errorResponse('Order item not found.', 404);
         }
 
+        if (!$request->user()->hasRestaurantAccess($item->order->restaurant_id)) {
+            return $this->errorResponse('Unauthorized access to this order item.', 403);
+        }
+
         $validated = $request->validate([
             'status' => 'required|in:pending,preparing,ready,served,cancelled',
         ]);
 
-        $item->update(['status' => $validated['status']]);
+        $previousStatus = $item->status;
+        $updateData = ['status' => $validated['status']];
+        if ($validated['status'] === 'served') {
+            $updateData['served_at'] = now();
+        }
+        $item->update($updateData);
 
-        // Sync overall order status
         $order = $item->order;
-        $itemStatuses = $order->items()->pluck('status');
-        if ($itemStatuses->every(fn($s) => $s === 'ready' || $s === 'served')) {
-            $order->update(['order_status' => 'ready']);
-        } elseif ($itemStatuses->contains('preparing') && $order->order_status !== 'ready') {
-            $order->update(['order_status' => 'preparing']);
+
+        // Recalculate order totals if item was cancelled or un-cancelled
+        if ($previousStatus === 'cancelled' || $validated['status'] === 'cancelled') {
+            $order->recalculateTotals(
+                (float) $order->discount_amount,
+                (float) $order->service_charge,
+                (float) $order->packaging_charge
+            );
+        }
+
+        // Sync overall order status (excluding cancelled items)
+        $itemStatuses = $order->items()->where('status', '!=', 'cancelled')->pluck('status');
+        if ($itemStatuses->isNotEmpty()) {
+            if ($itemStatuses->every(fn($s) => $s === 'ready' || $s === 'served')) {
+                $order->update(['order_status' => 'ready']);
+            } elseif ($itemStatuses->contains('preparing') && $order->order_status !== 'ready') {
+                $order->update(['order_status' => 'preparing']);
+            }
         }
 
         AuditLog::log(
@@ -175,8 +196,29 @@ class KdsController extends Controller
         $user = $request->user();
         $station = $request->input('station', 'all');
 
+        $restaurantId = $request->header('X-Restaurant-ID')
+            ?? $request->input('restaurant_id')
+            ?? $user->restaurants()->first()?->id;
+
+        $branchId = $request->header('X-Branch-ID')
+            ?? $request->input('branch_id')
+            ?? $user->branches()->first()?->id;
+
+        $orderScope = function ($q) use ($user, $restaurantId, $branchId) {
+            if ($restaurantId) {
+                $q->where('restaurant_id', $restaurantId);
+            } elseif (!$user->isSuperAdmin()) {
+                $q->whereIn('restaurant_id', $user->restaurants()->pluck('restaurants.id'));
+            }
+            if ($branchId) {
+                $q->where('branch_id', $branchId);
+            }
+            $q->where('order_status', '!=', 'cancelled');
+        };
+
         $query = OrderItem::where('kot_number', $kotNumber)
-            ->whereIn('status', ['pending', 'preparing']);
+            ->whereIn('status', ['pending', 'preparing'])
+            ->whereHas('order', $orderScope);
 
         if ($station !== 'all') {
             $query->where('kitchen_station', $station);
@@ -184,10 +226,14 @@ class KdsController extends Controller
 
         $updatedCount = $query->update(['status' => 'ready']);
 
-        // Check and sync order statuses
-        $orders = Order::whereHas('items', fn($q) => $q->where('kot_number', $kotNumber))->get();
+        // Check and sync order statuses (excluding cancelled items)
+        $orders = Order::where($orderScope)
+            ->whereHas('items', fn($q) => $q->where('kot_number', $kotNumber))
+            ->get();
+
         foreach ($orders as $order) {
-            if ($order->items()->pluck('status')->every(fn($s) => $s === 'ready' || $s === 'served')) {
+            $activeStatuses = $order->items()->where('status', '!=', 'cancelled')->pluck('status');
+            if ($activeStatuses->isNotEmpty() && $activeStatuses->every(fn($s) => $s === 'ready' || $s === 'served')) {
                 $order->update(['order_status' => 'ready']);
             }
         }

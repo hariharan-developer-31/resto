@@ -39,7 +39,7 @@ class PurchaseOrderController extends Controller
         }
 
         $query = PurchaseOrder::where('restaurant_id', $restaurantId)
-            ->with(['supplier:id,name,phone,email', 'branch:id,name', 'creator:id,name']);
+            ->with(['supplier:id,name,phone,email', 'branch:id,name', 'creator:id,name', 'items.inventoryItem:id,name,unit,sku']);
 
         // Filter by branch
         if ($branchId = $request->header('X-Branch-ID') ?? $request->input('branch_id')) {
@@ -85,6 +85,22 @@ class PurchaseOrderController extends Controller
 
         $branch = Branch::findOrFail($validated['branch_id']);
         $restaurantId = $validated['restaurant_id'] ?? $branch->restaurant_id;
+
+        $supplier = Supplier::where('id', $validated['supplier_id'])
+            ->where('restaurant_id', $restaurantId)
+            ->first();
+        if (!$supplier) {
+            return $this->errorResponse('Selected supplier does not belong to this restaurant.', 422);
+        }
+
+        foreach ($validated['items'] as $item) {
+            $invExists = InventoryItem::where('id', $item['inventory_item_id'])
+                ->where('branch_id', $branch->id)
+                ->exists();
+            if (!$invExists) {
+                return $this->errorResponse('One or more selected inventory items do not belong to the active branch.', 422);
+            }
+        }
 
         $po = DB::transaction(function () use ($validated, $restaurantId, $branch, $user) {
             $poNumber = PurchaseOrder::generatePoNumber();
@@ -142,7 +158,7 @@ class PurchaseOrderController extends Controller
     /**
      * Display a specific purchase order with items.
      */
-    public function show(int $id): JsonResponse
+    public function show(Request $request, int $id): JsonResponse
     {
         $po = PurchaseOrder::with([
             'items.inventoryItem',
@@ -151,6 +167,10 @@ class PurchaseOrderController extends Controller
             'creator:id,name',
             'receiver:id,name',
         ])->findOrFail($id);
+
+        if (!$request->user()->hasRestaurantAccess($po->restaurant_id)) {
+            return $this->errorResponse('Unauthorized access to this purchase order.', 403);
+        }
 
         return $this->successResponse($po, 'Purchase order retrieved.');
     }
@@ -164,8 +184,16 @@ class PurchaseOrderController extends Controller
         $user = $request->user();
         $po = PurchaseOrder::with('items.inventoryItem')->findOrFail($id);
 
+        if (!$user->hasRestaurantAccess($po->restaurant_id)) {
+            return $this->errorResponse('Unauthorized access to this purchase order.', 403);
+        }
+
         if ($po->status === 'received') {
             return $this->errorResponse('This purchase order has already been completely received.', 400);
+        }
+
+        if (in_array($po->status, ['cancelled', 'draft'], true)) {
+            return $this->errorResponse("Cannot receive goods against a {$po->status} purchase order.", 422);
         }
 
         $validated = $request->validate([
@@ -174,9 +202,23 @@ class PurchaseOrderController extends Controller
             'items.*.quantity_received' => 'required|numeric|min:0',
         ]);
 
-        DB::transaction(function () use ($po, $validated, $user) {
-            $allReceived = true;
+        // Pre-validate no over-receiving
+        foreach ($validated['items'] as $receipt) {
+            $poItem = $po->items->firstWhere('id', $receipt['item_id']);
+            if (!$poItem) {
+                return $this->errorResponse('One or more line items do not belong to this purchase order.', 422);
+            }
+            $qtyNow = (float) $receipt['quantity_received'];
+            $newTotal = round((float) $poItem->quantity_received + $qtyNow, 3);
+            if ($newTotal > (float) $poItem->quantity_ordered + 0.001) {
+                return $this->errorResponse(
+                    "Received quantity ({$newTotal}) exceeds ordered quantity ({$poItem->quantity_ordered}) for item #{$poItem->id}.",
+                    422
+                );
+            }
+        }
 
+        DB::transaction(function () use ($po, $validated, $user) {
             foreach ($validated['items'] as $receipt) {
                 $poItem = $po->items->firstWhere('id', $receipt['item_id']);
                 if (!$poItem) continue;
@@ -184,7 +226,7 @@ class PurchaseOrderController extends Controller
                 $qtyReceivedNow = (float) $receipt['quantity_received'];
                 if ($qtyReceivedNow <= 0) continue;
 
-                $newTotalReceived = (float) $poItem->quantity_received + $qtyReceivedNow;
+                $newTotalReceived = round((float) $poItem->quantity_received + $qtyReceivedNow, 3);
                 $poItem->update(['quantity_received' => $newTotalReceived]);
 
                 // Increment stock level for the inventory item
@@ -200,11 +242,12 @@ class PurchaseOrderController extends Controller
                         "Supplier delivery accepted"
                     );
                 }
-
-                if ($newTotalReceived < (float) $poItem->quantity_ordered) {
-                    $allReceived = false;
-                }
             }
+
+            // Check ALL line items on the PO (fixes partial-receipt lockout bug)
+            $allReceived = $po->items()->get()->every(
+                fn($item) => (float) $item->quantity_received + 0.001 >= (float) $item->quantity_ordered
+            );
 
             $po->update([
                 'status' => $allReceived ? 'received' : 'partially_received',

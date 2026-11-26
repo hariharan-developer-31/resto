@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
 import { Button } from '@/components/ui/button';
@@ -19,7 +20,10 @@ import {
   ArrowRight,
 } from 'lucide-react';
 
-export default function ReservePage() {
+function ReservePageContent() {
+  const searchParams = useSearchParams();
+  const restaurantSlug = searchParams.get('restaurant') || 'the-grand-feast';
+
   const [resBranchId, setResBranchId] = useState<number>(1);
   const [resName, setResName] = useState('');
   const [resPhone, setResPhone] = useState('');
@@ -31,32 +35,39 @@ export default function ReservePage() {
   const [resError, setResError] = useState<string | null>(null);
   const [bookingConfirmed, setBookingConfirmed] = useState<any | null>(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     setResDate(new Date().toISOString().split('T')[0]);
   }, []);
 
-  // Fetch branches
+  // Fetch restaurant & branches dynamically by slug
   const { data: publicData } = useQuery({
-    queryKey: ['public-restaurant-profile'],
+    queryKey: ['public-restaurant-profile', restaurantSlug],
     queryFn: async () => {
-      const res = await apiClient.get<any>('/public/restaurants/the-grand-feast');
+      const res = await apiClient.get<any>(`/public/restaurants/${restaurantSlug}`);
       return res.data;
     },
   });
 
-  const branches = publicData?.branches || [
-    { id: 1, name: 'Downtown Flagship', city: 'Chennai', address: '42 Anna Salai, Thousand Lights' },
-    { id: 2, name: 'Seaside Bistro', city: 'Chennai', address: '18 Beach Road, Besant Nagar' },
-  ];
+  const restaurant = publicData?.restaurant;
+  const branches = publicData?.branches || [];
+
+  useEffect(() => {
+    if (branches.length > 0 && !branches.some((b: any) => b.id === resBranchId)) {
+      setResBranchId(branches[0].id);
+    }
+  }, [branches, resBranchId]);
 
   const reservationMutation = useMutation({
     mutationFn: async () => {
       setResError(null);
+      if (!resName.trim() || !resPhone.trim()) {
+        throw new Error('Please enter your name and phone number.');
+      }
       const res = await apiClient.post<any>('/public/reservations', {
-        restaurant_id: 1,
+        restaurant_id: restaurant?.id || 1,
         branch_id: resBranchId,
-        customer_name: resName,
-        customer_phone: resPhone,
+        customer_name: resName.trim(),
+        customer_phone: resPhone.trim(),
         customer_email: resEmail || undefined,
         guest_count: resGuests,
         reservation_date: resDate,
@@ -69,7 +80,7 @@ export default function ReservePage() {
       setBookingConfirmed(data);
     },
     onError: (err: any) => {
-      setResError(err.response?.data?.message || err.message || 'Failed to book reservation.');
+      setResError(err?.message || 'Failed to book reservation.');
     },
   });
 
@@ -89,7 +100,7 @@ export default function ReservePage() {
             <ChevronLeft className="h-4 w-4" /> Back to Home
           </Link>
           <span className="font-baloo text-2xl font-extrabold text-[#252525]">
-            The Grand Feast
+            {restaurant?.name || 'Restaurant OS'}
           </span>
           <div className="w-24 hidden sm:block" />
         </div>
@@ -121,7 +132,7 @@ export default function ReservePage() {
                   Booking Reference
                 </span>
                 <span className="font-extrabold text-base text-[#252525]">
-                  {bookingConfirmed.booking_code || 'RES-10492'}
+                  {bookingConfirmed.booking_code || (bookingConfirmed.id ? `RES-${String(bookingConfirmed.id).padStart(5, '0')}` : 'CONFIRMED')}
                 </span>
               </div>
               <div className="flex justify-between">
@@ -286,8 +297,22 @@ export default function ReservePage() {
 
       {/* Footer */}
       <footer className="relative z-10 text-center py-6 text-xs text-[#252525]/80 font-medium">
-        The Grand Feast · Table Reservation System
+        {restaurant?.name || 'Restaurant OS'} · Table Reservation System
       </footer>
     </div>
+  );
+}
+
+export default function ReservePage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-[#B4D58A] flex items-center justify-center p-4 text-sm font-semibold text-[#252525]">
+          Loading reservation form...
+        </div>
+      }
+    >
+      <ReservePageContent />
+    </Suspense>
   );
 }

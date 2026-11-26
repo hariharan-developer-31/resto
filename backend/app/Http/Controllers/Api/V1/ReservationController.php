@@ -37,7 +37,7 @@ class ReservationController extends Controller
         }
 
         $query = Reservation::where('restaurant_id', $restaurantId)
-            ->with(['table:id,table_number,capacity,status', 'branch:id,name']);
+            ->with(['table:id,table_number,seating_capacity,location,status', 'branch:id,name']);
 
         // Filter by branch
         if ($branchId = $request->header('X-Branch-ID') ?? $request->input('branch_id')) {
@@ -95,11 +95,18 @@ class ReservationController extends Controller
         $branch = Branch::findOrFail($validated['branch_id']);
         $restaurantId = $validated['restaurant_id'] ?? $branch->restaurant_id;
 
-        // Check table conflict if table specified
+        // Check table conflict & seating capacity if table specified
         if (!empty($validated['table_id'])) {
             $table = DiningTable::findOrFail($validated['table_id']);
             if ($table->branch_id !== $branch->id) {
                 return $this->errorResponse('Selected table does not belong to the chosen branch.', 422);
+            }
+
+            if ($table->seating_capacity < (int) $validated['guest_count']) {
+                return $this->errorResponse(
+                    "Table {$table->table_number} seats {$table->seating_capacity}, which is insufficient for {$validated['guest_count']} guests.",
+                    422
+                );
             }
 
             if (Reservation::hasTableConflict($table->id, $validated['reservation_date'], $validated['reservation_time'])) {
@@ -135,9 +142,12 @@ class ReservationController extends Controller
     /**
      * Display a specific reservation.
      */
-    public function show(int $id): JsonResponse
+    public function show(Request $request, int $id): JsonResponse
     {
         $reservation = Reservation::with(['table', 'branch', 'restaurant'])->findOrFail($id);
+        if (!$request->user()->hasRestaurantAccess($reservation->restaurant_id)) {
+            return $this->errorResponse('Unauthorized access to this reservation.', 403);
+        }
         return $this->successResponse($reservation, 'Reservation details retrieved.');
     }
 
@@ -148,6 +158,9 @@ class ReservationController extends Controller
     {
         $user = $request->user();
         $reservation = Reservation::findOrFail($id);
+        if (!$user->hasRestaurantAccess($reservation->restaurant_id)) {
+            return $this->errorResponse('Unauthorized access to this reservation.', 403);
+        }
 
         $validated = $request->validate([
             'table_id' => 'nullable|exists:dining_tables,id',
@@ -186,6 +199,9 @@ class ReservationController extends Controller
     {
         $user = $request->user();
         $reservation = Reservation::findOrFail($id);
+        if (!$user->hasRestaurantAccess($reservation->restaurant_id)) {
+            return $this->errorResponse('Unauthorized access to this reservation.', 403);
+        }
 
         $validated = $request->validate([
             'status' => ['required', Rule::in(['pending', 'confirmed', 'checked_in', 'seated', 'completed', 'cancelled', 'no_show'])],
@@ -200,6 +216,13 @@ class ReservationController extends Controller
                 $tableId = $validated['table_id'] ?? $reservation->table_id;
                 if (!$tableId) {
                     return $this->errorResponse('Please specify or assign a table before seating the guest.', 422);
+                }
+                $seatTable = DiningTable::findOrFail($tableId);
+                if ((int) $seatTable->branch_id !== (int) $reservation->branch_id) {
+                    return $this->errorResponse('Selected table does not belong to this reservation branch.', 422);
+                }
+                if ($seatTable->status === 'out_of_service') {
+                    return $this->errorResponse('Selected table is currently out of service.', 422);
                 }
                 $reservation->seatGuest($tableId);
                 break;
@@ -240,6 +263,9 @@ class ReservationController extends Controller
     {
         $user = $request->user();
         $reservation = Reservation::findOrFail($id);
+        if (!$user->hasRestaurantAccess($reservation->restaurant_id)) {
+            return $this->errorResponse('Unauthorized access to this reservation.', 403);
+        }
 
         $validated = $request->validate([
             'table_id' => 'required|exists:dining_tables,id',
@@ -249,6 +275,13 @@ class ReservationController extends Controller
 
         if ($table->branch_id !== $reservation->branch_id) {
             return $this->errorResponse('Selected table does not belong to this reservation branch.', 422);
+        }
+
+        if ($table->seating_capacity < (int) $reservation->guest_count) {
+            return $this->errorResponse(
+                "Table {$table->table_number} seats {$table->seating_capacity}, which is insufficient for {$reservation->guest_count} guests.",
+                422
+            );
         }
 
         $date = $reservation->reservation_date instanceof \DateTimeInterface 
@@ -279,6 +312,9 @@ class ReservationController extends Controller
     {
         $user = $request->user();
         $reservation = Reservation::findOrFail($id);
+        if (!$user->hasRestaurantAccess($reservation->restaurant_id)) {
+            return $this->errorResponse('Unauthorized access to this reservation.', 403);
+        }
 
         AuditLog::log('reservation.deleted', $reservation, $reservation->toArray(), null, $user);
         $reservation->delete();

@@ -35,10 +35,17 @@ export default function MenuCatalogPage() {
   const activeRestaurant = useAuthStore((s) => s.activeRestaurant);
   const hasPermission = useAuthStore((s) => s.hasPermission);
   const isSuperAdmin = user?.is_super_admin ?? false;
+  const canCreate = isSuperAdmin || hasPermission('menu.create');
+  const canEdit = isSuperAdmin || hasPermission('menu.edit');
+  const canDelete = isSuperAdmin || hasPermission('menu.delete');
 
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
   const [search, setSearch] = useState('');
   const [dietaryFilter, setDietaryFilter] = useState('');
+
+  React.useEffect(() => {
+    setSelectedCategoryId(null);
+  }, [activeRestaurant?.id]);
 
   // Modals state
   const [isItemModalOpen, setIsItemModalOpen] = useState(false);
@@ -156,11 +163,13 @@ export default function MenuCatalogPage() {
         kitchen_station: itemStation,
         description: itemDescription,
         is_featured: itemFeatured,
-        variants: variantsList.map((v) => ({
-          name: v.name,
-          price: Number(v.price),
-          is_default: v.is_default,
-        })),
+        variants: variantsList
+          .filter((v) => v.name.trim() !== '' && v.price !== '')
+          .map((v) => ({
+            name: v.name.trim(),
+            price: Number(v.price),
+            is_default: v.is_default,
+          })),
         addon_ids: selectedAddonIds,
       };
 
@@ -278,31 +287,33 @@ export default function MenuCatalogPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
-          <Button
-            onClick={() => setIsAddonModalOpen(true)}
-            variant="outline"
-            size="sm"
-            className="gap-1.5 text-xs"
-          >
-            <Tag className="h-3.5 w-3.5" /> Add-on
-          </Button>
-          <Button
-            onClick={() => setIsCategoryModalOpen(true)}
-            variant="outline"
-            size="sm"
-            className="gap-1.5 text-xs"
-          >
-            <FolderPlus className="h-3.5 w-3.5" /> Category
-          </Button>
-          <Button
-            onClick={openCreateItemModal}
-            size="sm"
-            className="gap-2 text-xs shadow-xs"
-          >
-            <Plus className="h-4 w-4" /> Add Food Item
-          </Button>
-        </div>
+        {canCreate && (
+          <div className="flex items-center gap-2">
+            <Button
+              onClick={() => setIsAddonModalOpen(true)}
+              variant="outline"
+              size="sm"
+              className="gap-1.5 text-xs"
+            >
+              <Tag className="h-3.5 w-3.5" /> Add-on
+            </Button>
+            <Button
+              onClick={() => setIsCategoryModalOpen(true)}
+              variant="outline"
+              size="sm"
+              className="gap-1.5 text-xs"
+            >
+              <FolderPlus className="h-3.5 w-3.5" /> Category
+            </Button>
+            <Button
+              onClick={openCreateItemModal}
+              size="sm"
+              className="gap-2 text-xs shadow-xs"
+            >
+              <Plus className="h-4 w-4" /> Add Food Item
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Category Tabs */}
@@ -374,9 +385,11 @@ export default function MenuCatalogPage() {
           <p className="text-xs text-[#5A5D58] mt-1">
             {search ? 'No items match your search.' : 'Add your first culinary item to begin service.'}
           </p>
-          <Button onClick={openCreateItemModal} size="sm" className="mt-4 gap-2">
-            <Plus className="h-4 w-4" /> Add Food Item
-          </Button>
+          {canCreate && (
+            <Button onClick={openCreateItemModal} size="sm" className="mt-4 gap-2">
+              <Plus className="h-4 w-4" /> Add Food Item
+            </Button>
+          )}
         </Card>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -500,38 +513,48 @@ export default function MenuCatalogPage() {
                 </div>
 
                 {/* Footer Actions */}
+                {(canEdit || canDelete) && (
                 <div className="p-3 px-5 border-t border-black/[0.04] bg-[#FAF9F6]/50 flex items-center justify-between rounded-b-2xl">
-                  <button
-                    onClick={() => toggleStockMutation.mutate(item.id)}
-                    className={`text-xs font-semibold flex items-center gap-1.5 cursor-pointer ${
-                      item.is_available ? 'text-[#B4D58A]' : 'text-[#F2AFC0]'
-                    }`}
-                  >
-                    <Power className="h-3.5 w-3.5" />
-                    <span>{item.is_available ? 'In Stock' : 'Out of Stock'}</span>
-                  </button>
+                  {canEdit ? (
+                    <button
+                      onClick={() => toggleStockMutation.mutate(item.id)}
+                      className={`text-xs font-semibold flex items-center gap-1.5 cursor-pointer ${
+                        item.is_available ? 'text-[#B4D58A]' : 'text-[#F2AFC0]'
+                      }`}
+                    >
+                      <Power className="h-3.5 w-3.5" />
+                      <span>{item.is_available ? 'In Stock' : 'Out of Stock'}</span>
+                    </button>
+                  ) : (
+                    <span className="text-xs text-[#8E928B]">{item.is_available ? 'In Stock' : 'Out of Stock'}</span>
+                  )}
 
                   <div className="flex items-center gap-1">
-                    <button
-                      onClick={() => openEditItemModal(item)}
-                      title="Edit Item"
-                      className="p-1.5 rounded-lg border border-black/[0.06] text-[#5A5D58] hover:text-[#252525] hover:bg-white transition-colors"
-                    >
-                      <Edit className="h-3.5 w-3.5" />
-                    </button>
-                    <button
-                      onClick={() => {
-                        if (confirm(`Delete "${item.name}"?`)) {
-                          deleteItemMutation.mutate(item.id);
-                        }
-                      }}
-                      title="Delete Item"
-                      className="p-1.5 rounded-lg border border-black/[0.06] text-[#F2AFC0] hover:bg-[#F2AFC0]/20 hover:border-[#F8DADA] transition-colors"
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </button>
+                    {canEdit && (
+                      <button
+                        onClick={() => openEditItemModal(item)}
+                        title="Edit Item"
+                        className="p-1.5 rounded-lg border border-black/[0.06] text-[#5A5D58] hover:text-[#252525] hover:bg-white transition-colors"
+                      >
+                        <Edit className="h-3.5 w-3.5" />
+                      </button>
+                    )}
+                    {canDelete && (
+                      <button
+                        onClick={() => {
+                          if (confirm(`Delete "${item.name}"?`)) {
+                            deleteItemMutation.mutate(item.id);
+                          }
+                        }}
+                        title="Delete Item"
+                        className="p-1.5 rounded-lg border border-black/[0.06] text-[#F2AFC0] hover:bg-[#F2AFC0]/20 hover:border-[#F8DADA] transition-colors"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    )}
                   </div>
                 </div>
+                )}
               </Card>
             );
           })}
@@ -650,6 +673,19 @@ export default function MenuCatalogPage() {
                   className="w-full rounded-[10px] border border-black/[0.06] p-3 text-sm text-[#252525] placeholder:text-[#8E928B] outline-none focus:border-[#B4D58A]"
                 />
               </div>
+
+              <label className="flex items-center gap-2 pt-1 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={itemFeatured}
+                  onChange={(e) => setItemFeatured(e.target.checked)}
+                  className="rounded border-black/[0.06] text-[#B4D58A] focus:ring-[#B4D58A]"
+                />
+                <span className="text-xs font-medium text-[#252525] flex items-center gap-1.5">
+                  <Sparkles className="h-3.5 w-3.5 text-[#F3DA8A]" />
+                  Mark as Featured / Chef&apos;s Special
+                </span>
+              </label>
 
               {/* Variants Builder */}
               <div className="space-y-2 pt-2 border-t border-black/[0.04]">

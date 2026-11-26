@@ -3,6 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 import { useAuthStore } from '@/lib/auth-store';
 import { cn } from '@/lib/utils';
 import {
@@ -31,6 +32,7 @@ interface SidebarProps {
 
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const pathname = usePathname();
+  const queryClient = useQueryClient();
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
   const hasPermission = useAuthStore((s) => s.hasPermission);
@@ -247,7 +249,10 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             </div>
 
             <button
-              onClick={() => logout()}
+              onClick={() => {
+                logout();
+                queryClient.clear();
+              }}
               title="Sign Out"
               className="p-2 text-[#5A5D58] hover:text-[#252525] hover:bg-white rounded-xl transition-all cursor-pointer"
             >

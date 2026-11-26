@@ -95,9 +95,12 @@ class SupplierController extends Controller
     /**
      * Display a specific supplier.
      */
-    public function show(int $id): JsonResponse
+    public function show(Request $request, int $id): JsonResponse
     {
         $supplier = Supplier::with(['inventoryItems', 'purchaseOrders'])->findOrFail($id);
+        if (!$request->user()->hasRestaurantAccess($supplier->restaurant_id)) {
+            return $this->errorResponse('Unauthorized access to this supplier.', 403);
+        }
         return $this->successResponse($supplier, 'Supplier details retrieved.');
     }
 
@@ -108,6 +111,9 @@ class SupplierController extends Controller
     {
         $user = $request->user();
         $supplier = Supplier::findOrFail($id);
+        if (!$user->hasRestaurantAccess($supplier->restaurant_id)) {
+            return $this->errorResponse('Unauthorized access to this supplier.', 403);
+        }
 
         $validated = $request->validate([
             'name' => 'sometimes|string|max:150',
@@ -135,6 +141,9 @@ class SupplierController extends Controller
     {
         $user = $request->user();
         $supplier = Supplier::findOrFail($id);
+        if (!$user->hasRestaurantAccess($supplier->restaurant_id)) {
+            return $this->errorResponse('Unauthorized access to this supplier.', 403);
+        }
 
         AuditLog::log('supplier.deleted', $supplier, $supplier->toArray(), null, $user);
         $supplier->delete();

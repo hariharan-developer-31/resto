@@ -156,6 +156,24 @@ class RolePermissionController extends Controller
             return $this->errorResponse('Role not found.', 404);
         }
 
+        if ($role->name === 'Super Admin') {
+            return $this->errorResponse('Super Admin role permissions cannot be modified.', 422);
+        }
+
+        $systemRoles = [
+            'Super Admin',
+            'Restaurant Admin',
+            'Branch Manager',
+            'Cashier',
+            'Waiter',
+            'Kitchen Staff',
+            'Customer',
+        ];
+
+        if (in_array($role->name, $systemRoles, true) && !$user->isSuperAdmin()) {
+            return $this->errorResponse('Only a Super Admin can modify core system role permissions.', 403);
+        }
+
         $validated = $request->validate([
             'permissions' => 'required|array',
             'permissions.*' => 'exists:permissions,name',

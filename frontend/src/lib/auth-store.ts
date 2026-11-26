@@ -47,7 +47,7 @@ interface AuthState {
   updateUser: (user: AuthUser) => void;
   setActiveRestaurant: (restaurant: UserRestaurant | null) => void;
   setActiveBranch: (branch: UserBranch | null) => void;
-  logout: () => void;
+  logout: (options?: { skipApi?: boolean }) => void;
   hydrate: () => void;
   hasRole: (roleName: string) => boolean;
   hasPermission: (permissionName: string) => boolean;
@@ -97,18 +97,24 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   setActiveRestaurant: (restaurant) => {
+    const currentBranch = get().activeBranch;
+    const validBranch = restaurant && currentBranch?.restaurant_id === restaurant.id
+      ? currentBranch
+      : get().user?.branches?.find(b => b.restaurant_id === restaurant?.id) || null;
+
     if (typeof window !== 'undefined') {
       if (restaurant) {
         localStorage.setItem('resto_restaurant_id', String(restaurant.id));
       } else {
         localStorage.removeItem('resto_restaurant_id');
       }
-    }
 
-    const currentBranch = get().activeBranch;
-    const validBranch = restaurant && currentBranch?.restaurant_id === restaurant.id
-      ? currentBranch
-      : get().user?.branches?.find(b => b.restaurant_id === restaurant?.id) || null;
+      if (validBranch) {
+        localStorage.setItem('resto_branch_id', String(validBranch.id));
+      } else {
+        localStorage.removeItem('resto_branch_id');
+      }
+    }
 
     set({ activeRestaurant: restaurant, activeBranch: validBranch });
   },
@@ -124,7 +130,20 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set({ activeBranch: branch });
   },
 
-  logout: () => {
+  logout: (options) => {
+    const existingToken = get().token || (typeof window !== 'undefined' ? localStorage.getItem('resto_token') : null);
+
+    if (!options?.skipApi && existingToken && typeof window !== 'undefined') {
+      const baseUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://resto-production-eaf02fa7.up.railway.app/api/v1').replace(/\/$/, '');
+      fetch(`${baseUrl}/auth/logout`, {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${existingToken}`,
+        },
+      }).catch(() => {});
+    }
+
     if (typeof window !== 'undefined') {
       localStorage.removeItem('resto_token');
       localStorage.removeItem('resto_user');
@@ -156,9 +175,25 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           ? user.restaurants?.find(r => r.id === Number(restaurantId)) || user.restaurants?.[0] || null
           : user.restaurants?.[0] || null;
 
-        const activeBranch = branchId 
-          ? user.branches?.find(b => b.id === Number(branchId)) || user.branches?.[0] || null
-          : user.branches?.[0] || null;
+        const matchingBranches = activeRestaurant
+          ? (user.branches || []).filter(b => b.restaurant_id === activeRestaurant.id)
+          : (user.branches || []);
+
+        const activeBranch = branchId
+          ? matchingBranches.find(b => b.id === Number(branchId)) || matchingBranches[0] || null
+          : matchingBranches[0] || null;
+
+        if (activeRestaurant) {
+          localStorage.setItem('resto_restaurant_id', String(activeRestaurant.id));
+        } else {
+          localStorage.removeItem('resto_restaurant_id');
+        }
+
+        if (activeBranch) {
+          localStorage.setItem('resto_branch_id', String(activeBranch.id));
+        } else {
+          localStorage.removeItem('resto_branch_id');
+        }
 
         set({
           token,

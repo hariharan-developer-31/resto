@@ -25,8 +25,6 @@ class Restaurant extends Model
         'currency_symbol',
         'timezone',
         'primary_color',
-        'current_plan_id',
-        'subscription_status',
         'is_active',
     ];
 
