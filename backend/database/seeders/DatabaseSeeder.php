@@ -160,7 +160,7 @@ class DatabaseSeeder extends Seeder
         Role::firstOrCreate(['name' => 'Customer', 'guard_name' => 'web']);
 
         // 3. Create Super Admin User
-        $superAdmin = User::firstOrCreate(
+        $superAdmin = User::updateOrCreate(
             ['email' => 'superadmin@resto.com'],
             [
                 'name' => 'Super Administrator',
@@ -248,7 +248,7 @@ class DatabaseSeeder extends Seeder
         );
 
         // 5. Create Restaurant Staff Users
-        $restAdmin = User::firstOrCreate(
+        $restAdmin = User::updateOrCreate(
             ['email' => 'admin@grandfeast.com'],
             [
                 'name' => 'Rajesh Sharma (Admin)',
@@ -263,7 +263,7 @@ class DatabaseSeeder extends Seeder
         $restAdmin->restaurants()->syncWithoutDetaching([$restaurant->id]);
         $restAdmin->branches()->syncWithoutDetaching([$branch1->id, $branch2->id]);
 
-        $manager = User::firstOrCreate(
+        $manager = User::updateOrCreate(
             ['email' => 'manager@grandfeast.com'],
             [
                 'name' => 'Priya Patel (Manager)',
@@ -278,7 +278,7 @@ class DatabaseSeeder extends Seeder
         $manager->restaurants()->syncWithoutDetaching([$restaurant->id]);
         $manager->branches()->syncWithoutDetaching([$branch1->id]);
 
-        $cashier = User::firstOrCreate(
+        $cashier = User::updateOrCreate(
             ['email' => 'cashier@grandfeast.com'],
             [
                 'name' => 'Karthik Raja (Cashier)',
@@ -293,7 +293,7 @@ class DatabaseSeeder extends Seeder
         $cashier->restaurants()->syncWithoutDetaching([$restaurant->id]);
         $cashier->branches()->syncWithoutDetaching([$branch1->id]);
 
-        $waiter = User::firstOrCreate(
+        $waiter = User::updateOrCreate(
             ['email' => 'waiter@grandfeast.com'],
             [
                 'name' => 'Arun Kumar (Waiter)',
@@ -308,7 +308,7 @@ class DatabaseSeeder extends Seeder
         $waiter->restaurants()->syncWithoutDetaching([$restaurant->id]);
         $waiter->branches()->syncWithoutDetaching([$branch1->id]);
 
-        $kitchen = User::firstOrCreate(
+        $kitchen = User::updateOrCreate(
             ['email' => 'kitchen@grandfeast.com'],
             [
                 'name' => 'Chef Suresh (Kitchen)',

@@ -1,6 +1,6 @@
 <?php
 
-// Immediate CORS preflight handler
+// Immediate CORS preflight handler for fast browser OPTIONS check
 if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     header('Access-Control-Allow-Origin: *');
     header('Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE, OPTIONS');
@@ -9,9 +9,6 @@ if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'OPTIONS
     http_response_code(204);
     exit(0);
 }
-
-// Guarantee CORS header on every response
-header('Access-Control-Allow-Origin: *');
 
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
