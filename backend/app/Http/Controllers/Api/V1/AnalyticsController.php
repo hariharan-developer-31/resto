@@ -41,6 +41,10 @@ class AnalyticsController extends Controller
             return $this->errorResponse('Please specify an active restaurant context.', 400);
         }
 
+        if (!$user->hasRestaurantAccess((int) $restaurantId)) {
+            return $this->errorResponse('Unauthorized access to this restaurant.', 403);
+        }
+
         $branchId = $request->header('X-Branch-ID') ?? $request->input('branch_id');
 
         // Date range filter (default: last 30 days)
@@ -105,7 +109,9 @@ class AnalyticsController extends Controller
 
         // 4. Payment Modes Breakdown
         $orderIds = $orders->pluck('id');
-        $payments = Payment::whereIn('order_id', $orderIds)->where('status', 'successful')->get();
+        $payments = Payment::whereIn('order_id', $orderIds)
+            ->whereIn('status', ['success', 'successful'])
+            ->get();
 
         $paymentModes = [
             'cash' => round((float) $payments->where('payment_method', 'cash')->sum('amount'), 2),
@@ -159,6 +165,10 @@ class AnalyticsController extends Controller
 
         if (!$restaurantId && $user->isSuperAdmin()) {
             $restaurantId = Branch::first()?->restaurant_id;
+        }
+
+        if (!$restaurantId || !$user->hasRestaurantAccess((int) $restaurantId)) {
+            return $this->errorResponse('Unauthorized or missing restaurant context.', 403);
         }
 
         $branchId = $request->header('X-Branch-ID') ?? $request->input('branch_id');
@@ -231,12 +241,15 @@ class AnalyticsController extends Controller
             $restaurantId = Branch::first()?->restaurant_id;
         }
 
+        if (!$restaurantId || !$user->hasRestaurantAccess((int) $restaurantId)) {
+            return $this->errorResponse('Unauthorized or missing restaurant context.', 403);
+        }
+
         $branchId = $request->header('X-Branch-ID') ?? $request->input('branch_id');
 
         $query = Order::where('restaurant_id', $restaurantId)
             ->where('order_type', 'dine_in')
             ->where('payment_status', 'paid')
-            ->whereNotNull('settled_at')
             ->whereNotNull('table_id');
 
         if ($branchId) {
@@ -248,12 +261,12 @@ class AnalyticsController extends Controller
         $turnaroundTimes = [];
         foreach ($completedOrders as $order) {
             $created = Carbon::parse($order->created_at);
-            $settled = Carbon::parse($order->settled_at);
-            $diffMinutes = max(1, $created->diffInMinutes($settled));
+            $settled = Carbon::parse($order->settled_at ?? $order->updated_at);
+            $diffMinutes = max(1, (int) abs($created->diffInMinutes($settled)));
             $turnaroundTimes[] = $diffMinutes;
         }
 
-        $avgTurnaround = count($turnaroundTimes) > 0 ? round(array_sum($turnaroundTimes) / count($turnaroundTimes)) : 45;
+        $avgTurnaround = count($turnaroundTimes) > 0 ? round(array_sum($turnaroundTimes) / count($turnaroundTimes)) : 0;
 
         // Current Floor Occupancy
         $tablesQuery = DiningTable::query();
@@ -296,15 +309,26 @@ class AnalyticsController extends Controller
             $restaurantId = Branch::first()?->restaurant_id;
         }
 
-        $branchId = $request->header('X-Branch-ID') ?? $request->input('branch_id') ?? Branch::first()?->id;
-        $branch = Branch::with('restaurant')->findOrFail($branchId);
+        if (!$restaurantId || !$user->hasRestaurantAccess((int) $restaurantId)) {
+            return $this->errorResponse('Unauthorized or missing restaurant context.', 403);
+        }
+
+        $branchId = $request->header('X-Branch-ID')
+            ?? $request->input('branch_id')
+            ?? Branch::where('restaurant_id', $restaurantId)->first()?->id;
+
+        if (!$branchId) {
+            return $this->errorResponse('No branch found for this restaurant.', 404);
+        }
+
+        $branch = Branch::with('restaurant')->where('restaurant_id', $restaurantId)->findOrFail($branchId);
 
         $reportDate = $request->input('date', now()->toDateString());
         $start = Carbon::parse($reportDate)->startOfDay();
         $end = Carbon::parse($reportDate)->endOfDay();
 
         // Orders on this day
-        $orders = Order::where('branch_id', $branchId)
+        $orders = Order::where('branch_id', $branch->id)
             ->whereBetween('created_at', [$start, $end])
             ->get();
 
@@ -322,7 +346,9 @@ class AnalyticsController extends Controller
 
         // Payment tenders
         $orderIds = $paidOrders->pluck('id');
-        $payments = Payment::whereIn('order_id', $orderIds)->where('status', 'successful')->get();
+        $payments = Payment::whereIn('order_id', $orderIds)
+            ->whereIn('status', ['success', 'successful'])
+            ->get();
 
         $cashTendered = (float) $payments->where('payment_method', 'cash')->sum('amount');
         $upiTendered = (float) $payments->where('payment_method', 'upi')->sum('amount');
@@ -385,6 +411,10 @@ class AnalyticsController extends Controller
 
         if (!$restaurantId && $user->isSuperAdmin()) {
             $restaurantId = Branch::first()?->restaurant_id;
+        }
+
+        if (!$restaurantId || !$user->hasRestaurantAccess((int) $restaurantId)) {
+            return $this->errorResponse('Unauthorized or missing restaurant context.', 403);
         }
 
         $startDate = $request->input('start_date') ? Carbon::parse($request->input('start_date'))->startOfDay() : now()->startOfMonth();

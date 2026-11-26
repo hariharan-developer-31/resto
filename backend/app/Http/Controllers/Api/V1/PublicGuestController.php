@@ -122,9 +122,13 @@ class PublicGuestController extends Controller
      */
     public function placeTableOrder(Request $request, string $qrToken): JsonResponse
     {
-        $table = DiningTable::where('qr_token', $qrToken)->first();
+        $table = DiningTable::with('branch')->where('qr_token', $qrToken)->first();
         if (!$table) {
             return $this->errorResponse('Invalid table QR token.', 404);
+        }
+
+        if ($table->status === 'out_of_service') {
+            return $this->errorResponse('This table is currently unavailable for ordering.', 422);
         }
 
         $validated = $request->validate([
@@ -140,14 +144,38 @@ class PublicGuestController extends Controller
             'items.*.addon_ids.*' => 'exists:addons,id',
         ]);
 
+        // Validate every item & addon belongs to this table's restaurant and is available
+        foreach ($validated['items'] as $itemData) {
+            $menuItemCheck = MenuItem::find($itemData['menu_item_id']);
+            if (!$menuItemCheck || (int) $menuItemCheck->restaurant_id !== (int) $table->restaurant_id) {
+                return $this->errorResponse('One or more selected items do not belong to this restaurant.', 422);
+            }
+            if (!$menuItemCheck->is_available) {
+                return $this->errorResponse("Item [{$menuItemCheck->name}] is currently out of stock.", 422);
+            }
+            if (!empty($itemData['addon_ids'])) {
+                $invalidAddon = Addon::whereIn('id', $itemData['addon_ids'])
+                    ->where(function ($q) use ($table) {
+                        $q->where('restaurant_id', '!=', $table->restaurant_id)->orWhere('is_active', false);
+                    })
+                    ->exists();
+                if ($invalidAddon) {
+                    return $this->errorResponse('One or more selected addons are unavailable for this restaurant.', 422);
+                }
+            }
+        }
+
         return DB::transaction(function () use ($validated, $table) {
-            $restaurantId = $table->restaurant_id;
-            $branchId = $table->branch_id;
+            $lockedTable = DiningTable::where('id', $table->id)->lockForUpdate()->firstOrFail();
+            $restaurantId = $lockedTable->restaurant_id;
+            $branchId = $lockedTable->branch_id;
+            $branchTaxRate = $table->branch?->tax_rate ?? 5.00;
 
             // Check if table already has an active order
-            $order = Order::where('table_id', $table->id)
+            $order = Order::where('table_id', $lockedTable->id)
                 ->whereIn('order_status', ['pending', 'preparing', 'ready'])
                 ->where('payment_status', '!=', 'paid')
+                ->lockForUpdate()
                 ->latest()
                 ->first();
 
@@ -158,17 +186,22 @@ class PublicGuestController extends Controller
                 // Additional Order Round
                 $order->increment('round_count');
                 $roundNumber = $order->round_count;
+
+                if ($order->order_status === 'ready') {
+                    $order->update(['order_status' => 'preparing']);
+                }
             } else {
                 $isNewOrder = true;
-                $orderNumber = Order::generateOrderNumber($branchId);
+                $orderNumber = Order::generateOrderNumber((int) $branchId);
 
                 $order = Order::create([
                     'restaurant_id' => $restaurantId,
                     'branch_id' => $branchId,
-                    'table_id' => $table->id,
-                    'waiter_id' => $table->waiter_id,
+                    'table_id' => $lockedTable->id,
+                    'waiter_id' => $lockedTable->waiter_id,
                     'customer_name' => $validated['customer_name'] ?? 'Table Guest',
                     'customer_phone' => $validated['customer_phone'] ?? null,
+                    'guest_count' => $lockedTable->seating_capacity,
                     'order_number' => $orderNumber,
                     'order_type' => 'dine_in',
                     'order_status' => 'pending',
@@ -181,13 +214,13 @@ class PublicGuestController extends Controller
                     'special_instructions' => $validated['special_instructions'] ?? null,
                 ]);
 
-                if ($table->status !== 'occupied') {
-                    $table->update(['status' => 'occupied']);
+                if ($lockedTable->status !== 'occupied') {
+                    $lockedTable->update(['status' => 'occupied']);
                 }
             }
 
             // Generate KOT Ticket
-            $kotNumber = Order::generateKotNumber($branchId);
+            $kotNumber = Order::generateKotNumber((int) $branchId);
 
             // Process Items
             foreach ($validated['items'] as $itemData) {
@@ -225,7 +258,7 @@ class PublicGuestController extends Controller
                 }
 
                 $itemSubtotalWithAddons = $itemSubtotal + $addonTotal;
-                $taxRate = $menuItem->tax_rate ?? 5.00;
+                $taxRate = $menuItem->tax_rate ?? $branchTaxRate;
                 $taxAmount = round($itemSubtotalWithAddons * ($taxRate / 100), 2);
                 $itemTotalPrice = $itemSubtotalWithAddons + $taxAmount;
 
@@ -254,8 +287,12 @@ class PublicGuestController extends Controller
                 }
             }
 
-            // Recalculate Totals
-            $order->recalculateTotals(0.00, (float) ($order->service_charge ?? 0.00), (float) ($order->packaging_charge ?? 0.00));
+            // Recalculate Totals (preserving any existing staff discount/service/packaging charges)
+            $order->recalculateTotals(
+                (float) ($order->discount_amount ?? 0.00),
+                (float) ($order->service_charge ?? 0.00),
+                (float) ($order->packaging_charge ?? 0.00)
+            );
 
             // Record Audit Log
             AuditLog::log(

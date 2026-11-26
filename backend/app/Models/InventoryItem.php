@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\DB;
 
 class InventoryItem extends Model
 {
@@ -73,39 +74,47 @@ class InventoryItem extends Model
         ?int $referenceId = null,
         ?string $notes = null
     ): StockMovement {
-        $oldStock = (float) $this->current_stock;
-        $newStock = max(0.000, $oldStock + $delta);
+        return DB::transaction(function () use ($delta, $movementType, $userId, $reason, $referenceType, $referenceId, $notes) {
+            $lockedItem = self::where('id', $this->id)->lockForUpdate()->firstOrFail();
 
-        // Determine stock status
-        $status = 'in_stock';
-        if ($newStock <= 0.0001) {
-            $status = 'out_of_stock';
-        } elseif ($newStock <= (float) $this->minimum_stock) {
-            $status = 'low_stock';
-        }
+            $oldStock = (float) $lockedItem->current_stock;
+            $newStock = max(0.000, round($oldStock + $delta, 3));
+            $actualDelta = round($newStock - $oldStock, 3);
 
-        $this->update([
-            'current_stock' => $newStock,
-            'status' => $status,
-        ]);
+            // Determine stock status
+            $status = 'in_stock';
+            if ($newStock <= 0.0001) {
+                $status = 'out_of_stock';
+            } elseif ($newStock <= (float) $lockedItem->minimum_stock) {
+                $status = 'low_stock';
+            }
 
-        $unitCost = (float) $this->unit_cost;
-        $totalCost = round(abs($delta) * $unitCost, 2);
+            $lockedItem->update([
+                'current_stock' => $newStock,
+                'status' => $status,
+            ]);
 
-        return StockMovement::create([
-            'restaurant_id' => $this->restaurant_id,
-            'branch_id' => $this->branch_id,
-            'inventory_item_id' => $this->id,
-            'user_id' => $userId,
-            'movement_type' => $movementType,
-            'quantity' => $delta,
-            'balance_after' => $newStock,
-            'unit_cost' => $unitCost,
-            'total_cost' => $totalCost,
-            'reference_type' => $referenceType,
-            'reference_id' => $referenceId,
-            'reason' => $reason,
-            'notes' => $notes,
-        ]);
+            $this->current_stock = $newStock;
+            $this->status = $status;
+
+            $unitCost = (float) $lockedItem->unit_cost;
+            $totalCost = round(abs($actualDelta) * $unitCost, 2);
+
+            return StockMovement::create([
+                'restaurant_id' => $lockedItem->restaurant_id,
+                'branch_id' => $lockedItem->branch_id,
+                'inventory_item_id' => $lockedItem->id,
+                'user_id' => $userId,
+                'movement_type' => $movementType,
+                'quantity' => $actualDelta,
+                'balance_after' => $newStock,
+                'unit_cost' => $unitCost,
+                'total_cost' => $totalCost,
+                'reference_type' => $referenceType,
+                'reference_id' => $referenceId,
+                'reason' => $reason,
+                'notes' => $notes,
+            ]);
+        });
     }
 }

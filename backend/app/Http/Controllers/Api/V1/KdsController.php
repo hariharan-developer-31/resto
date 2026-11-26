@@ -139,19 +139,40 @@ class KdsController extends Controller
             return $this->errorResponse('Order item not found.', 404);
         }
 
+        if (!$request->user()->hasRestaurantAccess($item->order->restaurant_id)) {
+            return $this->errorResponse('Unauthorized access to this order item.', 403);
+        }
+
         $validated = $request->validate([
             'status' => 'required|in:pending,preparing,ready,served,cancelled',
         ]);
 
-        $item->update(['status' => $validated['status']]);
+        $previousStatus = $item->status;
+        $updateData = ['status' => $validated['status']];
+        if ($validated['status'] === 'served') {
+            $updateData['served_at'] = now();
+        }
+        $item->update($updateData);
 
-        // Sync overall order status
         $order = $item->order;
-        $itemStatuses = $order->items()->pluck('status');
-        if ($itemStatuses->every(fn($s) => $s === 'ready' || $s === 'served')) {
-            $order->update(['order_status' => 'ready']);
-        } elseif ($itemStatuses->contains('preparing') && $order->order_status !== 'ready') {
-            $order->update(['order_status' => 'preparing']);
+
+        // Recalculate order totals if item was cancelled or un-cancelled
+        if ($previousStatus === 'cancelled' || $validated['status'] === 'cancelled') {
+            $order->recalculateTotals(
+                (float) $order->discount_amount,
+                (float) $order->service_charge,
+                (float) $order->packaging_charge
+            );
+        }
+
+        // Sync overall order status (excluding cancelled items)
+        $itemStatuses = $order->items()->where('status', '!=', 'cancelled')->pluck('status');
+        if ($itemStatuses->isNotEmpty()) {
+            if ($itemStatuses->every(fn($s) => $s === 'ready' || $s === 'served')) {
+                $order->update(['order_status' => 'ready']);
+            } elseif ($itemStatuses->contains('preparing') && $order->order_status !== 'ready') {
+                $order->update(['order_status' => 'preparing']);
+            }
         }
 
         AuditLog::log(

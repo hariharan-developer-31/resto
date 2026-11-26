@@ -44,7 +44,11 @@ class PurchaseOrder extends Model
 
     public static function generatePoNumber(): string
     {
-        return 'PO-' . date('Ymd') . '-' . strtoupper(Str::random(4));
+        do {
+            $candidate = 'PO-' . date('Ymd') . '-' . strtoupper(Str::random(6));
+        } while (static::withTrashed()->where('po_number', $candidate)->exists());
+
+        return $candidate;
     }
 
     public function restaurant(): BelongsTo

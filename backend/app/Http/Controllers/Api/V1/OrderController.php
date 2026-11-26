@@ -110,6 +110,7 @@ class OrderController extends Controller
             'order_type' => 'required|in:dine_in,takeaway,delivery',
             'customer_name' => 'nullable|string|max:100',
             'customer_phone' => 'nullable|string|max:30',
+            'guest_count' => 'nullable|integer|min:1|max:100',
             'special_instructions' => 'nullable|string',
             'discount_amount' => 'nullable|numeric|min:0',
             'service_charge' => 'nullable|numeric|min:0',
@@ -143,20 +144,57 @@ class OrderController extends Controller
             return $this->errorResponse('Valid restaurant and branch context required.', 422);
         }
 
-        return DB::transaction(function () use ($validated, $restaurantId, $branchId, $user) {
+        $branch = Branch::find($branchId);
+        if (!$branch || (int) $branch->restaurant_id !== (int) $restaurantId) {
+            return $this->errorResponse('Valid restaurant and branch context required.', 422);
+        }
+
+        // Pre-validate items, addons, and table ownership before entering transaction
+        if ($validated['order_type'] === 'dine_in' && !empty($validated['table_id'])) {
+            $checkTable = DiningTable::find($validated['table_id']);
+            if (!$checkTable || (int) $checkTable->branch_id !== (int) $branchId) {
+                return $this->errorResponse('Selected table does not belong to the active branch.', 422);
+            }
+            if ($checkTable->status === 'out_of_service') {
+                return $this->errorResponse('Selected table is currently out of service.', 422);
+            }
+        }
+
+        foreach ($validated['items'] as $itemData) {
+            $menuItemCheck = MenuItem::find($itemData['menu_item_id']);
+            if (!$menuItemCheck || (int) $menuItemCheck->restaurant_id !== (int) $restaurantId) {
+                return $this->errorResponse('One or more selected menu items do not belong to this restaurant.', 422);
+            }
+            if (!$menuItemCheck->is_available) {
+                return $this->errorResponse("Menu item [{$menuItemCheck->name}] is currently unavailable.", 422);
+            }
+            if (!empty($itemData['addon_ids'])) {
+                $invalidAddon = Addon::whereIn('id', $itemData['addon_ids'])
+                    ->where(function ($q) use ($restaurantId) {
+                        $q->where('restaurant_id', '!=', $restaurantId)->orWhere('is_active', false);
+                    })
+                    ->exists();
+                if ($invalidAddon) {
+                    return $this->errorResponse('One or more selected addons are unavailable or do not belong to this restaurant.', 422);
+                }
+            }
+        }
+
+        return DB::transaction(function () use ($validated, $restaurantId, $branchId, $branch, $user) {
             $table = null;
             $order = null;
             $isNewOrder = true;
             $roundNumber = 1;
 
-            // Dine-in order resolution: check if table already has an active order
+            // Dine-in order resolution: lock table row to prevent duplicate concurrent orders
             if ($validated['order_type'] === 'dine_in' && !empty($validated['table_id'])) {
-                $table = DiningTable::find($validated['table_id']);
-                
+                $table = DiningTable::where('id', $validated['table_id'])->lockForUpdate()->first();
+
                 // Look for existing active order on this table
                 $existingOrder = Order::where('table_id', $table->id)
                     ->whereIn('order_status', ['pending', 'preparing', 'ready'])
                     ->where('payment_status', '!=', 'paid')
+                    ->lockForUpdate()
                     ->latest()
                     ->first();
 
@@ -165,12 +203,16 @@ class OrderController extends Controller
                     $isNewOrder = false;
                     $order->increment('round_count');
                     $roundNumber = $order->round_count;
+
+                    if ($order->order_status === 'ready') {
+                        $order->update(['order_status' => 'preparing']);
+                    }
                 }
             }
 
             // Create new order if none active
             if (!$order) {
-                $orderNumber = Order::generateOrderNumber($branchId);
+                $orderNumber = Order::generateOrderNumber((int) $branchId);
                 $waiterId = $table?->waiter_id ?? ($user->hasRole('Waiter') ? $user->id : null);
 
                 $order = Order::create([
@@ -180,6 +222,7 @@ class OrderController extends Controller
                     'waiter_id' => $waiterId,
                     'customer_name' => $validated['customer_name'] ?? null,
                     'customer_phone' => $validated['customer_phone'] ?? null,
+                    'guest_count' => $validated['guest_count'] ?? ($table?->seating_capacity),
                     'order_number' => $orderNumber,
                     'order_type' => $validated['order_type'],
                     'order_status' => 'pending',
@@ -200,7 +243,7 @@ class OrderController extends Controller
             }
 
             // Generate KOT ticket number for this batch of items
-            $kotNumber = Order::generateKotNumber($branchId);
+            $kotNumber = Order::generateKotNumber((int) $branchId);
             $newOrderItems = [];
 
             // Process order items
@@ -241,7 +284,7 @@ class OrderController extends Controller
                 }
 
                 $itemSubtotalWithAddons = $itemSubtotal + $addonTotal;
-                $taxRate = $menuItem->tax_rate ?? 5.00;
+                $taxRate = $menuItem->tax_rate ?? $branch->tax_rate ?? 5.00;
                 $taxAmount = round($itemSubtotalWithAddons * ($taxRate / 100), 2);
                 $itemTotalPrice = $itemSubtotalWithAddons + $taxAmount;
 
@@ -349,6 +392,7 @@ class OrderController extends Controller
             'status' => 'required|in:pending,preparing,ready,served,cancelled',
         ]);
 
+        $previousStatus = $item->status;
         $updateData = ['status' => $validated['status']];
         if ($validated['status'] === 'served') {
             $updateData['served_at'] = now();
@@ -356,13 +400,25 @@ class OrderController extends Controller
 
         $item->update($updateData);
 
-        // Update overall order status if necessary
         $order = $item->order;
-        $activeStatuses = $order->items()->pluck('status');
-        if ($activeStatuses->every(fn($s) => $s === 'served')) {
-            $order->update(['order_status' => 'ready']);
-        } elseif ($activeStatuses->contains('preparing')) {
-            $order->update(['order_status' => 'preparing']);
+
+        // Recalculate order totals if item was cancelled or restored
+        if ($previousStatus === 'cancelled' || $validated['status'] === 'cancelled') {
+            $order->recalculateTotals(
+                (float) $order->discount_amount,
+                (float) $order->service_charge,
+                (float) $order->packaging_charge
+            );
+        }
+
+        // Update overall order status (excluding cancelled items)
+        $activeStatuses = $order->items()->where('status', '!=', 'cancelled')->pluck('status');
+        if ($activeStatuses->isNotEmpty()) {
+            if ($activeStatuses->every(fn($s) => $s === 'served' || $s === 'ready')) {
+                $order->update(['order_status' => 'ready']);
+            } elseif ($activeStatuses->contains('preparing')) {
+                $order->update(['order_status' => 'preparing']);
+            }
         }
 
         return $this->successResponse($item, "Item status updated to {$validated['status']}.");
@@ -382,6 +438,10 @@ class OrderController extends Controller
             return $this->errorResponse('Unauthorized access to this order.', 403);
         }
 
+        if ($order->order_status === 'cancelled') {
+            return $this->errorResponse('Cannot settle a cancelled order.', 422);
+        }
+
         if ($order->payment_status === 'paid') {
             return $this->errorResponse('Order has already been fully paid and settled.', 422);
         }
@@ -391,6 +451,7 @@ class OrderController extends Controller
             'paid_amount' => 'nullable|numeric|min:0',
             'discount_amount' => 'nullable|numeric|min:0',
             'service_charge' => 'nullable|numeric|min:0',
+            'packaging_charge' => 'nullable|numeric|min:0',
             'table_status_after' => 'nullable|string|in:cleaning,available,occupied',
             'payments' => 'nullable|array|min:1',
             'payments.*.payment_method' => 'required|in:cash,card,upi',
@@ -399,19 +460,27 @@ class OrderController extends Controller
             'notes' => 'nullable|string',
         ]);
 
+        if (($validated['payment_method'] ?? null) === 'split' && empty($validated['payments'])) {
+            return $this->errorResponse('Split payment requires at least one payment breakdown entry.', 422);
+        }
+
         return DB::transaction(function () use ($validated, $order, $request) {
             $user = $request->user();
 
-            // Apply any final discount adjustment
-            if (isset($validated['discount_amount'])) {
+            // Apply any final discount / service / packaging charge adjustment
+            if (
+                array_key_exists('discount_amount', $validated) ||
+                array_key_exists('service_charge', $validated) ||
+                array_key_exists('packaging_charge', $validated)
+            ) {
                 $order->recalculateTotals(
-                    $validated['discount_amount'],
-                    $validated['service_charge'] ?? $order->service_charge,
-                    $order->packaging_charge
+                    $validated['discount_amount'] ?? (float) $order->discount_amount,
+                    $validated['service_charge'] ?? (float) $order->service_charge,
+                    $validated['packaging_charge'] ?? (float) $order->packaging_charge
                 );
             }
 
-            $totalAmount = $order->total_amount;
+            $totalAmount = (float) $order->total_amount;
             $paymentEntries = [];
             $totalPaid = 0.00;
 
@@ -420,15 +489,15 @@ class OrderController extends Controller
                 foreach ($validated['payments'] as $p) {
                     $paymentEntries[] = [
                         'method' => $p['payment_method'],
-                        'amount' => $p['amount'],
+                        'amount' => (float) $p['amount'],
                         'reference' => $p['transaction_reference'] ?? null,
                     ];
-                    $totalPaid += $p['amount'];
+                    $totalPaid += (float) $p['amount'];
                 }
             } else {
                 // Single payment mode
                 $method = $validated['payment_method'] ?? 'cash';
-                $amount = $validated['paid_amount'] ?? $totalAmount;
+                $amount = isset($validated['paid_amount']) ? (float) $validated['paid_amount'] : $totalAmount;
                 $paymentEntries[] = [
                     'method' => $method,
                     'amount' => $amount,
@@ -437,24 +506,28 @@ class OrderController extends Controller
                 $totalPaid = $amount;
             }
 
-            if ($totalPaid < $totalAmount) {
+            if ($totalPaid + 0.001 < $totalAmount) {
                 return $this->errorResponse(
                     "Total paid amount (₹{$totalPaid}) cannot be less than order total (₹{$totalAmount}).",
                     422
                 );
             }
 
-            $changeAmount = max(0.00, $totalPaid - $totalAmount);
-            $invoiceNumber = Order::generateInvoiceNumber($order->branch_id);
+            $changeAmount = round(max(0.00, $totalPaid - $totalAmount), 2);
+            $invoiceNumber = Order::generateInvoiceNumber((int) $order->branch_id);
 
-            // Record payments
+            // Record net applied payment amounts (so cash change does not inflate tender drawer reports)
+            $remainingDue = $totalAmount;
             foreach ($paymentEntries as $entry) {
+                $appliedAmount = round(min($entry['amount'], $remainingDue), 2);
+                $remainingDue = max(0.00, round($remainingDue - $appliedAmount, 2));
+
                 Payment::create([
                     'restaurant_id' => $order->restaurant_id,
                     'branch_id' => $order->branch_id,
                     'order_id' => $order->id,
                     'payment_method' => $entry['method'],
-                    'amount' => $entry['amount'],
+                    'amount' => $appliedAmount > 0 ? $appliedAmount : $entry['amount'],
                     'transaction_reference' => $entry['reference'],
                     'status' => 'success',
                     'received_by' => $user->id,
@@ -470,6 +543,7 @@ class OrderController extends Controller
                 'paid_amount' => $totalPaid,
                 'change_amount' => $changeAmount,
                 'invoice_number' => $invoiceNumber,
+                'settled_at' => now(),
             ]);
 
             // Release table

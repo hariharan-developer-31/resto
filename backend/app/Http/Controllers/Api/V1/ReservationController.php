@@ -37,7 +37,7 @@ class ReservationController extends Controller
         }
 
         $query = Reservation::where('restaurant_id', $restaurantId)
-            ->with(['table:id,table_number,capacity,status', 'branch:id,name']);
+            ->with(['table:id,table_number,seating_capacity,location,status', 'branch:id,name']);
 
         // Filter by branch
         if ($branchId = $request->header('X-Branch-ID') ?? $request->input('branch_id')) {

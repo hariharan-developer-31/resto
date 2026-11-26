@@ -115,7 +115,7 @@ Route::prefix('v1')->group(function () {
         Route::patch('/tables/{id}/status', [TableController::class, 'updateStatus']);
 
         // Orders, POS & KOT Operations
-        Route::apiResource('orders', OrderController::class);
+        Route::apiResource('orders', OrderController::class)->only(['index', 'store', 'show']);
         Route::patch('/order-items/{id}/status', [OrderController::class, 'updateItemStatus']);
         Route::post('/orders/{id}/settle', [OrderController::class, 'settleBill']);
         Route::post('/orders/{id}/cancel', [OrderController::class, 'cancel']);
@@ -142,7 +142,7 @@ Route::prefix('v1')->group(function () {
         Route::post('/menu-items/{id}/recipe', [RecipeController::class, 'saveRecipe']);
 
         // Purchase Orders
-        Route::apiResource('purchase-orders', PurchaseOrderController::class)->except(['destroy']);
+        Route::apiResource('purchase-orders', PurchaseOrderController::class)->only(['index', 'store', 'show']);
         Route::post('/purchase-orders/{id}/receive', [PurchaseOrderController::class, 'receive']);
 
         // Business Analytics & Executive Reports (Phase 8)

@@ -395,4 +395,72 @@ class PhaseFourPosAndOrdersTest extends TestCase
             $this->assertEquals('available', $table->fresh()->status);
         }
     }
+
+    /**
+     * Test single taxation (no double-taxation) and item cancellation recalculation.
+     */
+    public function test_order_tax_is_not_double_counted_and_cancelled_item_recalculates_total(): void
+    {
+        $cashier = User::where('email', 'cashier@grandfeast.com')->firstOrFail();
+        $token = $cashier->createToken('cashier_token')->plainTextToken;
+        $restaurant = Restaurant::firstOrFail();
+        $branch = Branch::firstOrFail();
+        $menuItem = MenuItem::where('restaurant_id', $restaurant->id)->where('is_available', true)->firstOrFail();
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+            'X-Restaurant-ID' => (string) $restaurant->id,
+            'X-Branch-ID' => (string) $branch->id,
+        ])->postJson('/api/v1/orders', [
+            'order_type' => 'takeaway',
+            'items' => [
+                ['menu_item_id' => $menuItem->id, 'quantity' => 1],
+            ],
+        ]);
+
+        $response->assertStatus(201);
+        $order = $response->json('data.order');
+        $expectedSubtotal = round((float) $menuItem->base_price, 2);
+        $taxRate = (float) ($menuItem->tax_rate ?? $branch->tax_rate ?? 5.00);
+        $expectedTax = round($expectedSubtotal * ($taxRate / 100), 2);
+        $expectedTotal = round($expectedSubtotal + $expectedTax, 2);
+
+        $this->assertEquals($expectedSubtotal, (float) $order['subtotal']);
+        $this->assertEquals($expectedTax, (float) $order['tax_amount']);
+        $this->assertEquals($expectedTotal, (float) $order['total_amount']);
+
+        // Cancelling the only item must recalculate order total to 0.00
+        $itemId = $order['items'][0]['id'];
+        $this->withHeader('Authorization', 'Bearer ' . $token)
+            ->patchJson("/api/v1/order-items/{$itemId}/status", ['status' => 'cancelled'])
+            ->assertStatus(200);
+
+        $freshOrder = Order::findOrFail($order['id']);
+        $this->assertEquals(0.00, (float) $freshOrder->total_amount);
+    }
+
+    /**
+     * Test cancelled order cannot be settled and multi-branch orders do not collide.
+     */
+    public function test_cannot_settle_cancelled_order_and_multi_branch_numbers_are_unique(): void
+    {
+        $superAdmin = User::where('email', 'superadmin@resto.com')->firstOrFail();
+        $token = $superAdmin->createToken('admin_token')->plainTextToken;
+        $cancelledOrder = Order::where('order_status', 'cancelled')->firstOrFail();
+
+        $this->withHeader('Authorization', 'Bearer ' . $token)
+            ->postJson("/api/v1/orders/{$cancelledOrder->id}/settle", [
+                'payment_method' => 'cash',
+                'paid_amount' => 500,
+            ])
+            ->assertStatus(422);
+
+        // Multi-branch order numbers must not collide on the same day
+        $branches = Branch::take(2)->get();
+        if ($branches->count() === 2) {
+            $num1 = Order::generateOrderNumber($branches[0]->id);
+            $num2 = Order::generateOrderNumber($branches[1]->id);
+            $this->assertNotEquals($num1, $num2);
+        }
+    }
 }
