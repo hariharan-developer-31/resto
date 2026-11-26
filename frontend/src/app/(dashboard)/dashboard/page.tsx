@@ -134,7 +134,7 @@ export default function DashboardPage() {
     {
       title: 'Total Restaurants',
       value: overview.total_restaurants,
-      sub: 'Active SaaS tenants',
+      sub: 'Active dining brands',
       icon: Store,
       color: 'text-[#252525] bg-[#F3DA8A]/25',
     },
@@ -190,7 +190,7 @@ export default function DashboardPage() {
           </div>
           <p className="text-xs text-[#5A5D58]">
             {isSuperAdmin
-              ? 'Multi-restaurant platform performance, financial telemetry and tenant operations'
+              ? 'Multi-restaurant platform performance, financial telemetry and branch operations'
               : `Managing operations for ${activeRestaurant?.name} • Branch: ${activeBranch?.name || 'Main'}`}
           </p>
         </div>

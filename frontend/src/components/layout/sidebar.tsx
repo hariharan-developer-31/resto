@@ -99,12 +99,6 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
           permission: 'restaurants.view',
         },
         {
-          label: 'SaaS Subscription',
-          href: '/subscription',
-          icon: CreditCard,
-          permission: 'settings.view',
-        },
-        {
           label: 'Menu Catalog',
           href: '/menu',
           icon: Layers,
@@ -170,7 +164,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                 Restaurant OS
               </span>
               <span className="text-[10px] font-semibold tracking-widest text-[#5A5D58] uppercase block mt-1">
-                Multi-Tenant SaaS
+                Restaurant Platform
               </span>
             </div>
           </Link>
