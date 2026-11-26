@@ -31,10 +31,8 @@ import {
 
 export default function RestaurantsPage() {
   const queryClient = useQueryClient();
-  const { user, isSuperAdmin } = useAuthStore((s) => ({
-    user: s.user,
-    isSuperAdmin: s.user?.is_super_admin ?? false,
-  }));
+  const user = useAuthStore((s) => s.user);
+  const isSuperAdmin = user?.is_super_admin ?? false;
 
   const [search, setSearch] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);

@@ -30,35 +30,44 @@ class PublicGuestController extends Controller
      */
     public function restaurantDetails(string $slug): JsonResponse
     {
-        $restaurant = Restaurant::where('slug', $slug)
-            ->where('is_active', true)
-            ->first();
+        try {
+            $restaurant = Restaurant::where('slug', $slug)
+                ->where('is_active', true)
+                ->first();
 
-        if (!$restaurant) {
-            $restaurant = Restaurant::where('is_active', true)->first();
+            if (!$restaurant) {
+                $restaurant = Restaurant::where('is_active', true)->first();
+            }
+
+            if (!$restaurant) {
+                return $this->errorResponse('Restaurant not found.', 404);
+            }
+
+            $branches = Branch::where('restaurant_id', $restaurant->id)
+                ->where('is_active', true)
+                ->get();
+
+            $categories = Category::where('restaurant_id', $restaurant->id)
+                ->where('is_active', true)
+                ->with(['menuItems' => function ($q) {
+                    $q->where('is_available', true)->with(['variants', 'addons']);
+                }])
+                ->orderBy('sort_order')
+                ->get();
+
+            return $this->successResponse([
+                'restaurant' => $restaurant,
+                'branches' => $branches,
+                'menu_catalog' => $categories,
+            ], 'Public restaurant profile retrieved.');
+        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+                'file' => basename($e->getFile()),
+                'line' => $e->getLine(),
+            ], 500);
         }
-
-        if (!$restaurant) {
-            return $this->errorResponse('Restaurant not found.', 404);
-        }
-
-        $branches = Branch::where('restaurant_id', $restaurant->id)
-            ->where('is_active', true)
-            ->get();
-
-        $categories = Category::where('restaurant_id', $restaurant->id)
-            ->where('is_active', true)
-            ->with(['menuItems' => function ($q) {
-                $q->where('is_available', true)->with(['variants', 'addons']);
-            }])
-            ->orderBy('sort_order')
-            ->get();
-
-        return $this->successResponse([
-            'restaurant' => $restaurant,
-            'branches' => $branches,
-            'menu_catalog' => $categories,
-        ], 'Public restaurant profile retrieved.');
     }
 
     /**

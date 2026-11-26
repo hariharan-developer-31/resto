@@ -31,12 +31,10 @@ interface SidebarProps {
 
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const pathname = usePathname();
-  const { user, logout, hasPermission, isSuperAdmin } = useAuthStore((s) => ({
-    user: s.user,
-    logout: s.logout,
-    hasPermission: s.hasPermission,
-    isSuperAdmin: s.user?.is_super_admin ?? false,
-  }));
+  const user = useAuthStore((s) => s.user);
+  const logout = useAuthStore((s) => s.logout);
+  const hasPermission = useAuthStore((s) => s.hasPermission);
+  const isSuperAdmin = user?.is_super_admin ?? false;
 
   const navItems = [
     {

@@ -14,13 +14,11 @@ interface TopbarProps {
 }
 
 export function Topbar({ onMenuClick }: TopbarProps) {
-  const { user, activeRestaurant, activeBranch, setActiveRestaurant, setActiveBranch } = useAuthStore((s) => ({
-    user: s.user,
-    activeRestaurant: s.activeRestaurant,
-    activeBranch: s.activeBranch,
-    setActiveRestaurant: s.setActiveRestaurant,
-    setActiveBranch: s.setActiveBranch,
-  }));
+  const user = useAuthStore((s) => s.user);
+  const activeRestaurant = useAuthStore((s) => s.activeRestaurant);
+  const activeBranch = useAuthStore((s) => s.activeBranch);
+  const setActiveRestaurant = useAuthStore((s) => s.setActiveRestaurant);
+  const setActiveBranch = useAuthStore((s) => s.setActiveBranch);
 
   const availableRestaurants = user?.restaurants || [];
   const availableBranches = (user?.branches || []).filter(

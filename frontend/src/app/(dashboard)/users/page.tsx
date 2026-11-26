@@ -27,10 +27,8 @@ import {
 
 export default function UsersManagementPage() {
   const queryClient = useQueryClient();
-  const { currentUser, isSuperAdmin } = useAuthStore((s) => ({
-    currentUser: s.user,
-    isSuperAdmin: s.user?.is_super_admin ?? false,
-  }));
+  const currentUser = useAuthStore((s) => s.user);
+  const isSuperAdmin = currentUser?.is_super_admin ?? false;
 
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState('');

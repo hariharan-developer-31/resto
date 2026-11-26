@@ -45,13 +45,16 @@ import {
 } from 'recharts';
 
 export default function DashboardPage() {
-  const { user, activeRestaurant, activeBranch, logout, isSuperAdmin } = useAuthStore((s) => ({
-    user: s.user,
-    activeRestaurant: s.activeRestaurant,
-    activeBranch: s.activeBranch,
-    logout: s.logout,
-    isSuperAdmin: s.user?.is_super_admin ?? false,
-  }));
+  const [mounted, setMounted] = React.useState(false);
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const user = useAuthStore((s) => s.user);
+  const activeRestaurant = useAuthStore((s) => s.activeRestaurant);
+  const activeBranch = useAuthStore((s) => s.activeBranch);
+  const logout = useAuthStore((s) => s.logout);
+  const isSuperAdmin = user?.is_super_admin ?? false;
 
   // Fetch live Super Admin stats from backend API
   const { data: statsData, isLoading, refetch, isFetching } = useQuery({
@@ -260,50 +263,52 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent className="pt-4">
             <div className="h-64 w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={revenueTrends} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#B4D58A" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#B4D58A" stopOpacity={0.0} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="black/[0.04]" vertical={false} />
-                  <XAxis
-                    dataKey="label"
-                    stroke="#8E928B"
-                    fontSize={11}
-                    tickLine={false}
-                    axisLine={{ stroke: 'black/[0.06]' }}
-                  />
-                  <YAxis
-                    stroke="#8E928B"
-                    fontSize={11}
-                    tickLine={false}
-                    axisLine={{ stroke: 'black/[0.06]' }}
-                    tickFormatter={(val) => `₹${val}`}
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: '#FFFFFF',
-                      borderRadius: '10px',
-                      border: '1px solid black/[0.06]',
-                      boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-                      fontFamily: 'var(--font-dm-sans)',
-                      fontSize: '12px',
-                    }}
-                    formatter={(value: any) => [`₹${Number(value).toFixed(2)}`, 'Revenue']}
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="revenue"
-                    stroke="#B4D58A"
-                    strokeWidth={2.5}
-                    fillOpacity={1}
-                    fill="url(#colorRevenue)"
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
+              {mounted && (
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={revenueTrends} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#B4D58A" stopOpacity={0.3} />
+                        <stop offset="95%" stopColor="#B4D58A" stopOpacity={0.0} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="black/[0.04]" vertical={false} />
+                    <XAxis
+                      dataKey="label"
+                      stroke="#8E928B"
+                      fontSize={11}
+                      tickLine={false}
+                      axisLine={{ stroke: 'black/[0.06]' }}
+                    />
+                    <YAxis
+                      stroke="#8E928B"
+                      fontSize={11}
+                      tickLine={false}
+                      axisLine={{ stroke: 'black/[0.06]' }}
+                      tickFormatter={(val) => `₹${val}`}
+                    />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: '#FFFFFF',
+                        borderRadius: '10px',
+                        border: '1px solid black/[0.06]',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+                        fontFamily: 'var(--font-dm-sans)',
+                        fontSize: '12px',
+                      }}
+                      formatter={(value: any) => [`₹${Number(value).toFixed(2)}`, 'Revenue']}
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="revenue"
+                      stroke="#B4D58A"
+                      strokeWidth={2.5}
+                      fillOpacity={1}
+                      fill="url(#colorRevenue)"
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -318,35 +323,37 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent className="pt-4">
             <div className="h-64 w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={revenueTrends} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="black/[0.04]" vertical={false} />
-                  <XAxis
-                    dataKey="label"
-                    stroke="#8E928B"
-                    fontSize={10}
-                    tickLine={false}
-                    axisLine={{ stroke: 'black/[0.06]' }}
-                  />
-                  <YAxis
-                    stroke="#8E928B"
-                    fontSize={11}
-                    tickLine={false}
-                    axisLine={{ stroke: 'black/[0.06]' }}
-                    allowDecimals={false}
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: '#FFFFFF',
-                      borderRadius: '10px',
-                      border: '1px solid black/[0.06]',
-                      fontSize: '12px',
-                    }}
-                    formatter={(value: any) => [value, 'Orders']}
-                  />
-                  <Bar dataKey="orders" fill="#B4D58A" radius={[6, 6, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
+              {mounted && (
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={revenueTrends} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="black/[0.04]" vertical={false} />
+                    <XAxis
+                      dataKey="label"
+                      stroke="#8E928B"
+                      fontSize={10}
+                      tickLine={false}
+                      axisLine={{ stroke: 'black/[0.06]' }}
+                    />
+                    <YAxis
+                      stroke="#8E928B"
+                      fontSize={11}
+                      tickLine={false}
+                      axisLine={{ stroke: 'black/[0.06]' }}
+                      allowDecimals={false}
+                    />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: '#FFFFFF',
+                        borderRadius: '10px',
+                        border: '1px solid black/[0.06]',
+                        fontSize: '12px',
+                      }}
+                      formatter={(value: any) => [value, 'Orders']}
+                    />
+                    <Bar dataKey="orders" fill="#B4D58A" radius={[6, 6, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              )}
             </div>
           </CardContent>
         </Card>

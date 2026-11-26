@@ -31,11 +31,10 @@ import {
 
 export default function MenuCatalogPage() {
   const queryClient = useQueryClient();
-  const { activeRestaurant, hasPermission, isSuperAdmin } = useAuthStore((s) => ({
-    activeRestaurant: s.activeRestaurant,
-    hasPermission: s.hasPermission,
-    isSuperAdmin: s.user?.is_super_admin ?? false,
-  }));
+  const user = useAuthStore((s) => s.user);
+  const activeRestaurant = useAuthStore((s) => s.activeRestaurant);
+  const hasPermission = useAuthStore((s) => s.hasPermission);
+  const isSuperAdmin = user?.is_super_admin ?? false;
 
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
   const [search, setSearch] = useState('');

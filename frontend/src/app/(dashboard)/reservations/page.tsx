@@ -59,10 +59,8 @@ interface Reservation {
 
 export default function ReservationsPage() {
   const queryClient = useQueryClient();
-  const { activeRestaurant, activeBranch } = useAuthStore((s) => ({
-    activeRestaurant: s.activeRestaurant,
-    activeBranch: s.activeBranch,
-  }));
+  const activeRestaurant = useAuthStore((s) => s.activeRestaurant);
+  const activeBranch = useAuthStore((s) => s.activeBranch);
 
   // Date filter initialized safely for prerendering
   const [selectedDate, setSelectedDate] = useState<string>('');

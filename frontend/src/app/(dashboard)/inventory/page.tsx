@@ -91,10 +91,8 @@ interface PurchaseOrder {
 
 export default function InventoryManagementPage() {
   const queryClient = useQueryClient();
-  const { activeRestaurant, activeBranch } = useAuthStore((s) => ({
-    activeRestaurant: s.activeRestaurant,
-    activeBranch: s.activeBranch,
-  }));
+  const activeRestaurant = useAuthStore((s) => s.activeRestaurant);
+  const activeBranch = useAuthStore((s) => s.activeBranch);
 
   // Active Tab
   const [activeTab, setActiveTab] = useState<'stock' | 'alerts' | 'suppliers' | 'orders'>('stock');

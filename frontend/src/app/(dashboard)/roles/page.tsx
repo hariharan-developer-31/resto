@@ -23,9 +23,8 @@ import {
 
 export default function RolesPermissionsPage() {
   const queryClient = useQueryClient();
-  const { isSuperAdmin } = useAuthStore((s) => ({
-    isSuperAdmin: s.user?.is_super_admin ?? false,
-  }));
+  const user = useAuthStore((s) => s.user);
+  const isSuperAdmin = user?.is_super_admin ?? false;
 
   const [selectedRoleId, setSelectedRoleId] = useState<number | null>(null);
   const [activePermissions, setActivePermissions] = useState<string[]>([]);

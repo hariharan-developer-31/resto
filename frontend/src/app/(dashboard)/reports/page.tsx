@@ -41,10 +41,8 @@ import {
 
 export default function ReportsAndAnalyticsPage() {
   const printRef = useRef<HTMLDivElement>(null);
-  const { activeRestaurant, activeBranch } = useAuthStore((s) => ({
-    activeRestaurant: s.activeRestaurant,
-    activeBranch: s.activeBranch,
-  }));
+  const activeRestaurant = useAuthStore((s) => s.activeRestaurant);
+  const activeBranch = useAuthStore((s) => s.activeBranch);
 
   // Tabs
   const [activeTab, setActiveTab] = useState<'overview' | 'menu' | 'efficiency' | 'eod' | 'tax'>('overview');

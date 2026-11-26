@@ -33,10 +33,8 @@ export default function TablesManagementPage() {
   const queryClient = useQueryClient();
   const printRef = useRef<HTMLDivElement>(null);
 
-  const { activeRestaurant, activeBranch } = useAuthStore((s) => ({
-    activeRestaurant: s.activeRestaurant,
-    activeBranch: s.activeBranch,
-  }));
+  const activeRestaurant = useAuthStore((s) => s.activeRestaurant);
+  const activeBranch = useAuthStore((s) => s.activeBranch);
 
   const [selectedLocation, setSelectedLocation] = useState<string>('All');
   const [statusFilter, setStatusFilter] = useState<string>('All');

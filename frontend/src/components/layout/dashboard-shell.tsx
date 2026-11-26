@@ -10,10 +10,8 @@ import { Loader2 } from 'lucide-react';
 export function DashboardShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const { isAuthenticated, isHydrated } = useAuthStore((s) => ({
-    isAuthenticated: s.isAuthenticated,
-    isHydrated: s.isHydrated,
-  }));
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const isHydrated = useAuthStore((s) => s.isHydrated);
 
   useEffect(() => {
     if (isHydrated && !isAuthenticated) {

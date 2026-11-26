@@ -40,9 +40,7 @@ interface SubscriptionPlan {
 
 export default function SubscriptionManagementPage() {
   const queryClient = useQueryClient();
-  const { activeRestaurant } = useAuthStore((s) => ({
-    activeRestaurant: s.activeRestaurant,
-  }));
+  const activeRestaurant = useAuthStore((s) => s.activeRestaurant);
 
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('monthly');
   const [selectedPlanForUpgrade, setSelectedPlanForUpgrade] = useState<SubscriptionPlan | null>(null);
