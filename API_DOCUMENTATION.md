@@ -20,7 +20,7 @@
   "message": "System health status",
   "data": {
     "status": "healthy",
-    "version": "1.0.0-phase4",
+    "version": "1.0.0-phase5",
     "environment": "production",
     "database": "connected",
     "timestamp": "2026-11-26T12:00:00+05:30"
@@ -109,108 +109,126 @@
 
 ---
 
-## 7. Orders, POS & KOT Operations
+## 7. Orders, POS & Billing Operations
 
-### 7.1 List Orders
-- **Endpoint:** `GET /orders`
-- **Query Parameters:**
-  - `branch_id`: Filter by physical branch
-  - `order_status`: Filter by `pending`, `preparing`, `ready`, `completed`, `cancelled`
-  - `payment_status`: Filter by `unpaid`, `paid`, `partially_paid`
-  - `order_type`: Filter by `dine_in`, `takeaway`, `delivery`
-  - `table_id`: Filter by dining table
-  - `active_only`: Boolean (`true` returns only active dining sessions)
-  - `search`: Searches order numbers, invoice numbers, customer name, and phone
-- **Response `200 OK`:** Paginated list with items, table details, and assigned waiter.
-
-### 7.2 Create Order or Append Round
-- **Endpoint:** `POST /orders`
-- **Auth:** `Bearer <token>` (`orders.create`)
-- **Request Body:**
-```json
-{
-  "order_type": "dine_in",
-  "table_id": 1,
-  "customer_name": "Rahul Sharma",
-  "customer_phone": "9876543210",
-  "discount_amount": 0.00,
-  "service_charge": 0.00,
-  "packaging_charge": 0.00,
-  "items": [
-    {
-      "menu_item_id": 1,
-      "menu_variant_id": 2,
-      "quantity": 2,
-      "special_instructions": "Less spicy, extra crisp",
-      "addon_ids": [1, 2]
-    }
-  ]
-}
-```
-*Note:*
-- If `table_id` is specified for `dine_in` and the table already has an active open order, items are automatically appended as an incremental **Order Round** (e.g. Round 2, Round 3).
-- Generates a sequential **KOT Ticket** (`KOT-YYYYMMDD-XXX`) for the items in this round.
-- Automatically marks dining table status as `occupied`.
-
-### 7.3 Get Order Details & Rounds
-- **Endpoint:** `GET /orders/{id}`
-- **Response `200 OK`:** Returns full order object with items grouped by round number and payment records.
-
-### 7.4 Update Item Preparation Status
-- **Endpoint:** `PATCH /order-items/{id}/status`
-- **Request Body:**
-```json
-{
-  "status": "served"
-}
-```
-*Allowed statuses:* `pending`, `preparing`, `ready`, `served`, `cancelled`.  
-*Note:* Setting status to `served` records `served_at = now()`.
-
-### 7.5 Settle Bill & Collect Payment
-- **Endpoint:** `POST /orders/{id}/settle`
-- **Auth:** `Bearer <token>` (`orders.edit` or `payments.create`)
-- **Request Body (Single Cash Payment):**
-```json
-{
-  "payment_method": "cash",
-  "paid_amount": 1000.00,
-  "discount_amount": 50.00,
-  "table_status_after": "cleaning"
-}
-```
-- **Request Body (Split Payment):**
-```json
-{
-  "payment_method": "split",
-  "payments": [
-    { "payment_method": "cash", "amount": 500.00 },
-    { "payment_method": "upi", "amount": 320.00, "transaction_reference": "UPI998877665544" }
-  ],
-  "table_status_after": "cleaning"
-}
-```
-*Response `200 OK`:*
-- Generates unique tax invoice number (`INV-YYYYMMDD-XXXX`).
-- Calculates change amount returned to customer.
-- Marks `payment_status = 'paid'` and `order_status = 'completed'`.
-- Automatically transitions table status to `cleaning`.
-
-### 7.6 Cancel Order
-- **Endpoint:** `POST /orders/{id}/cancel`
-- **Request Body:**
-```json
-{
-  "cancellation_reason": "Customer had an emergency before food was prepared."
-}
-```
-*Safeguards:*
-- Prevents cancelling an already paid/settled order.
-- Cancels all associated order items and frees dining table back to `available`.
+- `GET /orders` – Paginated list of orders with filters (`branch_id`, `order_status`, `payment_status`, `order_type`, `table_id`, `active_only`, `search`).
+- `POST /orders` – Create order or append round to occupied table. Generates KOT number (`KOT-YYYYMMDD-XXX`).
+- `GET /orders/{id}` – Full order object with items grouped by round and payment records.
+- `PATCH /order-items/{id}/status` – Update item preparation status (`pending`, `preparing`, `ready`, `served`, `cancelled`).
+- `POST /orders/{id}/settle` – Settle bill via Cash, Card, UPI, or Split payment. Generates tax invoice (`INV-YYYYMMDD-XXXX`) and resets table.
+- `POST /orders/{id}/cancel` – Cancel order with mandatory reason and frees dining table.
 
 ---
 
-## 8. Auditing & Security
+## 8. Kitchen Display System (KDS)
 
-- `GET /audit-logs?action=order.created&page=1` – Paginated audit events.
+### 8.1 List KDS Tickets
+- **Endpoint:** `GET /kds/tickets`
+- **Auth:** `Bearer <token>` (`kitchen.view`)
+- **Query Parameters:**
+  - `station`: `all` (default), `main`, `grill`, `tandoor`, `biryani`, `beverage`, `dessert`
+  - `mode`: `active` (default, pending/preparing tickets) or `completed` (ready/served within 4 hours)
+- **Response `200 OK`:**
+```json
+{
+  "success": true,
+  "message": "KDS tickets retrieved successfully.",
+  "data": {
+    "station": "all",
+    "mode": "active",
+    "tickets_count": 2,
+    "tickets": [
+      {
+        "kot_number": "KOT-20261126-001",
+        "order_id": 4,
+        "order_number": "ORD-20261126-0004",
+        "order_type": "dine_in",
+        "table_number": "T-01",
+        "table_location": "Main Dining Hall",
+        "waiter_name": "Arun Waiter",
+        "round_number": 1,
+        "created_at": "2026-11-26T13:00:00+05:30",
+        "elapsed_minutes": 8,
+        "urgency": "normal",
+        "total_items": 3,
+        "items": [
+          {
+            "id": 12,
+            "name": "Chicken Dum Biryani",
+            "variant_name": "Family Pack",
+            "quantity": 2,
+            "status": "preparing",
+            "kitchen_station": "biryani",
+            "special_instructions": "Less spicy, please",
+            "addons": [
+              { "name": "Extra Salan Gravy", "quantity": 2 }
+            ]
+          }
+        ],
+        "all_preparing": true,
+        "all_ready": false
+      }
+    ]
+  }
+}
+```
+
+### 8.2 Update Dish Item Status
+- **Endpoint:** `PATCH /kds/items/{id}/status`
+- **Auth:** `Bearer <token>` (`kitchen.view`)
+- **Request Body:**
+```json
+{
+  "status": "ready"
+}
+```
+*Allowed statuses:* `pending`, `preparing`, `ready`, `served`, `cancelled`. Automatically synchronizes overall order status to `preparing` or `ready`.
+
+### 8.3 Batch Mark Whole Ticket Ready
+- **Endpoint:** `POST /kds/tickets/{kot_number}/ready`
+- **Auth:** `Bearer <token>` (`kitchen.view`)
+- **Query / Body Parameters:**
+  - `station`: Optional station scope (e.g. `biryani` or `all`).
+- **Response `200 OK`:**
+```json
+{
+  "success": true,
+  "message": "KOT ticket KOT-20261126-001 marked as Ready for pickup.",
+  "data": {
+    "kot_number": "KOT-20261126-001",
+    "updated_items_count": 2
+  }
+}
+```
+
+### 8.4 KDS Station Summary Metrics
+- **Endpoint:** `GET /kds/summary`
+- **Auth:** `Bearer <token>` (`kitchen.view`)
+- **Response `200 OK`:**
+```json
+{
+  "success": true,
+  "message": "KDS summary metrics retrieved.",
+  "data": {
+    "pending_items": 4,
+    "preparing_items": 6,
+    "ready_items": 2,
+    "overdue_tickets": 1,
+    "station_counts": {
+      "main": 3,
+      "grill": 1,
+      "tandoor": 2,
+      "biryani": 4,
+      "beverage": 0,
+      "dessert": 0
+    }
+  }
+}
+```
+
+---
+
+## 9. Auditing & Security
+
+- `GET /audit-logs?action=kds.item_status_updated&page=1` – Paginated audit events.
 - `GET /tenant/verify` – Tenant isolation verification header test.

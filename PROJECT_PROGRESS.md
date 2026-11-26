@@ -1,46 +1,52 @@
 # RESTAURANT OS - PROJECT PROGRESS & ARCHITECTURE AUDIT
 
 **Project Type:** Full-stack, Multi-tenant Restaurant Management System (Restaurant OS)  
-**Current Phase:** Phase 4 Completed (Staff POS, Order Rounds, KOT Dispatch, Waiter Station & Bill Settlement)  
+**Current Phase:** Phase 5 Completed (Kitchen Display System, Station Routing, Timers, Urgency Alerts & KDS Metrics)  
 **Frontend Deployment Target:** Vercel (Next.js 16 App Router, TypeScript, Tailwind CSS v4, Recharts, qrcode.react)  
 **Backend Deployment Target:** Railway (Laravel 13 REST API, PHP 8.3, Sanctum, Spatie Permission)  
 **Future Final Target:** Hostinger Unlimited Shared Hosting (Zero-daemon architecture, PHP + MySQL 8)  
 
 ---
 
-## 1. Executive Summary of Phase 4 Deliverables
+## 1. Executive Summary of Phase 5 Deliverables
 
-Phase 4 delivers the complete operational core of **Restaurant OS**: a high-speed cashier POS terminal, automated Order Rounds, KOT ticket generation, split bill settlement, and a mobile-optimized handheld Waiter Station.
+Phase 5 introduces the high-contrast **Kitchen Display System (KDS)**, connecting floor operations and waitstaff directly with chefs across specialized kitchen preparation stations.
 
 ### Completed Features:
 
-- [x] **High-Speed Staff POS Terminal (`/pos`)**
-  - **Multi-Service Modes:** Fast toggle between **Dine-In**, **Takeaway** (packaging charge support), and **Delivery**.
-  - **Visual Table Strip:** Real-time table status chips (Available = Green, Occupied = Blue, Billed = Purple).
-  - **Active Table Order Detection:** Selecting an occupied table immediately detects the active order session, displays the active order number and round count, and switches into "Add Round" mode.
-  - **Category & Item Browsing:** Horizontal category pills, fast veg/non-veg filter pills, instant name/code search.
-  - **Customization Modal:** Portion/variant selection (e.g. *Regular* vs *Family Pack*), customizable add-on checkboxes with dynamic price calculation, and kitchen notes input (e.g. *"Less spicy, no coriander"*).
+- [x] **Kitchen Display System Interface (`/kitchen`)**
+  - **High-Contrast Dark-on-White Kitchen Layout:** Built specifically for chef visibility and quick touch interactions in busy kitchen environments.
+  - **Station Routing Tabs:** Allows locking any kitchen display screen into a specific prep station or viewing the master kitchen queue:
+    - `All Stations` (Master Kitchen Controller)
+    - `Main Curries` (`main`)
+    - `Dum Biryani` (`biryani`)
+    - `Clay Tandoor` (`tandoor`)
+    - `Grill & Kebabs` (`grill`)
+    - `Bar & Beverages` (`beverage`)
+    - `Desserts & Sweets` (`dessert`)
+  - **Live Station Summary Metrics:** Header bar displaying real-time counts for pending dishes, currently cooking items, ready-for-pickup dishes, and overdue tickets.
 
-- [x] **Order Rounds & KOT Ticket Dispatch**
-  - **Multi-Round Ordering:** When additional items are ordered for an occupied table, they are automatically batched into an incremental round (Round 1, Round 2, Round 3) while keeping a single consolidated bill.
-  - **Kitchen Order Ticket (KOT):** Each round generates an unpredictable sequential ticket (`KOT-YYYYMMDD-XXX`) routing items to their designated kitchen station (`main`, `grill`, `tandoor`, `biryani`, `beverage`, `dessert`).
-  - **KOT Preview Modal:** Printable ticket with ticket number, table number, server, item portions, and special instructions.
+- [x] **Preparation Timers & Color-Coded Urgency**
+  - **Elapsed Time Tracking:** Dynamic clock tracking minutes elapsed since each ticket was fired by POS or Waitstaff.
+  - **3-Tier Urgency Thresholds:**
+    - **Normal (< 10 mins):** Subtle border (`#EAE7E0`), green timer badge (`#39845C`).
+    - **Attention (10–20 mins):** Amber warning border (`#D69A3A`) and amber timer badge.
+    - **Overdue (> 20 mins):** High-visibility red alert border (`#C84D4D`), red timer badge with visual pulse.
 
-- [x] **Bill Settlement & Split Payment Collection**
-  - **Multi-Mode Payments:** Single or Split payment support across **Cash**, **Card**, and **UPI**.
-  - **Cash Tender & Change Engine:** Pre-configured denomination buttons (₹500, ₹1000, ₹2000), cash received input, and automatic change return calculation.
-  - **Split Settlement:** Enter multiple payment splits (e.g., part Cash, part UPI) with live validation preventing under-payment.
-  - **Tax Invoice Receipt Modal:** Generates unique sequential tax invoice numbers (`INV-YYYYMMDD-XXXX`), full itemized tax breakdown (5% GST), and thermal receipt printing layout.
-  - **Table Auto-Reset:** Automatically transitions table status to `cleaning` upon bill settlement.
+- [x] **Ticket Layout & Dish Preparation Stepper**
+  - **Ticket Cards:** Displays KOT number (monospace font), Table number (or Takeaway / Delivery badge), Table location, Server name, and incremental Round Badges (`ROUND 2` in bold terracotta).
+  - **Item Details:** Large bold quantity multiplier, portion size badge (e.g. *Family Pack*), customizable add-ons list.
+  - **Cooking Notes Banner:** High-visibility amber banner highlighting guest allergies and preferences (e.g. *"⚠️ Note: Less spicy, no coriander"*).
+  - **Step-by-Step Status Flow:**
+    - Tap **`Start Prep`** (`pending` -> `preparing` with cooking flame icon).
+    - Tap **`Cooking...`** (`preparing` -> `ready` with checkmark icon).
+    - Automatically updates the master order status and notifies floor waitstaff.
+  - **One-Click Batch "Mark Whole Ticket Ready":** Completes all pending dishes on the ticket simultaneously and alerts the waitstaff for pickup.
 
-- [x] **Mobile-Optimized Waiter Station (`/waiter`)**
-  - **Handheld-First Design:** Optimized for 5–7 inch mobile phone and tablet touchscreens.
-  - **Floor Shift Dashboard:** Logged-in waiter details (*Arun*), live shift counters (My Tables, Occupied, Ready to Serve).
-  - **Filter Tabs:** *All Tables*, *My Assigned Tables*, *Occupied*, *Ready to Serve*.
-  - **Real-Time Dish Prep Tracker:** Displays item status directly from the kitchen (`pending`, `preparing`, `ready`, `served`).
-  - **One-Tap "Mark Served":** Instant button to mark food as served when kitchen marks dishes ready.
-  - **Rapid Order Pad Drawer:** Fast handheld ordering directly at the guest's table with category filters and instant kitchen firing.
-  - **Quick Status Dialog:** Instant table status switcher (*Available*, *Occupied*, *Billed*, *Cleaning*).
+- [x] **Synthesizer Kitchen Chime & Recall Mode**
+  - **Zero-Dependency Audio Chime:** Built-in Web Audio API synthesizer that chimes when new tickets are fired to the kitchen.
+  - **Recall Completed Mode:** Toggle to inspect recently completed or served tickets from the past 4 hours in case of customer or waitstaff queries.
+  - **Real-Time Polling:** Synchronizes live kitchen state every 5 seconds.
 
 ---
 
@@ -55,11 +61,11 @@ All accounts use password: `password123`
 | **Branch Manager** | `manager@grandfeast.com` | Downtown Flagship | Branch operations, waiter assignment, daily sales |
 | **Cashier / POS** | `cashier@grandfeast.com` | Downtown Flagship | POS ordering, table billing, payment collection |
 | **Waiter** | `waiter@grandfeast.com` | Downtown Flagship | Handheld order pad, assigned tables, mark served |
-| **Kitchen Chef** | `kitchen@grandfeast.com` | Downtown Flagship | Kitchen KDS queue, preparation status |
+| **Kitchen Chef** | `kitchen@grandfeast.com` | Downtown Flagship | Kitchen KDS queue, station routing, mark ready |
 
 ---
 
-## 3. Database Schema Overview (Phase 1 through Phase 4)
+## 3. Database Schema Overview (Cumulative)
 
 ```mermaid
 erDiagram
@@ -93,9 +99,9 @@ erDiagram
 
 ```
 Backend Test Suite (PHPUnit 12.5 / Laravel 13):
-Tests: 34 passed, 0 failed (100% pass rate)
-Assertions: 155
-Duration: 13.51s
+Tests: 39 passed, 0 failed (100% pass rate)
+Assertions: 186
+Duration: 18.26s
 
 Feature Test Breakdown:
 Phase 1: Authentication & Tenant Isolation
@@ -140,6 +146,13 @@ Phase 4: Staff POS, KOT & Order Rounds
   ✓ test_cannot_settle_with_insufficient_payment
   ✓ test_cancel_order_with_mandatory_reason_and_free_table
 
+Phase 5: Kitchen Display System (KDS)
+  ✓ test_kitchen_staff_can_retrieve_kds_tickets
+  ✓ test_kitchen_staff_can_filter_by_station
+  ✓ test_chef_can_update_item_status
+  ✓ test_chef_can_batch_mark_entire_ticket_as_ready
+  ✓ test_kds_summary_metrics
+
 Frontend Build (Next.js 16 Turbopack):
   ✓ TypeScript type check passed (0 errors)
   ✓ Compiled routes:
@@ -148,6 +161,7 @@ Frontend Build (Next.js 16 Turbopack):
       ○ /audit-logs
       ○ /dashboard
       ○ /forgot-password
+      ○ /kitchen        [Phase 5 Kitchen Display System]
       ○ /login
       ○ /menu
       ○ /pos            [Phase 4 POS Terminal]
@@ -162,12 +176,16 @@ Frontend Build (Next.js 16 Turbopack):
 
 ---
 
-## 5. Next Phase: Phase 5 Scope
+## 5. Next Phase: Phase 6 Scope
 
-**Phase 5: Kitchen Display System (KDS)**
-- Real-time kitchen view organized by cooking station (`main`, `grill`, `tandoor`, `biryani`, `beverage`, `dessert`).
-- Ticket priority indicators: preparation timers, overdue warning alerts (e.g. >20 mins elapsed).
-- KDS Station selector for station-specific kitchen screens.
-- Interactive status stepping: Start Preparing (`preparing`) -> Ready for Pickup (`ready`) with audio cue/alert.
-- Cancellation and modification alerts directly on KDS screens.
-- Order round badges on KOT tickets.
+**Phase 6: Customer Website & QR Ordering Portal**
+- Public customer restaurant website (`/` and `/[restaurantSlug]`) with DM Serif Display branding.
+- Contactless Table QR Ordering (`/order/[qrToken]`):
+  - Direct customer menu browsing without login required.
+  - Portions, variants, and addon selection.
+  - Cart drawer and instant table order placement.
+  - Real-time customer order tracking screen (Order Placed -> Kitchen Preparing -> Ready -> Served).
+  - Digital Table Bell ("Call Waiter", "Request Water", "Request Bill").
+- Table Reservation Portal (`/reserve`):
+  - Date & time picker, guest count, seating preferences.
+  - Instant booking confirmation.

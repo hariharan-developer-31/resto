@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\V1\AddonController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\BranchController;
 use App\Http\Controllers\Api\V1\CategoryController;
+use App\Http\Controllers\Api\V1\KdsController;
 use App\Http\Controllers\Api\V1\MenuItemController;
 use App\Http\Controllers\Api\V1\OrderController;
 use App\Http\Controllers\Api\V1\RestaurantController;
@@ -94,6 +95,12 @@ Route::prefix('v1')->group(function () {
         Route::patch('/order-items/{id}/status', [OrderController::class, 'updateItemStatus']);
         Route::post('/orders/{id}/settle', [OrderController::class, 'settleBill']);
         Route::post('/orders/{id}/cancel', [OrderController::class, 'cancel']);
+
+        // Kitchen Display System (KDS)
+        Route::get('/kds/tickets', [KdsController::class, 'tickets']);
+        Route::get('/kds/summary', [KdsController::class, 'summary']);
+        Route::patch('/kds/items/{id}/status', [KdsController::class, 'updateItemStatus']);
+        Route::post('/kds/tickets/{kot}/ready', [KdsController::class, 'markTicketReady']);
 
         // Audit Logs Explorer
         Route::get('/audit-logs', [SystemController::class, 'auditLogs']);
