@@ -9,9 +9,13 @@ nixPkgs = [
     "php83Extensions.curl"
 ]
 
+[phases.install]
+cmds = [
+    "composer install --no-dev --optimize-autoloader --no-interaction"
+]
+
 [phases.build]
 cmds = [
-    "composer install --no-dev --optimize-autoloader --no-interaction",
     "php artisan config:cache",
     "php artisan route:cache"
 ]
