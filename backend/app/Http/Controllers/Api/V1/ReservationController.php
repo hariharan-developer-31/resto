@@ -95,11 +95,18 @@ class ReservationController extends Controller
         $branch = Branch::findOrFail($validated['branch_id']);
         $restaurantId = $validated['restaurant_id'] ?? $branch->restaurant_id;
 
-        // Check table conflict if table specified
+        // Check table conflict & seating capacity if table specified
         if (!empty($validated['table_id'])) {
             $table = DiningTable::findOrFail($validated['table_id']);
             if ($table->branch_id !== $branch->id) {
                 return $this->errorResponse('Selected table does not belong to the chosen branch.', 422);
+            }
+
+            if ($table->seating_capacity < (int) $validated['guest_count']) {
+                return $this->errorResponse(
+                    "Table {$table->table_number} seats {$table->seating_capacity}, which is insufficient for {$validated['guest_count']} guests.",
+                    422
+                );
             }
 
             if (Reservation::hasTableConflict($table->id, $validated['reservation_date'], $validated['reservation_time'])) {
@@ -210,6 +217,13 @@ class ReservationController extends Controller
                 if (!$tableId) {
                     return $this->errorResponse('Please specify or assign a table before seating the guest.', 422);
                 }
+                $seatTable = DiningTable::findOrFail($tableId);
+                if ((int) $seatTable->branch_id !== (int) $reservation->branch_id) {
+                    return $this->errorResponse('Selected table does not belong to this reservation branch.', 422);
+                }
+                if ($seatTable->status === 'out_of_service') {
+                    return $this->errorResponse('Selected table is currently out of service.', 422);
+                }
                 $reservation->seatGuest($tableId);
                 break;
 
@@ -261,6 +275,13 @@ class ReservationController extends Controller
 
         if ($table->branch_id !== $reservation->branch_id) {
             return $this->errorResponse('Selected table does not belong to this reservation branch.', 422);
+        }
+
+        if ($table->seating_capacity < (int) $reservation->guest_count) {
+            return $this->errorResponse(
+                "Table {$table->table_number} seats {$table->seating_capacity}, which is insufficient for {$reservation->guest_count} guests.",
+                422
+            );
         }
 
         $date = $reservation->reservation_date instanceof \DateTimeInterface 

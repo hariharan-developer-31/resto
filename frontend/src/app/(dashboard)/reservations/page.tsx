@@ -66,6 +66,7 @@ export default function ReservationsPage() {
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [page, setPage] = useState<number>(1);
 
   // Modals state
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -92,12 +93,13 @@ export default function ReservationsPage() {
 
   // Fetch Reservations
   const { data: resData, isLoading, refetch, isFetching } = useQuery({
-    queryKey: ['reservations', activeRestaurant?.id, activeBranch?.id, selectedDate, statusFilter, searchQuery],
+    queryKey: ['reservations', activeRestaurant?.id, activeBranch?.id, selectedDate, statusFilter, searchQuery, page],
     queryFn: async () => {
       const params = new URLSearchParams();
       if (selectedDate) params.append('date', selectedDate);
       if (statusFilter !== 'all') params.append('status', statusFilter);
       if (searchQuery) params.append('search', searchQuery);
+      params.append('page', String(page));
 
       const res = await apiRequest(`reservations?${params.toString()}`, {
         restaurantId: activeRestaurant?.id,
@@ -105,14 +107,15 @@ export default function ReservationsPage() {
       });
       return res.data;
     },
-    enabled: !!activeRestaurant?.id,
+    enabled: !!activeRestaurant?.id && !!selectedDate,
   });
 
-  // Fetch Tables for Assignment
+  // Fetch Tables for Assignment (unwrap { tables, branch, locations })
   const { data: tablesData } = useQuery({
-    queryKey: ['dining-tables', activeBranch?.id],
+    queryKey: ['dining-tables', activeRestaurant?.id, activeBranch?.id],
     queryFn: async () => {
       const res = await apiRequest('tables', {
+        restaurantId: activeRestaurant?.id,
         branchId: activeBranch?.id,
       });
       return res.data;
@@ -121,7 +124,10 @@ export default function ReservationsPage() {
   });
 
   const reservations: Reservation[] = resData?.data || [];
-  const diningTables: DiningTable[] = tablesData || [];
+  const lastPage: number = resData?.last_page || 1;
+  const diningTables: DiningTable[] = Array.isArray(tablesData)
+    ? tablesData
+    : tablesData?.tables || [];
 
   // Metrics calculation
   const totalBookings = reservations.length;
@@ -250,9 +256,6 @@ export default function ReservationsPage() {
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-bold tracking-tight text-[#252525]">Table Reservations & Seating</h1>
-            <Badge variant="outline" className="text-[#B4D58A] border-[#B4D58A]/20 bg-[#FAF9F6]">
-              Phase 7
-            </Badge>
           </div>
           <p className="text-sm text-[#5A5D58] mt-1">
             Manage table bookings, assign seating layouts, track guest arrivals, and prevent overlapping reservations.
@@ -337,10 +340,13 @@ export default function ReservationsPage() {
         <CardContent className="p-4">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
-              {['all', 'confirmed', 'checked_in', 'seated', 'completed', 'cancelled'].map((status) => (
+              {['all', 'pending', 'confirmed', 'checked_in', 'seated', 'completed', 'cancelled', 'no_show'].map((status) => (
                 <button
                   key={status}
-                  onClick={() => setStatusFilter(status)}
+                  onClick={() => {
+                    setStatusFilter(status);
+                    setPage(1);
+                  }}
                   className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                     statusFilter === status
                       ? 'bg-[#B4D58A] text-white'
@@ -470,6 +476,17 @@ export default function ReservationsPage() {
 
                     <td className="px-6 py-4 text-right">
                       <div className="flex items-center justify-end gap-1.5">
+                        {/* Confirm Pending Booking */}
+                        {res.status === 'pending' && (
+                          <Button
+                            size="sm"
+                            onClick={() => statusMutation.mutate({ id: res.id, status: 'confirmed' })}
+                            className="h-8 text-xs bg-[#B4D58A] hover:bg-[#9EC271] text-white"
+                          >
+                            Confirm
+                          </Button>
+                        )}
+
                         {/* Seating / Check-in Actions */}
                         {res.status === 'confirmed' && (
                           <>
@@ -495,6 +512,15 @@ export default function ReservationsPage() {
                               className="h-8 text-xs bg-[#B4D58A] hover:bg-[#2F6B4A] text-white"
                             >
                               <Armchair className="w-3 h-3 mr-1" /> Seat Guest
+                            </Button>
+
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => statusMutation.mutate({ id: res.id, status: 'no_show' })}
+                              className="h-8 text-xs text-[#5A5D58] hover:text-[#252525]"
+                            >
+                              No-Show
                             </Button>
                           </>
                         )}
@@ -564,6 +590,19 @@ export default function ReservationsPage() {
             </tbody>
           </table>
         </div>
+        {lastPage > 1 && (
+          <div className="px-6 py-3 border-t border-black/[0.06] flex items-center justify-between text-xs text-[#5A5D58]">
+            <span>Page {page} of {lastPage}</span>
+            <div className="flex gap-2">
+              <Button size="sm" variant="outline" disabled={page <= 1} onClick={() => setPage((p) => p - 1)} className="h-7 text-xs">
+                Previous
+              </Button>
+              <Button size="sm" variant="outline" disabled={page >= lastPage} onClick={() => setPage((p) => p + 1)} className="h-7 text-xs">
+                Next
+              </Button>
+            </div>
+          </div>
+        )}
       </Card>
 
       {/* Modal 1: New Reservation Modal */}

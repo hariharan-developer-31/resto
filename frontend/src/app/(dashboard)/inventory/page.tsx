@@ -95,12 +95,13 @@ export default function InventoryManagementPage() {
   const activeBranch = useAuthStore((s) => s.activeBranch);
 
   // Active Tab
-  const [activeTab, setActiveTab] = useState<'stock' | 'alerts' | 'suppliers' | 'orders'>('stock');
+  const [activeTab, setActiveTab] = useState<'stock' | 'alerts' | 'suppliers' | 'orders' | 'recipes'>('stock');
 
-  // Filters
+  // Filters & Pagination
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [invPage, setInvPage] = useState<number>(1);
 
   // Modals state
   const [isAddItemModalOpen, setIsAddItemModalOpen] = useState(false);
@@ -110,6 +111,11 @@ export default function InventoryManagementPage() {
   const [isReceivePoModalOpen, setIsReceivePoModalOpen] = useState(false);
   const [selectedItemForAdjust, setSelectedItemForAdjust] = useState<InventoryItem | null>(null);
   const [selectedPoForReceive, setSelectedPoForReceive] = useState<PurchaseOrder | null>(null);
+  const [historyItemId, setHistoryItemId] = useState<number | null>(null);
+
+  // Recipe BOM state
+  const [selectedRecipeMenuId, setSelectedRecipeMenuId] = useState<number | null>(null);
+  const [recipeRows, setRecipeRows] = useState<{ inventory_item_id: number; quantity_required: number; unit: string }[]>([]);
 
   // Form states: New Inventory Item
   const [itemName, setItemName] = useState('');
@@ -154,12 +160,13 @@ export default function InventoryManagementPage() {
 
   // Fetch Inventory Items
   const { data: inventoryData, isLoading: isInvLoading, refetch: refetchInv, isFetching: isInvFetching } = useQuery({
-    queryKey: ['inventory', activeRestaurant?.id, activeBranch?.id, categoryFilter, statusFilter, searchQuery],
+    queryKey: ['inventory', activeRestaurant?.id, activeBranch?.id, categoryFilter, statusFilter, searchQuery, invPage],
     queryFn: async () => {
       const params = new URLSearchParams();
       if (categoryFilter !== 'all') params.append('category', categoryFilter);
       if (statusFilter !== 'all') params.append('status', statusFilter);
       if (searchQuery) params.append('search', searchQuery);
+      params.append('page', String(invPage));
 
       const res = await apiRequest(`inventory?${params.toString()}`, {
         restaurantId: activeRestaurant?.id,
@@ -170,8 +177,21 @@ export default function InventoryManagementPage() {
     enabled: !!activeRestaurant?.id,
   });
 
+  // Unfiltered Inventory Catalog for PO Builder & Recipe BOM dropdowns
+  const { data: allInventoryData } = useQuery({
+    queryKey: ['inventory-catalog-all', activeRestaurant?.id, activeBranch?.id],
+    queryFn: async () => {
+      const res = await apiRequest('inventory?per_page=100', {
+        restaurantId: activeRestaurant?.id,
+        branchId: activeBranch?.id,
+      });
+      return res.data?.data || [];
+    },
+    enabled: !!activeRestaurant?.id,
+  });
+
   // Fetch Low Stock Alerts
-  const { data: alertsData } = useQuery({
+  const { data: alertsData, refetch: refetchAlerts } = useQuery({
     queryKey: ['inventory-alerts', activeRestaurant?.id, activeBranch?.id],
     queryFn: async () => {
       const res = await apiRequest('inventory/alerts', {
@@ -181,6 +201,73 @@ export default function InventoryManagementPage() {
       return res.data;
     },
     enabled: !!activeRestaurant?.id,
+  });
+
+  // Fetch Stock Movement History when modal open
+  const { data: historyItemDetail, isLoading: isHistoryLoading } = useQuery({
+    queryKey: ['inventory-history', historyItemId],
+    queryFn: async () => {
+      const res = await apiRequest(`inventory/${historyItemId}`, {
+        restaurantId: activeRestaurant?.id,
+        branchId: activeBranch?.id,
+      });
+      return res.data;
+    },
+    enabled: !!historyItemId,
+  });
+
+  // Fetch Menu Items for Recipe BOM Tab
+  const { data: recipeMenuItems = [] } = useQuery({
+    queryKey: ['menu-items-for-bom', activeRestaurant?.id],
+    queryFn: async () => {
+      const res = await apiRequest('menu-items?per_page=100', {
+        restaurantId: activeRestaurant?.id,
+      });
+      return res.data?.data || res.data || [];
+    },
+    enabled: !!activeRestaurant?.id && activeTab === 'recipes',
+  });
+
+  // Fetch Recipe BOM for selected dish
+  const { data: activeRecipeData, isLoading: isRecipeLoading } = useQuery({
+    queryKey: ['dish-recipe', selectedRecipeMenuId],
+    queryFn: async () => {
+      const res = await apiRequest(`menu-items/${selectedRecipeMenuId}/recipe`, {
+        restaurantId: activeRestaurant?.id,
+      });
+      return res.data;
+    },
+    enabled: !!selectedRecipeMenuId && activeTab === 'recipes',
+  });
+
+  useEffect(() => {
+    if (activeRecipeData?.recipe_ingredients) {
+      setRecipeRows(
+        activeRecipeData.recipe_ingredients.map((r: any) => ({
+          inventory_item_id: r.inventory_item_id,
+          quantity_required: Number(r.quantity_required),
+          unit: r.unit || 'kg',
+        }))
+      );
+    }
+  }, [activeRecipeData]);
+
+  const saveRecipeMutation = useMutation({
+    mutationFn: async () => {
+      if (!selectedRecipeMenuId) throw new Error('Select a dish first.');
+      return await apiRequest(`menu-items/${selectedRecipeMenuId}/recipe`, {
+        method: 'POST',
+        restaurantId: activeRestaurant?.id,
+        body: JSON.stringify({ ingredients: recipeRows }),
+      });
+    },
+    onSuccess: () => {
+      toast.success('Recipe BOM saved! Orders for this dish will auto-deduct ingredients.');
+      queryClient.invalidateQueries({ queryKey: ['dish-recipe', selectedRecipeMenuId] });
+    },
+    onError: (err: any) => {
+      toast.error(err?.message || 'Failed to save recipe BOM.');
+    },
   });
 
   // Fetch Suppliers
@@ -209,12 +296,14 @@ export default function InventoryManagementPage() {
   });
 
   const inventoryItems: InventoryItem[] = inventoryData?.data || [];
+  const invLastPage: number = inventoryData?.last_page || 1;
+  const catalogItems: InventoryItem[] = allInventoryData || inventoryItems;
   const lowStockAlerts: InventoryItem[] = alertsData || [];
   const suppliers: Supplier[] = suppliersData || [];
   const purchaseOrders: PurchaseOrder[] = purchaseOrdersData?.data || [];
 
   // Summary Metrics
-  const totalItemCount = inventoryItems.length;
+  const totalItemCount = inventoryData?.total ?? inventoryItems.length;
   const lowStockCount = lowStockAlerts.length;
   const totalInventoryValue = inventoryItems.reduce(
     (sum, item) => sum + Number(item.current_stock) * Number(item.unit_cost),
@@ -339,12 +428,9 @@ export default function InventoryManagementPage() {
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-bold tracking-tight text-[#252525]">Inventory & Supply Chain</h1>
-            <Badge variant="outline" className="text-[#B4D58A] border-[#B4D58A]/20 bg-[#FAF9F6]">
-              Phase 7
-            </Badge>
           </div>
           <p className="text-sm text-[#5A5D58] mt-1">
-            Raw materials catalog, low stock replenishment alerts, supplier contacts, and purchase orders.
+            Raw materials catalog, low stock replenishment alerts, supplier contacts, purchase orders, and recipe BOMs.
           </p>
         </div>
 
@@ -354,6 +440,7 @@ export default function InventoryManagementPage() {
             size="sm"
             onClick={() => {
               refetchInv();
+              refetchAlerts();
               refetchSuppliers();
               refetchPo();
             }}
@@ -366,7 +453,13 @@ export default function InventoryManagementPage() {
 
           {activeTab === 'stock' && (
             <Button
-              onClick={() => setIsAddItemModalOpen(true)}
+              onClick={() => {
+                if (!activeBranch?.id) {
+                  toast.error('Please select an active branch first.');
+                  return;
+                }
+                setIsAddItemModalOpen(true);
+              }}
               className="bg-[#B4D58A] hover:bg-[#9EC271] text-white shadow-sm"
             >
               <Plus className="w-4 h-4 mr-2" /> Add Material
@@ -385,12 +478,16 @@ export default function InventoryManagementPage() {
           {activeTab === 'orders' && (
             <Button
               onClick={() => {
-                if (inventoryItems.length > 0) {
+                if (!activeBranch?.id) {
+                  toast.error('Please select an active branch first.');
+                  return;
+                }
+                if (catalogItems.length > 0) {
                   setPoItems([
                     {
-                      inventory_item_id: inventoryItems[0].id,
+                      inventory_item_id: catalogItems[0].id,
                       quantity_ordered: 10,
-                      unit_cost: Number(inventoryItems[0].unit_cost),
+                      unit_cost: Number(catalogItems[0].unit_cost),
                     },
                   ]);
                 }
@@ -520,6 +617,18 @@ export default function InventoryManagementPage() {
             {purchaseOrders.length}
           </span>
         </button>
+
+        <button
+          onClick={() => setActiveTab('recipes')}
+          className={`pb-3 text-sm font-semibold flex items-center gap-2 border-b-2 transition-colors ${
+            activeTab === 'recipes'
+              ? 'border-[#B4D58A] text-[#B4D58A]'
+              : 'border-transparent text-[#5A5D58] hover:text-[#252525]'
+          }`}
+        >
+          <SlidersHorizontal className="w-4 h-4" />
+          <span>Recipe BOMs</span>
+        </button>
       </div>
 
       {/* Tab 1: Stock Items Catalog */}
@@ -527,31 +636,64 @@ export default function InventoryManagementPage() {
         <div className="space-y-4">
           {/* Filters Bar */}
           <Card className="border-black/[0.06] bg-white shadow-xs">
-            <CardContent className="p-4 flex flex-col md:flex-row items-center justify-between gap-4">
-              <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
-                {['all', 'meat', 'poultry', 'dairy', 'produce', 'spices', 'dry_goods', 'beverages', 'packaging'].map((cat) => (
-                  <button
-                    key={cat}
-                    onClick={() => setCategoryFilter(cat)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                      categoryFilter === cat
-                        ? 'bg-[#B4D58A] text-white'
-                        : 'bg-[#F3DA8A]/25 text-[#5A5D58] hover:bg-black/[0.06] hover:text-[#252525]'
-                    }`}
-                  >
-                    {cat.charAt(0).toUpperCase() + cat.slice(1).replace('_', ' ')}
-                  </button>
-                ))}
+            <CardContent className="p-4 space-y-3">
+              <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+                <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
+                  {['all', 'meat', 'seafood', 'poultry', 'dairy', 'produce', 'spices', 'dry_goods', 'beverages', 'packaging'].map((cat) => (
+                    <button
+                      key={cat}
+                      onClick={() => {
+                        setCategoryFilter(cat);
+                        setInvPage(1);
+                      }}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                        categoryFilter === cat
+                          ? 'bg-[#B4D58A] text-white'
+                          : 'bg-[#F3DA8A]/25 text-[#5A5D58] hover:bg-black/[0.06] hover:text-[#252525]'
+                      }`}
+                    >
+                      {cat.charAt(0).toUpperCase() + cat.slice(1).replace('_', ' ')}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="relative w-full md:w-64">
+                  <Search className="w-4 h-4 absolute left-3 top-2.5 text-[#8E928B]" />
+                  <Input
+                    placeholder="Search ingredient or SKU..."
+                    value={searchQuery}
+                    onChange={(e) => {
+                      setSearchQuery(e.target.value);
+                      setInvPage(1);
+                    }}
+                    className="pl-9 text-xs h-9 border-black/[0.06] bg-[#FAF9F6]"
+                  />
+                </div>
               </div>
 
-              <div className="relative w-full md:w-64">
-                <Search className="w-4 h-4 absolute left-3 top-2.5 text-[#8E928B]" />
-                <Input
-                  placeholder="Search ingredient or SKU..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9 text-xs h-9 border-black/[0.06] bg-[#FAF9F6]"
-                />
+              <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-black/[0.04]">
+                <span className="text-[11px] font-semibold text-[#5A5D58] mr-1">Stock Status:</span>
+                {[
+                  { id: 'all', label: 'All' },
+                  { id: 'in_stock', label: 'In Stock' },
+                  { id: 'low_stock', label: 'Low Stock' },
+                  { id: 'out_of_stock', label: 'Out of Stock' },
+                ].map((st) => (
+                  <button
+                    key={st.id}
+                    onClick={() => {
+                      setStatusFilter(st.id);
+                      setInvPage(1);
+                    }}
+                    className={`px-2.5 py-1 rounded-md text-[11px] font-semibold transition-colors ${
+                      statusFilter === st.id
+                        ? 'bg-[#252525] text-white'
+                        : 'bg-[#FAF9F6] text-[#5A5D58] hover:bg-black/[0.06]'
+                    }`}
+                  >
+                    {st.label}
+                  </button>
+                ))}
               </div>
             </CardContent>
           </Card>
@@ -631,17 +773,27 @@ export default function InventoryManagementPage() {
                           <td className="px-6 py-4">{getStatusBadge(item.status)}</td>
 
                           <td className="px-6 py-4 text-right">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => {
-                                setSelectedItemForAdjust(item);
-                                setIsAdjustStockModalOpen(true);
-                              }}
-                              className="h-8 text-xs border-black/[0.06] hover:bg-[#F3DA8A]/25 text-[#252525]"
-                            >
-                              <SlidersHorizontal className="w-3 h-3 mr-1" /> Adjust Stock
-                            </Button>
+                            <div className="flex items-center justify-end gap-1.5">
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => setHistoryItemId(item.id)}
+                                className="h-8 text-xs text-[#5A5D58] hover:text-[#252525]"
+                              >
+                                <History className="w-3.5 h-3.5 mr-1" /> Ledger
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => {
+                                  setSelectedItemForAdjust(item);
+                                  setIsAdjustStockModalOpen(true);
+                                }}
+                                className="h-8 text-xs border-black/[0.06] hover:bg-[#F3DA8A]/25 text-[#252525]"
+                              >
+                                <SlidersHorizontal className="w-3 h-3 mr-1" /> Adjust Stock
+                              </Button>
+                            </div>
                           </td>
                         </tr>
                       );
@@ -650,6 +802,19 @@ export default function InventoryManagementPage() {
                 </tbody>
               </table>
             </div>
+            {invLastPage > 1 && (
+              <div className="px-6 py-3 border-t border-black/[0.06] flex items-center justify-between text-xs text-[#5A5D58]">
+                <span>Page {invPage} of {invLastPage}</span>
+                <div className="flex gap-2">
+                  <Button size="sm" variant="outline" disabled={invPage <= 1} onClick={() => setInvPage((p) => p - 1)} className="h-7 text-xs">
+                    Previous
+                  </Button>
+                  <Button size="sm" variant="outline" disabled={invPage >= invLastPage} onClick={() => setInvPage((p) => p + 1)} className="h-7 text-xs">
+                    Next
+                  </Button>
+                </div>
+              </div>
+            )}
           </Card>
         </div>
       )}
@@ -833,14 +998,27 @@ export default function InventoryManagementPage() {
                         </Badge>
                       </td>
                       <td className="px-6 py-4 text-right">
-                        {po.status !== 'received' && (
+                        {po.status !== 'received' && po.status !== 'cancelled' && (
                           <Button
                             size="sm"
-                            onClick={() => {
-                              setSelectedPoForReceive(po);
+                            onClick={async () => {
+                              let poWithItems = po;
+                              if (!po.items || po.items.length === 0) {
+                                try {
+                                  const detail = await apiRequest(`purchase-orders/${po.id}`, {
+                                    restaurantId: activeRestaurant?.id,
+                                    branchId: activeBranch?.id,
+                                  });
+                                  if (detail?.data) poWithItems = detail.data;
+                                } catch {
+                                  // fallback
+                                }
+                              }
+                              setSelectedPoForReceive(poWithItems);
                               const initialQtyMap: { [id: number]: number } = {};
-                              po.items?.forEach((item) => {
-                                initialQtyMap[item.id] = Number(item.quantity_ordered) - Number(item.quantity_received);
+                              poWithItems.items?.forEach((item) => {
+                                const rem = Math.max(0, Number(item.quantity_ordered) - Number(item.quantity_received));
+                                initialQtyMap[item.id] = Number(rem.toFixed(3));
                               });
                               setReceivedQuantities(initialQtyMap);
                               setIsReceivePoModalOpen(true);
@@ -857,6 +1035,142 @@ export default function InventoryManagementPage() {
               </tbody>
             </table>
           </div>
+        </Card>
+      )}
+
+      {/* Tab 5: Recipe Bill of Materials (BOM) */}
+      {activeTab === 'recipes' && (
+        <Card className="border-black/[0.06] bg-white shadow-xs">
+          <CardHeader className="pb-3 border-b border-black/[0.06]">
+            <CardTitle className="text-lg text-[#252525]">Recipe Bill of Materials (BOM)</CardTitle>
+            <CardDescription className="text-xs text-[#5A5D58]">
+              Map menu dishes to raw material quantities. Placing POS or QR orders automatically deducts these ingredients from branch stock.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="p-5 space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-end gap-3">
+              <div className="flex-1 space-y-1">
+                <label className="text-xs font-semibold text-[#252525]">Select Menu Dish</label>
+                <select
+                  value={selectedRecipeMenuId ?? ''}
+                  onChange={(e) => {
+                    const val = e.target.value ? Number(e.target.value) : null;
+                    setSelectedRecipeMenuId(val);
+                    setRecipeRows([]);
+                  }}
+                  className="w-full h-10 px-3 rounded-lg border border-black/[0.08] bg-[#FAF9F6] text-xs font-medium text-[#252525]"
+                >
+                  <option value="">Choose a dish to edit its recipe...</option>
+                  {recipeMenuItems.map((m: any) => (
+                    <option key={m.id} value={m.id}>
+                      {m.name} (₹{Number(m.base_price).toFixed(2)})
+                    </option>
+                  ))}
+                </select>
+              </div>
+              {selectedRecipeMenuId && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    if (catalogItems.length === 0) {
+                      toast.error('Add raw materials first before building a recipe.');
+                      return;
+                    }
+                    setRecipeRows((prev) => [
+                      ...prev,
+                      {
+                        inventory_item_id: catalogItems[0].id,
+                        quantity_required: 0.1,
+                        unit: catalogItems[0].unit || 'kg',
+                      },
+                    ]);
+                  }}
+                  className="h-10 text-xs"
+                >
+                  <Plus className="w-3.5 h-3.5 mr-1" /> Add Ingredient
+                </Button>
+              )}
+            </div>
+
+            {selectedRecipeMenuId && (
+              isRecipeLoading ? (
+                <p className="text-xs text-[#5A5D58] py-4">Loading recipe ingredients...</p>
+              ) : (
+                <div className="space-y-2">
+                  {recipeRows.length === 0 ? (
+                    <p className="text-xs text-[#5A5D58] py-6 text-center bg-[#FAF9F6] rounded-xl border border-dashed border-black/[0.08]">
+                      No ingredients configured for this dish yet. Click &ldquo;Add Ingredient&rdquo; to map raw materials.
+                    </p>
+                  ) : (
+                    recipeRows.map((row, idx) => (
+                      <div key={idx} className="grid grid-cols-12 gap-2 items-center p-2.5 rounded-xl bg-[#FAF9F6] border border-black/[0.06]">
+                        <select
+                          value={row.inventory_item_id}
+                          onChange={(e) => {
+                            const id = Number(e.target.value);
+                            const found = catalogItems.find((c) => c.id === id);
+                            setRecipeRows((prev) =>
+                              prev.map((r, i) =>
+                                i === idx ? { ...r, inventory_item_id: id, unit: found?.unit || r.unit } : r
+                              )
+                            );
+                          }}
+                          className="col-span-6 h-8 px-2 rounded border border-black/[0.06] bg-white text-xs text-[#252525]"
+                        >
+                          {catalogItems.map((c) => (
+                            <option key={c.id} value={c.id}>
+                              {c.name} ({c.unit})
+                            </option>
+                          ))}
+                        </select>
+                        <Input
+                          type="number"
+                          step="0.001"
+                          min="0.001"
+                          value={row.quantity_required}
+                          onChange={(e) =>
+                            setRecipeRows((prev) =>
+                              prev.map((r, i) => (i === idx ? { ...r, quantity_required: parseFloat(e.target.value) || 0 } : r))
+                            )
+                          }
+                          className="col-span-3 h-8 text-xs bg-white"
+                        />
+                        <Input
+                          value={row.unit}
+                          onChange={(e) =>
+                            setRecipeRows((prev) =>
+                              prev.map((r, i) => (i === idx ? { ...r, unit: e.target.value } : r))
+                            )
+                          }
+                          className="col-span-2 h-8 text-xs bg-white"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setRecipeRows((prev) => prev.filter((_, i) => i !== idx))}
+                          className="col-span-1 text-red-500 hover:text-red-700 text-xs font-bold"
+                        >
+                          <X className="w-4 h-4 mx-auto" />
+                        </button>
+                      </div>
+                    ))
+                  )}
+
+                  <div className="flex justify-end pt-3">
+                    <Button
+                      type="button"
+                      disabled={saveRecipeMutation.isPending}
+                      onClick={() => saveRecipeMutation.mutate()}
+                      className="bg-[#B4D58A] hover:bg-[#9EC271] text-white text-xs h-9"
+                    >
+                      {saveRecipeMutation.isPending ? 'Saving...' : 'Save Recipe BOM'}
+                    </Button>
+                  </div>
+                </div>
+              )
+            )}
+          </CardContent>
         </Card>
       )}
 
@@ -1362,13 +1676,13 @@ export default function InventoryManagementPage() {
                     variant="ghost"
                     size="sm"
                     onClick={() => {
-                      if (inventoryItems.length > 0) {
+                      if (catalogItems.length > 0) {
                         setPoItems([
                           ...poItems,
                           {
-                            inventory_item_id: inventoryItems[0].id,
+                            inventory_item_id: catalogItems[0].id,
                             quantity_ordered: 5,
-                            unit_cost: Number(inventoryItems[0].unit_cost),
+                            unit_cost: Number(catalogItems[0].unit_cost),
                           },
                         ]);
                       }
@@ -1381,14 +1695,13 @@ export default function InventoryManagementPage() {
 
                 <div className="space-y-2 max-h-48 overflow-y-auto">
                   {poItems.map((item, idx) => {
-                    const inv = inventoryItems.find((i) => i.id === item.inventory_item_id);
                     return (
                       <div key={idx} className="flex items-center gap-2 p-2 rounded-lg bg-[#FAF9F6] border border-black/[0.06]">
                         <select
                           value={item.inventory_item_id}
                           onChange={(e) => {
                             const newId = parseInt(e.target.value, 10);
-                            const found = inventoryItems.find((i) => i.id === newId);
+                            const found = catalogItems.find((i) => i.id === newId);
                             const updated = [...poItems];
                             updated[idx] = {
                               ...updated[idx],
@@ -1399,7 +1712,7 @@ export default function InventoryManagementPage() {
                           }}
                           className="w-1/2 h-8 px-2 rounded border border-black/[0.06] bg-white text-xs text-[#252525]"
                         >
-                          {inventoryItems.map((invItem) => (
+                          {catalogItems.map((invItem) => (
                             <option key={invItem.id} value={invItem.id}>
                               {invItem.name} ({invItem.unit})
                             </option>
@@ -1515,6 +1828,7 @@ export default function InventoryManagementPage() {
                       type="number"
                       step="0.01"
                       min="0"
+                      max={Math.max(0, Number(item.quantity_ordered) - Number(item.quantity_received))}
                       value={receivedQuantities[item.id] ?? 0}
                       onChange={(e) => {
                         setReceivedQuantities({
@@ -1554,6 +1868,56 @@ export default function InventoryManagementPage() {
                 className="text-xs bg-[#B4D58A] hover:bg-[#2F6B4A] text-white"
               >
                 {receivePoMutation.isPending ? 'Updating...' : 'Accept Goods & Increment Stock'}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal 6: Stock Movement Ledger History */}
+      {historyItemId && (
+        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-lg w-full p-6 border border-black/[0.06] space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-black/[0.06]">
+              <div>
+                <h3 className="font-bold text-base text-[#252525]">
+                  Stock Ledger — {historyItemDetail?.name || 'Loading...'}
+                </h3>
+                <p className="text-xs text-[#5A5D58]">Recent 20 audited stock movements</p>
+              </div>
+              <button onClick={() => setHistoryItemId(null)} className="text-[#8E928B] hover:text-[#252525]">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="max-h-72 overflow-y-auto divide-y divide-black/[0.06]">
+              {isHistoryLoading ? (
+                <p className="text-xs text-center text-[#5A5D58] py-8">Loading ledger...</p>
+              ) : !historyItemDetail?.stock_movements?.length ? (
+                <p className="text-xs text-center text-[#5A5D58] py-8">No stock movements recorded yet.</p>
+              ) : (
+                historyItemDetail.stock_movements.map((m: any) => (
+                  <div key={m.id} className="py-2.5 flex items-center justify-between text-xs">
+                    <div>
+                      <span className="font-semibold capitalize text-[#252525]">
+                        {String(m.movement_type).replace('_', ' ')}
+                      </span>
+                      <p className="text-[11px] text-[#5A5D58]">{m.reason || m.notes || '—'}</p>
+                    </div>
+                    <div className="text-right">
+                      <span className={`font-bold ${Number(m.quantity) >= 0 ? 'text-[#2F6B4A]' : 'text-red-500'}`}>
+                        {Number(m.quantity) >= 0 ? '+' : ''}{Number(m.quantity).toFixed(3)}
+                      </span>
+                      <p className="text-[10px] text-[#8E928B]">Bal: {Number(m.balance_after).toFixed(3)}</p>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+
+            <div className="flex justify-end pt-2 border-t border-black/[0.06]">
+              <Button size="sm" variant="outline" onClick={() => setHistoryItemId(null)} className="text-xs">
+                Close
               </Button>
             </div>
           </div>

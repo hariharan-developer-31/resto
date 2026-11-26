@@ -398,4 +398,71 @@ class PhaseSevenReservationsAndInventoryTest extends TestCase
 
         $this->assertCount(2, $getRes->json('data.recipe_ingredients'));
     }
+
+    /**
+     * Test midnight-crossing reservation conflict and table seating capacity enforcement.
+     */
+    public function test_midnight_conflict_and_table_capacity_validation(): void
+    {
+        $bookingDate = now()->addDays(4)->toDateString();
+        $smallTable = DiningTable::where('seating_capacity', '<=', 4)->firstOrFail();
+
+        // Reject guest_count exceeding table seating_capacity
+        $this->actingAs($this->manager)
+            ->withHeaders(['X-Restaurant-ID' => $this->restaurant->id, 'X-Branch-ID' => $this->branch->id])
+            ->postJson('/api/v1/reservations', [
+                'branch_id' => $this->branch->id,
+                'table_id' => $smallTable->id,
+                'customer_name' => 'Large Party',
+                'customer_phone' => '+91 90000 11111',
+                'guest_count' => $smallTable->seating_capacity + 4,
+                'reservation_date' => $bookingDate,
+                'reservation_time' => '20:00',
+            ])
+            ->assertStatus(422);
+
+        // Midnight-crossing conflict: 23:15 vs 23:45 on same table
+        Reservation::create([
+            'restaurant_id' => $this->restaurant->id,
+            'branch_id' => $this->branch->id,
+            'table_id' => $smallTable->id,
+            'customer_name' => 'Late Diner 1',
+            'customer_phone' => '+91 90000 22222',
+            'guest_count' => 2,
+            'reservation_date' => $bookingDate,
+            'reservation_time' => '23:15',
+            'status' => 'confirmed',
+        ]);
+
+        $this->assertTrue(Reservation::hasTableConflict($smallTable->id, $bookingDate, '23:45'));
+    }
+
+    /**
+     * Test placing an order automatically deducts Recipe BOM ingredients.
+     */
+    public function test_order_creation_auto_deducts_recipe_bom_inventory(): void
+    {
+        $recipe = RecipeIngredient::with(['menuItem', 'inventoryItem'])->firstOrFail();
+        $invItem = $recipe->inventoryItem;
+        $stockBefore = (float) $invItem->current_stock;
+
+        $this->actingAs($this->manager)
+            ->withHeaders([
+                'X-Restaurant-ID' => $this->restaurant->id,
+                'X-Branch-ID' => $this->branch->id,
+            ])
+            ->postJson('/api/v1/orders', [
+                'order_type' => 'takeaway',
+                'items' => [
+                    ['menu_item_id' => $recipe->menu_item_id, 'quantity' => 1],
+                ],
+            ])
+            ->assertStatus(201);
+
+        $this->assertLessThan($stockBefore, (float) $invItem->fresh()->current_stock);
+        $this->assertDatabaseHas('stock_movements', [
+            'inventory_item_id' => $invItem->id,
+            'movement_type' => 'order_deduction',
+        ]);
+    }
 }

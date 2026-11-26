@@ -16,6 +16,7 @@ use App\Models\OrderItem;
 use App\Models\OrderItemAddon;
 use App\Models\Reservation;
 use App\Models\Restaurant;
+use App\Services\InventoryDeductionService;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -208,6 +209,7 @@ class PublicGuestController extends Controller
 
             // Generate KOT Ticket
             $kotNumber = Order::generateKotNumber((int) $branchId);
+            $newOrderItems = [];
 
             // Process Items
             foreach ($validated['items'] as $itemData) {
@@ -272,6 +274,8 @@ class PublicGuestController extends Controller
                     $addonRecord['order_item_id'] = $orderItem->id;
                     OrderItemAddon::create($addonRecord);
                 }
+
+                $newOrderItems[] = $orderItem;
             }
 
             // Recalculate Totals (preserving any existing staff discount/service/packaging charges)
@@ -280,6 +284,9 @@ class PublicGuestController extends Controller
                 (float) ($order->service_charge ?? 0.00),
                 (float) ($order->packaging_charge ?? 0.00)
             );
+
+            // Auto-deduct raw materials via Recipe BOM
+            InventoryDeductionService::deductForOrderItems($order, $newOrderItems, null);
 
             // Record Audit Log
             AuditLog::log(

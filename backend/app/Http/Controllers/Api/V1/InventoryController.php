@@ -225,8 +225,15 @@ class InventoryController extends Controller
             return $this->errorResponse('Unauthorized access to this inventory item.', 403);
         }
 
+        $delta = (float) $validated['quantity'];
+        if (in_array($validated['movement_type'], ['wastage', 'spoilage'], true)) {
+            $delta = -abs($delta);
+        } elseif ($validated['movement_type'] === 'purchase_in') {
+            $delta = abs($delta);
+        }
+
         $movement = $item->adjustStock(
-            (float) $validated['quantity'],
+            $delta,
             $validated['movement_type'],
             $user->id,
             $validated['reason'],

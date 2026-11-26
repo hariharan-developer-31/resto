@@ -14,6 +14,7 @@ use App\Models\OrderItem;
 use App\Models\OrderItemAddon;
 use App\Models\Payment;
 use App\Models\Restaurant;
+use App\Services\InventoryDeductionService;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -321,6 +322,9 @@ class OrderController extends Controller
             $packagingCharge = $validated['packaging_charge'] ?? $order->packaging_charge;
 
             $order->recalculateTotals($discount, $serviceCharge, $packagingCharge);
+
+            // Auto-deduct raw materials via Recipe BOM
+            InventoryDeductionService::deductForOrderItems($order, $newOrderItems, $user->id);
 
             // Audit log
             AuditLog::log(
