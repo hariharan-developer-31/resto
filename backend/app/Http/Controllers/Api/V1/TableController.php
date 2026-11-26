@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\AuditLog;
 use App\Models\Branch;
 use App\Models\DiningTable;
-use App\Models\Restaurant;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -41,8 +40,7 @@ class TableController extends Controller
         }
 
         $query = DiningTable::where('branch_id', $branchId)
-            ->with(['waiter:id,name,username', 'branch:id,name', 'restaurant:id,name,slug'])
-            ->orderByRaw("CAST(REPLACE(table_number, 'T-', '') AS UNSIGNED) ASC, table_number ASC");
+            ->with(['waiter:id,name,username', 'branch:id,name', 'restaurant:id,name,slug']);
 
         // Status filter
         if ($status = $request->input('status')) {
@@ -59,25 +57,29 @@ class TableController extends Controller
             $query->where('waiter_id', $waiterId);
         }
 
-        $frontendUrl = env('FRONTEND_URL', 'http://localhost:3000');
+        $frontendUrl = rtrim((string) config('app.frontend_url', 'http://localhost:3000'), '/');
 
-        $tables = $query->get()->map(function ($table) use ($branch, $frontendUrl) {
-            return [
-                'id' => $table->id,
-                'restaurant_id' => $table->restaurant_id,
-                'branch_id' => $table->branch_id,
-                'table_number' => $table->table_number,
-                'seating_capacity' => $table->seating_capacity,
-                'location' => $table->location,
-                'status' => $table->status,
-                'waiter' => $table->waiter,
-                'qr_token' => $table->qr_token,
-                'qr_generated_at' => $table->qr_generated_at?->toIso8601String(),
-                'qr_ordering_url' => $table->qr_token 
-                    ? "{$frontendUrl}/order/qr/{$table->qr_token}" 
-                    : null,
-            ];
-        });
+        $tables = $query->get()
+            ->sortBy('table_number', SORT_NATURAL | SORT_FLAG_CASE)
+            ->values()
+            ->map(function ($table) use ($frontendUrl) {
+                return [
+                    'id' => $table->id,
+                    'restaurant_id' => $table->restaurant_id,
+                    'branch_id' => $table->branch_id,
+                    'table_number' => $table->table_number,
+                    'seating_capacity' => $table->seating_capacity,
+                    'location' => $table->location,
+                    'status' => $table->status,
+                    'waiter_id' => $table->waiter_id,
+                    'waiter' => $table->waiter,
+                    'qr_token' => $table->qr_token,
+                    'qr_generated_at' => $table->qr_generated_at?->toIso8601String(),
+                    'qr_ordering_url' => $table->qr_token
+                        ? "{$frontendUrl}/order/{$table->qr_token}"
+                        : null,
+                ];
+            });
 
         // Unique locations for filtering tabs
         $locations = DiningTable::where('branch_id', $branchId)
@@ -179,9 +181,9 @@ class TableController extends Controller
             return $this->errorResponse('Unauthorized access to this table.', 403);
         }
 
-        $frontendUrl = env('FRONTEND_URL', 'http://localhost:3000');
+        $frontendUrl = rtrim((string) config('app.frontend_url', 'http://localhost:3000'), '/');
         $data = $table->toArray();
-        $data['qr_ordering_url'] = $table->qr_token ? "{$frontendUrl}/order/qr/{$table->qr_token}" : null;
+        $data['qr_ordering_url'] = $table->qr_token ? "{$frontendUrl}/order/{$table->qr_token}" : null;
 
         return $this->successResponse($data, 'Table details retrieved.');
     }
@@ -305,14 +307,14 @@ class TableController extends Controller
             userId: $user->id
         );
 
-        $frontendUrl = env('FRONTEND_URL', 'http://localhost:3000');
+        $frontendUrl = rtrim((string) config('app.frontend_url', 'http://localhost:3000'), '/');
 
         return $this->successResponse([
             'table_id' => $table->id,
             'table_number' => $table->table_number,
             'qr_token' => $newToken,
             'qr_generated_at' => $table->qr_generated_at->toIso8601String(),
-            'qr_ordering_url' => "{$frontendUrl}/order/qr/{$newToken}",
+            'qr_ordering_url' => "{$frontendUrl}/order/{$newToken}",
         ], 'QR token regenerated successfully. Previous token has been revoked.');
     }
 

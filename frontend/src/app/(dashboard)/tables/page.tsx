@@ -67,9 +67,17 @@ export default function TablesManagementPage() {
   const { data: usersPayload } = useQuery({
     queryKey: ['branch-waiters', activeRestaurant?.id],
     queryFn: async () => {
-      const res = await apiRequest('users?role=Waiter&per_page=50');
-      return res.data?.data || [];
+      try {
+        const query = activeRestaurant?.id
+          ? `users?role=Waiter&per_page=50&restaurant_id=${activeRestaurant.id}`
+          : 'users?role=Waiter&per_page=50';
+        const res = await apiRequest(query);
+        return res.data?.data || [];
+      } catch {
+        return [];
+      }
     },
+    enabled: !!activeRestaurant?.id,
   });
 
   const tables: any[] = tablesPayload?.tables || [];
@@ -94,7 +102,7 @@ export default function TablesManagementPage() {
 
   const openCreateTableModal = () => {
     setSelectedTable(null);
-    setTableNumber('T-0' + (tables.length + 1));
+    setTableNumber('T-' + String(tables.length + 1).padStart(2, '0'));
     setSeatingCapacity('4');
     setLocation('AC Dining Hall');
     setWaiterId('');
@@ -568,11 +576,11 @@ export default function TablesManagementPage() {
             {/* Printable Standee Card */}
             <div
               ref={printRef}
-              className="p-6 rounded-2xl border-2 border-dashed border-[#B4D58A]/30 bg-[#FAF9F6] flex flex-col items-center text-center space-y-4"
+              className="print-area p-6 rounded-2xl border-2 border-dashed border-[#B4D58A]/30 bg-[#FAF9F6] flex flex-col items-center text-center space-y-4"
             >
               <div className="space-y-1">
-                <span className="font-bold text-lg font-bold text-[#252525] block">
-                  {activeRestaurant?.name || 'The Grand Feast'}
+                <span className="font-bold text-lg text-[#252525] block">
+                  {activeRestaurant?.name || 'Restaurant'}
                 </span>
                 <span className="text-xs text-[#5A5D58] block">
                   {activeBranch?.name} • Section: {selectedTable.location}
@@ -582,7 +590,10 @@ export default function TablesManagementPage() {
               {/* QR Image Canvas / SVG */}
               <div className="p-4 bg-white rounded-2xl shadow-sm border border-black/[0.06]">
                 <QRCodeSVG
-                  value={selectedTable.qr_ordering_url || `https://resto-os.com/order/qr/${selectedTable.qr_token}`}
+                  value={
+                    selectedTable.qr_ordering_url ||
+                    `${typeof window !== 'undefined' ? window.location.origin : ''}/order/${selectedTable.qr_token}`
+                  }
                   size={180}
                   level="H"
                   includeMargin={true}
@@ -603,7 +614,7 @@ export default function TablesManagementPage() {
             </div>
 
             {/* Controls */}
-            <div className="space-y-3 pt-2">
+            <div className="no-print space-y-3 pt-2">
               <div className="flex items-center justify-between gap-2">
                 <Button
                   onClick={handlePrintQr}

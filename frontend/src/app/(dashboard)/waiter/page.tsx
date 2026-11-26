@@ -4,6 +4,7 @@ import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
 import { useAuthStore } from '@/lib/auth-store';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
@@ -33,10 +34,23 @@ interface DiningTable {
   table_number: string;
   seating_capacity: number;
   location: string;
-  status: 'available' | 'occupied' | 'reserved' | 'billed' | 'cleaning' | 'out_of_service';
+  status: 'available' | 'occupied' | 'reserved' | 'billing' | 'cleaning' | 'out_of_service';
   waiter_id?: number;
   waiter?: { id: number; name: string };
   active_order?: any;
+}
+
+interface MenuVariant {
+  id: number;
+  name: string;
+  price: number;
+  is_default: boolean;
+}
+
+interface Addon {
+  id: number;
+  name: string;
+  price: number;
 }
 
 interface MenuItem {
@@ -47,11 +61,27 @@ interface MenuItem {
   base_price: number;
   is_available: boolean;
   kitchen_station: string;
+  variants?: MenuVariant[];
+  addons?: Addon[];
+}
+
+interface PadCartItem {
+  key: string;
+  menuItemId: number;
+  name: string;
+  variantId?: number;
+  variantName?: string;
+  addonIds: number[];
+  addonNames: string[];
+  price: number;
+  quantity: number;
 }
 
 export default function WaiterPage() {
   const queryClient = useQueryClient();
   const user = useAuthStore((s) => s.user);
+  const activeRestaurant = useAuthStore((s) => s.activeRestaurant);
+  const activeBranch = useAuthStore((s) => s.activeBranch);
 
   const [filterMode, setFilterMode] = useState<'my_tables' | 'all' | 'occupied' | 'ready'>('all');
   const [selectedTable, setSelectedTable] = useState<DiningTable | null>(null);
@@ -60,24 +90,29 @@ export default function WaiterPage() {
   const [orderPadOpen, setOrderPadOpen] = useState(false);
   const [padSearch, setPadSearch] = useState('');
   const [padCategory, setPadCategory] = useState<string>('all');
-  const [padCart, setPadCart] = useState<{ menuItemId: number; name: string; price: number; quantity: number }[]>([]);
+  const [padCart, setPadCart] = useState<PadCartItem[]>([]);
   const [padNote, setPadNote] = useState('');
+
+  // Customization Modal for Variants/Addons
+  const [customizingItem, setCustomizingItem] = useState<MenuItem | null>(null);
+  const [selectedVariant, setSelectedVariant] = useState<MenuVariant | null>(null);
+  const [selectedAddons, setSelectedAddons] = useState<Addon[]>([]);
 
   // Status Change Dialog
   const [statusDialogTable, setStatusDialogTable] = useState<DiningTable | null>(null);
 
   // Queries
   const { data: tables = [], isLoading: tablesLoading } = useQuery({
-    queryKey: ['tables'],
+    queryKey: ['tables', activeRestaurant?.id, activeBranch?.id],
     queryFn: async () => {
-      const res = await apiClient.get<any[]>('/tables');
-      return res.data || [];
+      const res = await apiClient.get<any>('/tables');
+      return Array.isArray(res.data) ? res.data : res.data?.tables || [];
     },
     refetchInterval: 5000, // Poll every 5s for real-time kitchen updates
   });
 
   const { data: activeOrders = [] } = useQuery({
-    queryKey: ['active-orders'],
+    queryKey: ['active-orders', activeRestaurant?.id, activeBranch?.id],
     queryFn: async () => {
       const res = await apiClient.get<any>('/orders?active_only=true');
       return res.data?.data || [];
@@ -86,15 +121,15 @@ export default function WaiterPage() {
   });
 
   const { data: menuItems = [] } = useQuery({
-    queryKey: ['menu-items'],
+    queryKey: ['menu-items', activeRestaurant?.id],
     queryFn: async () => {
-      const res = await apiClient.get<any>('/menu-items');
+      const res = await apiClient.get<any>('/menu-items?per_page=100');
       return res.data?.data || res.data || [];
     },
   });
 
   const { data: categories = [] } = useQuery({
-    queryKey: ['categories'],
+    queryKey: ['categories', activeRestaurant?.id],
     queryFn: async () => {
       const res = await apiClient.get<any[]>('/categories');
       return res.data || [];
@@ -115,8 +150,9 @@ export default function WaiterPage() {
   // Filter Tables
   const filteredTables = useMemo(() => {
     return tablesWithOrders.filter((tbl: any) => {
+      const assignedId = tbl.waiter_id ?? tbl.waiter?.id;
       if (filterMode === 'my_tables') {
-        return tbl.waiter_id === user?.id;
+        return assignedId === user?.id;
       }
       if (filterMode === 'occupied') {
         return tbl.status === 'occupied';
@@ -130,11 +166,40 @@ export default function WaiterPage() {
   }, [tablesWithOrders, filterMode, user?.id]);
 
   // Stats
-  const myTablesCount = tables.filter((t: DiningTable) => t.waiter_id === user?.id).length;
+  const myTablesCount = tables.filter((t: DiningTable) => (t.waiter_id ?? t.waiter?.id) === user?.id).length;
   const occupiedCount = tables.filter((t: DiningTable) => t.status === 'occupied').length;
   const readyDishesCount = activeOrders.reduce((sum: number, o: any) => {
     return sum + (o.items?.filter((i: any) => i.status === 'ready').length || 0);
   }, 0);
+
+  const addItemToPadCart = (item: MenuItem, variant: MenuVariant | null, addons: Addon[]) => {
+    const addonIds = addons.map((a) => a.id).sort((a, b) => a - b);
+    const key = `${item.id}-${variant?.id || 'base'}-${addonIds.join(',')}`;
+    const unitPrice = (variant ? Number(variant.price) : Number(item.base_price)) +
+      addons.reduce((s, a) => s + Number(a.price), 0);
+
+    setPadCart((prev) => {
+      const existing = prev.find((i) => i.key === key);
+      if (existing) {
+        return prev.map((i) => (i.key === key ? { ...i, quantity: i.quantity + 1 } : i));
+      }
+      return [
+        ...prev,
+        {
+          key,
+          menuItemId: item.id,
+          name: item.name,
+          variantId: variant?.id,
+          variantName: variant?.name,
+          addonIds,
+          addonNames: addons.map((a) => a.name),
+          price: unitPrice,
+          quantity: 1,
+        },
+      ];
+    });
+    setCustomizingItem(null);
+  };
 
   // Mutations
   const updateStatusMutation = useMutation({
@@ -143,8 +208,12 @@ export default function WaiterPage() {
       return res.data;
     },
     onSuccess: () => {
+      toast.success('Table status updated');
       queryClient.invalidateQueries({ queryKey: ['tables'] });
       setStatusDialogTable(null);
+    },
+    onError: (err: any) => {
+      toast.error(err?.message || 'Failed to update table status.');
     },
   });
 
@@ -154,31 +223,41 @@ export default function WaiterPage() {
       return res.data;
     },
     onSuccess: () => {
+      toast.success('Dish marked as served');
       queryClient.invalidateQueries({ queryKey: ['active-orders'] });
       queryClient.invalidateQueries({ queryKey: ['tables'] });
+    },
+    onError: (err: any) => {
+      toast.error(err?.message || 'Failed to update dish status.');
     },
   });
 
   const fireOrderMutation = useMutation({
     mutationFn: async () => {
-      if (!selectedTable) return;
+      if (!selectedTable) throw new Error('Please select a table first.');
       const res = await apiClient.post<any>('/orders', {
         order_type: 'dine_in',
         table_id: selectedTable.id,
         items: padCart.map((item) => ({
           menu_item_id: item.menuItemId,
+          menu_variant_id: item.variantId || null,
+          addon_ids: item.addonIds,
           quantity: item.quantity,
           special_instructions: padNote || undefined,
         })),
       });
       return res.data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      toast.success(`KOT ${data?.kot_number || ''} fired to kitchen!`);
       setOrderPadOpen(false);
       setPadCart([]);
       setPadNote('');
       queryClient.invalidateQueries({ queryKey: ['active-orders'] });
       queryClient.invalidateQueries({ queryKey: ['tables'] });
+    },
+    onError: (err: any) => {
+      toast.error(err?.message || 'Failed to send order to kitchen.');
     },
   });
 
@@ -269,7 +348,7 @@ export default function WaiterPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
         {filteredTables.map((tbl: any) => {
           const isOccupied = tbl.status === 'occupied';
-          const isMyTable = tbl.waiter_id === user?.id;
+          const isMyTable = (tbl.waiter_id ?? tbl.waiter?.id) === user?.id;
           const hasReadyDishes = tbl.active_order?.items?.some((i: any) => i.status === 'ready');
 
           return (
@@ -311,7 +390,7 @@ export default function WaiterPage() {
                           ? 'success'
                           : tbl.status === 'occupied'
                           ? 'info'
-                          : tbl.status === 'billed'
+                          : tbl.status === 'billing'
                           ? 'secondary'
                           : 'warning'
                       }
@@ -487,7 +566,12 @@ export default function WaiterPage() {
                   return matchCat && matchSearch && item.is_available;
                 })
                 .map((item: MenuItem) => {
-                  const inPadCart = padCart.find((i) => i.menuItemId === item.id);
+                  const hasOptions = (item.variants && item.variants.length > 0) || (item.addons && item.addons.length > 0);
+                  const baseKey = `${item.id}-base-`;
+                  const inPadCart = !hasOptions ? padCart.find((i) => i.key === baseKey) : null;
+                  const totalItemQty = padCart
+                    .filter((i) => i.menuItemId === item.id)
+                    .reduce((s, i) => s + i.quantity, 0);
 
                   return (
                     <div
@@ -497,9 +581,15 @@ export default function WaiterPage() {
                       <div>
                         <span className="text-xs font-semibold text-[#252525] block">
                           {item.name}
+                          {totalItemQty > 0 && hasOptions && (
+                            <span className="ml-1.5 text-[10px] bg-[#B4D58A]/25 text-[#252525] px-1.5 py-0.5 rounded-full font-bold">
+                              {totalItemQty} in pad
+                            </span>
+                          )}
                         </span>
                         <span className="text-[11px] font-bold text-[#B4D58A]">
                           ₹{Number(item.base_price).toFixed(2)}
+                          {hasOptions && <span className="text-[10px] text-[#5A5D58] font-normal ml-1">· Customizable</span>}
                         </span>
                       </div>
 
@@ -510,7 +600,7 @@ export default function WaiterPage() {
                               setPadCart((prev) =>
                                 prev
                                   .map((i) =>
-                                    i.menuItemId === item.id
+                                    i.key === baseKey
                                       ? { ...i, quantity: i.quantity - 1 }
                                       : i
                                   )
@@ -528,7 +618,7 @@ export default function WaiterPage() {
                             onClick={() => {
                               setPadCart((prev) =>
                                 prev.map((i) =>
-                                  i.menuItemId === item.id
+                                  i.key === baseKey
                                     ? { ...i, quantity: i.quantity + 1 }
                                     : i
                                 )
@@ -543,19 +633,19 @@ export default function WaiterPage() {
                         <Button
                           size="sm"
                           onClick={() => {
-                            setPadCart([
-                              ...padCart,
-                              {
-                                menuItemId: item.id,
-                                name: item.name,
-                                price: Number(item.base_price),
-                                quantity: 1,
-                              },
-                            ]);
+                            if (hasOptions) {
+                              setCustomizingItem(item);
+                              setSelectedVariant(
+                                item.variants?.find((v) => v.is_default) || item.variants?.[0] || null
+                              );
+                              setSelectedAddons([]);
+                            } else {
+                              addItemToPadCart(item, null, []);
+                            }
                           }}
-                          className="h-7 px-3 text-xs bg-[#B4D58A]/20 text-[#B4D58A] hover:bg-[#B4D58A] hover:text-white"
+                          className="h-7 px-3 text-xs bg-[#B4D58A]/20 text-[#252525] hover:bg-[#B4D58A] hover:text-white"
                         >
-                          + Add
+                          {hasOptions ? '+ Options' : '+ Add'}
                         </Button>
                       )}
                     </div>
@@ -565,6 +655,25 @@ export default function WaiterPage() {
 
             {/* Note & Bottom Submit */}
             <div className="p-3 border-t border-black/[0.06] bg-[#FAF9F6] space-y-2 shrink-0">
+              {padCart.length > 0 && (
+                <div className="max-h-20 overflow-y-auto space-y-1 text-[11px] pb-1 border-b border-black/[0.04]">
+                  {padCart.map((ci) => (
+                    <div key={ci.key} className="flex items-center justify-between text-[#5A5D58]">
+                      <span className="truncate pr-2">
+                        {ci.quantity}x {ci.name}
+                        {ci.variantName ? ` (${ci.variantName})` : ''}
+                        {ci.addonNames.length > 0 ? ` + ${ci.addonNames.join(', ')}` : ''}
+                      </span>
+                      <button
+                        onClick={() => setPadCart((prev) => prev.filter((x) => x.key !== ci.key))}
+                        className="text-red-500 hover:underline shrink-0"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
               <Input
                 placeholder="Table instructions (e.g. all food together, less salt)"
                 value={padNote}
@@ -590,6 +699,76 @@ export default function WaiterPage() {
         </div>
       )}
 
+      {/* MODAL: Waiter Item Customization (Variants & Addons) */}
+      {customizingItem && (
+        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-sm w-full border border-black/[0.06] shadow-xl p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="font-bold text-sm text-[#252525]">{customizingItem.name}</h3>
+              <button onClick={() => setCustomizingItem(null)} className="text-[#5A5D58]">
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            {customizingItem.variants && customizingItem.variants.length > 0 && (
+              <div className="space-y-1.5">
+                <p className="text-[11px] font-bold uppercase text-[#5A5D58]">Select Portion</p>
+                {customizingItem.variants.map((v) => (
+                  <button
+                    key={v.id}
+                    type="button"
+                    onClick={() => setSelectedVariant(v)}
+                    className={`w-full flex items-center justify-between p-2 rounded-lg border text-xs ${
+                      selectedVariant?.id === v.id
+                        ? 'border-[#B4D58A] bg-[#B4D58A]/15 font-bold'
+                        : 'border-black/[0.06]'
+                    }`}
+                  >
+                    <span>{v.name}</span>
+                    <span>₹{Number(v.price).toFixed(2)}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {customizingItem.addons && customizingItem.addons.length > 0 && (
+              <div className="space-y-1.5">
+                <p className="text-[11px] font-bold uppercase text-[#5A5D58]">Add-ons</p>
+                {customizingItem.addons.map((a) => {
+                  const checked = selectedAddons.some((x) => x.id === a.id);
+                  return (
+                    <button
+                      key={a.id}
+                      type="button"
+                      onClick={() =>
+                        setSelectedAddons((prev) =>
+                          checked ? prev.filter((x) => x.id !== a.id) : [...prev, a]
+                        )
+                      }
+                      className={`w-full flex items-center justify-between p-2 rounded-lg border text-xs ${
+                        checked
+                          ? 'border-[#B4D58A] bg-[#B4D58A]/15 font-semibold'
+                          : 'border-black/[0.06]'
+                      }`}
+                    >
+                      <span>{a.name}</span>
+                      <span>+₹{Number(a.price).toFixed(2)}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+
+            <Button
+              onClick={() => addItemToPadCart(customizingItem, selectedVariant, selectedAddons)}
+              className="w-full bg-[#B4D58A] hover:bg-[#9EC271] text-white text-xs h-9"
+            >
+              Add to Order Pad
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* MODAL: Quick Table Status Change */}
       {statusDialogTable && (
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
@@ -602,7 +781,7 @@ export default function WaiterPage() {
               {[
                 { status: 'available', label: 'Available (Ready for Guests)', color: 'bg-[#B4D58A]' },
                 { status: 'occupied', label: 'Occupied (Guests Seated)', color: 'bg-[#B4D58A]' },
-                { status: 'billed', label: 'Billed (Bill Requested)', color: 'bg-[#8E44AD]' },
+                { status: 'billing', label: 'Billing (Bill Requested)', color: 'bg-[#8E44AD]' },
                 { status: 'cleaning', label: 'Cleaning (Table Reset)', color: 'bg-[#F3DA8A]' },
               ].map((opt) => (
                 <button

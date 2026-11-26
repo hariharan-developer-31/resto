@@ -178,3 +178,34 @@
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(180, 213, 138, 0.7);
 }
+
+/* Clean print isolation for KOT tickets, Tax Invoices, QR Standees, and EOD Z-Reports */
+@media print {
+  body * {
+    visibility: hidden !important;
+  }
+
+  .print-area,
+  .print-area * {
+    visibility: visible !important;
+  }
+
+  .print-area {
+    position: fixed !important;
+    inset: 0 !important;
+    margin: 0 auto !important;
+    padding: 16px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    background: #FFFFFF !important;
+    box-shadow: none !important;
+    border: none !important;
+    overflow: visible !important;
+  }
+
+  .no-print,
+  .no-print * {
+    display: none !important;
+    visibility: hidden !important;
+  }
+}

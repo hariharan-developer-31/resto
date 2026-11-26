@@ -115,6 +115,7 @@ class PhaseFiveKdsTest extends TestCase
         $this->assertEquals('dine_in', $ticket['order_type']);
         $this->assertCount(2, $ticket['items']);
         $this->assertArrayHasKey('elapsed_minutes', $ticket);
+        $this->assertGreaterThanOrEqual(0, $ticket['elapsed_minutes']);
         $this->assertArrayHasKey('urgency', $ticket);
     }
 

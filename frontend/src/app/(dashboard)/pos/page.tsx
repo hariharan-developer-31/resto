@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
 import { useAuthStore } from '@/lib/auth-store';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
@@ -67,7 +68,7 @@ interface DiningTable {
   table_number: string;
   seating_capacity: number;
   location: string;
-  status: 'available' | 'occupied' | 'reserved' | 'billed' | 'cleaning' | 'out_of_service';
+  status: 'available' | 'occupied' | 'reserved' | 'billing' | 'cleaning' | 'out_of_service';
   waiter?: { id: number; name: string };
   active_order?: any;
 }
@@ -88,6 +89,9 @@ interface CartItem {
 export default function PosPage() {
   const queryClient = useQueryClient();
   const user = useAuthStore((s) => s.user);
+  const activeRestaurant = useAuthStore((s) => s.activeRestaurant);
+  const activeBranch = useAuthStore((s) => s.activeBranch);
+  const currencySymbol = activeRestaurant?.currency_symbol || '₹';
 
   // POS State
   const [orderType, setOrderType] = useState<'dine_in' | 'takeaway' | 'delivery'>('dine_in');
@@ -102,6 +106,13 @@ export default function PosPage() {
   const [packagingCharge, setPackagingCharge] = useState<number>(0);
   const [serviceCharge, setServiceCharge] = useState<number>(0);
 
+  // Reset table and cart when switching branch or restaurant
+  useEffect(() => {
+    setSelectedTable(null);
+    setCart([]);
+    setSelectedCategory('all');
+  }, [activeRestaurant?.id, activeBranch?.id]);
+
   // Modals
   const [customizingItem, setCustomizingItem] = useState<MenuItem | null>(null);
   const [selectedVariant, setSelectedVariant] = useState<MenuVariant | null>(null);
@@ -113,43 +124,44 @@ export default function PosPage() {
   const [settlementOrder, setSettlementOrder] = useState<any | null>(null);
   const [paymentMode, setPaymentMode] = useState<'cash' | 'card' | 'upi' | 'split'>('cash');
   const [tenderAmount, setTenderAmount] = useState<number>(0);
-  const [splitPayments, setSplitPayments] = useState<{ method: 'cash' | 'card' | 'upi'; amount: number }[]>([
-    { method: 'cash', amount: 0 },
-    { method: 'upi', amount: 0 },
+  const [splitPayments, setSplitPayments] = useState<{ payment_method: 'cash' | 'card' | 'upi'; amount: number }[]>([
+    { payment_method: 'cash', amount: 0 },
+    { payment_method: 'upi', amount: 0 },
+    { payment_method: 'card', amount: 0 },
   ]);
   const [invoiceData, setInvoiceData] = useState<any | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   // Fetch Categories
   const { data: categories = [] } = useQuery({
-    queryKey: ['categories'],
+    queryKey: ['categories', activeRestaurant?.id],
     queryFn: async () => {
       const res = await apiClient.get<any[]>('/categories');
       return res.data || [];
     },
   });
 
-  // Fetch Menu Items
+  // Fetch Menu Items (up to 100 items)
   const { data: menuItems = [], isLoading: itemsLoading } = useQuery({
-    queryKey: ['menu-items'],
+    queryKey: ['menu-items', activeRestaurant?.id],
     queryFn: async () => {
-      const res = await apiClient.get<any>('/menu-items');
+      const res = await apiClient.get<any>('/menu-items?per_page=100');
       return res.data?.data || res.data || [];
     },
   });
 
-  // Fetch Tables
+  // Fetch Tables (unwrap { tables, branch, locations })
   const { data: tables = [], refetch: refetchTables } = useQuery({
-    queryKey: ['tables'],
+    queryKey: ['tables', activeRestaurant?.id, activeBranch?.id],
     queryFn: async () => {
-      const res = await apiClient.get<any[]>('/tables');
-      return res.data || [];
+      const res = await apiClient.get<any>('/tables');
+      return Array.isArray(res.data) ? res.data : res.data?.tables || [];
     },
   });
 
   // Fetch Active Order for Selected Table
   const { data: activeTableOrder, refetch: refetchActiveOrder } = useQuery({
-    queryKey: ['table-active-order', selectedTable?.id],
+    queryKey: ['table-active-order', activeBranch?.id, selectedTable?.id],
     queryFn: async () => {
       if (!selectedTable?.id) return null;
       const res = await apiClient.get<any>(`/orders?table_id=${selectedTable.id}&active_only=true`);
@@ -216,7 +228,7 @@ export default function PosPage() {
     addons: Addon[],
     note: string
   ) => {
-    const cartItemId = `${item.id}-${variant?.id || 'base'}-${addons.map((a) => a.id).sort().join(',')}`;
+    const cartItemId = `${item.id}-${variant?.id || 'base'}-${addons.map((a) => a.id).sort().join(',')}-${note.trim().toLowerCase()}`;
 
     setCart((prev) => {
       const existing = prev.find((i) => i.cartItemId === cartItemId);
@@ -266,7 +278,7 @@ export default function PosPage() {
 
   // Create Order / Fire KOT Mutation
   const fireKotMutation = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (options?: { suppressKotModal?: boolean }) => {
       setErrorMsg(null);
       if (cart.length === 0) throw new Error('Cart cannot be empty.');
       if (orderType === 'dine_in' && !selectedTable) {
@@ -291,17 +303,22 @@ export default function PosPage() {
       };
 
       const res = await apiClient.post<any>('/orders', payload);
-      return res.data;
+      return { ...res.data, suppressKotModal: options?.suppressKotModal };
     },
     onSuccess: (data) => {
-      setKotData(data);
+      if (!data.suppressKotModal) {
+        setKotData(data);
+      }
       setCart([]);
+      toast.success(`KOT ${data.kot_number} sent to kitchen!`);
       queryClient.invalidateQueries({ queryKey: ['tables'] });
       queryClient.invalidateQueries({ queryKey: ['orders'] });
       refetchActiveOrder();
     },
     onError: (err: any) => {
-      setErrorMsg(err.response?.data?.message || err.message || 'Failed to place order.');
+      const msg = err?.message || 'Failed to place order.';
+      setErrorMsg(msg);
+      toast.error(msg);
     },
   });
 
@@ -311,14 +328,18 @@ export default function PosPage() {
       if (!settlementOrder) throw new Error('No order selected for settlement.');
 
       const payload: any = {
-        discount_amount: discountAmount,
-        service_charge: serviceCharge,
+        discount_amount: discountAmount > 0 ? discountAmount : Number(settlementOrder.discount_amount || 0),
+        service_charge: serviceCharge > 0 ? serviceCharge : Number(settlementOrder.service_charge || 0),
         table_status_after: 'cleaning',
       };
 
       if (paymentMode === 'split') {
+        const activeSplits = splitPayments.filter((p) => p.amount > 0);
+        if (activeSplits.length === 0) {
+          throw new Error('Enter at least one split payment amount.');
+        }
         payload.payment_method = 'split';
-        payload.payments = splitPayments.filter((p) => p.amount > 0);
+        payload.payments = activeSplits;
       } else {
         payload.payment_method = paymentMode;
         payload.paid_amount = tenderAmount || settlementOrder.total_amount;
@@ -330,13 +351,19 @@ export default function PosPage() {
     onSuccess: (data) => {
       setInvoiceData(data);
       setSettlementOrder(null);
+      setDiscountAmount(0);
+      setServiceCharge(0);
+      setPackagingCharge(0);
+      toast.success(`Invoice ${data.invoice_number} settled!`);
       queryClient.invalidateQueries({ queryKey: ['tables'] });
       queryClient.invalidateQueries({ queryKey: ['orders'] });
       refetchActiveOrder();
       refetchTables();
     },
     onError: (err: any) => {
-      setErrorMsg(err.response?.data?.message || err.message || 'Failed to settle bill.');
+      const msg = err?.message || 'Failed to settle bill.';
+      setErrorMsg(msg);
+      toast.error(msg);
     },
   });
 
@@ -398,7 +425,7 @@ export default function PosPage() {
               {tables.map((t: DiningTable) => {
                 const isSelected = selectedTable?.id === t.id;
                 const isOccupied = t.status === 'occupied';
-                const isBilled = t.status === 'billed';
+                const isBilled = t.status === 'billing';
 
                 return (
                   <button
@@ -752,30 +779,66 @@ export default function PosPage() {
         {/* Cart Calculation & Settle Footer */}
         <div className="p-3.5 border-t border-black/[0.06] bg-[#FAF9F6]/50 shrink-0 space-y-2">
           {/* Subtotal, Tax, Charges Breakdown */}
+          {/* Quick Discount & Service Charge Inputs */}
+          <div className="grid grid-cols-2 gap-2 pb-1">
+            <div>
+              <label className="text-[10px] font-semibold text-[#5A5D58] block mb-0.5">
+                Discount ({currencySymbol})
+              </label>
+              <Input
+                type="number"
+                min={0}
+                value={discountAmount || ''}
+                onChange={(e) => setDiscountAmount(Math.max(0, Number(e.target.value)))}
+                placeholder="0"
+                className="h-7 text-xs"
+              />
+            </div>
+            <div>
+              <label className="text-[10px] font-semibold text-[#5A5D58] block mb-0.5">
+                Service Charge ({currencySymbol})
+              </label>
+              <Input
+                type="number"
+                min={0}
+                value={serviceCharge || ''}
+                onChange={(e) => setServiceCharge(Math.max(0, Number(e.target.value)))}
+                placeholder="0"
+                className="h-7 text-xs"
+              />
+            </div>
+          </div>
+
           <div className="space-y-1 text-xs">
             <div className="flex justify-between text-[#5A5D58]">
               <span>Subtotal</span>
-              <span className="font-semibold text-[#252525]">₹{subtotal.toFixed(2)}</span>
+              <span className="font-semibold text-[#252525]">{currencySymbol}{subtotal.toFixed(2)}</span>
             </div>
             <div className="flex justify-between text-[#5A5D58]">
               <span>Taxes (5% GST)</span>
-              <span className="font-semibold text-[#252525]">₹{taxAmount.toFixed(2)}</span>
+              <span className="font-semibold text-[#252525]">{currencySymbol}{taxAmount.toFixed(2)}</span>
             </div>
+            {serviceCharge > 0 && (
+              <div className="flex justify-between text-[#5A5D58]">
+                <span>Service Charge</span>
+                <span className="font-semibold text-[#252525]">{currencySymbol}{serviceCharge.toFixed(2)}</span>
+              </div>
+            )}
             {packagingCharge > 0 && (
               <div className="flex justify-between text-[#5A5D58]">
                 <span>Packaging Charge</span>
-                <span className="font-semibold text-[#252525]">₹{packagingCharge.toFixed(2)}</span>
+                <span className="font-semibold text-[#252525]">{currencySymbol}{packagingCharge.toFixed(2)}</span>
               </div>
             )}
             {discountAmount > 0 && (
               <div className="flex justify-between text-[#B4D58A]">
                 <span>Discount Applied</span>
-                <span className="font-semibold">-₹{discountAmount.toFixed(2)}</span>
+                <span className="font-semibold">-{currencySymbol}{discountAmount.toFixed(2)}</span>
               </div>
             )}
             <div className="pt-2 border-t border-black/[0.06] flex justify-between items-baseline">
               <span className="font-bold text-sm text-[#252525]">Grand Total</span>
-              <span className="font-bold text-lg text-[#B4D58A]">₹{grandTotal.toFixed(2)}</span>
+              <span className="font-bold text-lg text-[#B4D58A]">{currencySymbol}{grandTotal.toFixed(2)}</span>
             </div>
           </div>
 
@@ -784,7 +847,7 @@ export default function PosPage() {
             {/* Fire KOT */}
             <Button
               disabled={cart.length === 0 || fireKotMutation.isPending}
-              onClick={() => fireKotMutation.mutate()}
+              onClick={() => fireKotMutation.mutate(undefined)}
               className="bg-[#B4D58A] hover:bg-[#9EC271] text-white text-xs font-semibold h-10 flex items-center justify-center gap-1.5 shadow-xs"
             >
               <Send className="h-3.5 w-3.5" />
@@ -794,17 +857,23 @@ export default function PosPage() {
             {/* Settle Bill (or Active Table Settlement) */}
             <Button
               variant="outline"
-              disabled={!activeTableOrder && cart.length === 0}
-              onClick={() => {
-                if (activeTableOrder) {
+              disabled={(!activeTableOrder && cart.length === 0) || fireKotMutation.isPending}
+              onClick={async () => {
+                if (activeTableOrder && cart.length === 0) {
                   setSettlementOrder(activeTableOrder);
                   setTenderAmount(Number(activeTableOrder.total_amount));
+                  setDiscountAmount(Number(activeTableOrder.discount_amount || 0));
+                  setServiceCharge(Number(activeTableOrder.service_charge || 0));
                 } else if (cart.length > 0) {
-                  // Direct takeaway settlement: fire and open settle
-                  fireKotMutation.mutateAsync().then((res) => {
+                  try {
+                    const res = await fireKotMutation.mutateAsync({ suppressKotModal: true });
                     setSettlementOrder(res.order);
                     setTenderAmount(Number(res.order.total_amount));
-                  });
+                    setDiscountAmount(Number(res.order.discount_amount || 0));
+                    setServiceCharge(Number(res.order.service_charge || 0));
+                  } catch {
+                    // Handled by fireKotMutation onError
+                  }
                 }
               }}
               className="border-[#B4D58A] text-[#B4D58A] hover:bg-[#B4D58A]/25 text-xs font-semibold h-10 flex items-center justify-center gap-1.5"
@@ -951,7 +1020,7 @@ export default function PosPage() {
       {/* MODAL 2: Kitchen Order Ticket (KOT) Generated */}
       {kotData && (
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-sm w-full border border-black/[0.06] shadow-2xl p-5 space-y-4">
+          <div className="print-area bg-white rounded-2xl max-w-sm w-full border border-black/[0.06] shadow-2xl p-5 space-y-4">
             <div className="text-center pb-3 border-b border-dashed border-black/[0.06]">
               <div className="h-10 w-10 bg-[#B4D58A]/10 text-[#B4D58A] rounded-full flex items-center justify-center mx-auto mb-2">
                 <CheckCircle2 className="h-6 w-6" />
@@ -990,7 +1059,7 @@ export default function PosPage() {
               ))}
             </div>
 
-            <div className="flex gap-2 pt-2">
+            <div className="no-print flex gap-2 pt-2">
               <Button
                 variant="outline"
                 onClick={() => window.print()}
@@ -1108,20 +1177,17 @@ export default function PosPage() {
                   placeholder="Enter Cash Tender Amount"
                   className="text-base font-bold text-[#252525]"
                 />
-                <div className="flex gap-1.5">
-                  {[
-                    Number(settlementOrder.total_amount),
-                    500,
-                    1000,
-                    2000,
-                  ].map((val) => (
+                <div className="flex gap-1.5 flex-wrap">
+                  {Array.from(
+                    new Set([Number(settlementOrder.total_amount), 500, 1000, 2000])
+                  ).map((val) => (
                     <button
-                      key={val}
+                      key={`tender-${val}`}
                       type="button"
                       onClick={() => setTenderAmount(val)}
                       className="px-2.5 py-1 text-xs bg-[#F3DA8A]/25 rounded hover:bg-black/[0.06] font-semibold text-[#252525]"
                     >
-                      ₹{val}
+                      {currencySymbol}{val}
                     </button>
                   ))}
                 </div>
@@ -1131,30 +1197,50 @@ export default function PosPage() {
             {/* Split Payment Entries */}
             {paymentMode === 'split' && (
               <div className="space-y-2">
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-3 gap-2">
                   <div>
-                    <label className="text-[11px] font-semibold text-[#5A5D58]">Cash Portion</label>
+                    <label className="text-[11px] font-semibold text-[#5A5D58]">Cash</label>
                     <Input
                       type="number"
+                      min={0}
                       value={splitPayments[0].amount || ''}
                       onChange={(e) =>
                         setSplitPayments([
-                          { method: 'cash', amount: Number(e.target.value) },
+                          { payment_method: 'cash', amount: Math.max(0, Number(e.target.value)) },
                           splitPayments[1],
+                          splitPayments[2],
                         ])
                       }
                       className="text-xs"
                     />
                   </div>
                   <div>
-                    <label className="text-[11px] font-semibold text-[#5A5D58]">UPI Portion</label>
+                    <label className="text-[11px] font-semibold text-[#5A5D58]">UPI</label>
                     <Input
                       type="number"
+                      min={0}
                       value={splitPayments[1].amount || ''}
                       onChange={(e) =>
                         setSplitPayments([
                           splitPayments[0],
-                          { method: 'upi', amount: Number(e.target.value) },
+                          { payment_method: 'upi', amount: Math.max(0, Number(e.target.value)) },
+                          splitPayments[2],
+                        ])
+                      }
+                      className="text-xs"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[11px] font-semibold text-[#5A5D58]">Card</label>
+                    <Input
+                      type="number"
+                      min={0}
+                      value={splitPayments[2].amount || ''}
+                      onChange={(e) =>
+                        setSplitPayments([
+                          splitPayments[0],
+                          splitPayments[1],
+                          { payment_method: 'card', amount: Math.max(0, Number(e.target.value)) },
                         ])
                       }
                       className="text-xs"
@@ -1164,7 +1250,7 @@ export default function PosPage() {
                 <div className="text-[11px] text-[#5A5D58] flex justify-between">
                   <span>Total Split Entered:</span>
                   <span className="font-bold text-[#252525]">
-                    ₹{(splitPayments[0].amount + splitPayments[1].amount).toFixed(2)}
+                    {currencySymbol}{(splitPayments[0].amount + splitPayments[1].amount + splitPayments[2].amount).toFixed(2)}
                   </span>
                 </div>
               </div>
@@ -1184,11 +1270,14 @@ export default function PosPage() {
       {/* MODAL 4: Final Tax Invoice Receipt */}
       {invoiceData && (
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-sm w-full border border-black/[0.06] shadow-2xl p-6 space-y-4">
+          <div className="print-area bg-white rounded-2xl max-w-sm w-full border border-black/[0.06] shadow-2xl p-6 space-y-4">
             <div className="text-center pb-3 border-b border-dashed border-black/[0.06]">
-              <h3 className="font-bold text-lg font-bold text-[#252525]">THE GRAND FEAST</h3>
-              <p className="text-[11px] text-[#5A5D58]">Downtown Flagship Branch</p>
-              <p className="text-[11px] text-[#5A5D58]">GSTIN: 33AAAAA0000A1Z5</p>
+              <h3 className="font-bold text-lg text-[#252525] uppercase">
+                {activeRestaurant?.name || 'Restaurant OS'}
+              </h3>
+              <p className="text-[11px] text-[#5A5D58]">
+                {activeBranch?.name || 'Main Branch'}
+              </p>
               <div className="mt-2 py-1 bg-[#FAF9F6] rounded border border-black/[0.06] font-mono text-xs font-bold text-[#B4D58A]">
                 INVOICE: {invoiceData.invoice_number}
               </div>
@@ -1204,7 +1293,7 @@ export default function PosPage() {
                 <span className="text-[#252525]">
                   {invoiceData.order?.table
                     ? `Table ${invoiceData.order.table.table_number}`
-                    : 'Counter Customer'}
+                    : invoiceData.order?.customer_name || 'Counter Customer'}
                 </span>
               </div>
               <div className="flex justify-between text-[#5A5D58]">
@@ -1213,30 +1302,66 @@ export default function PosPage() {
               </div>
             </div>
 
+            {invoiceData.order?.items?.length > 0 && (
+              <div className="border-t border-dashed border-black/[0.06] pt-2 space-y-1 text-xs max-h-40 overflow-y-auto">
+                {invoiceData.order.items
+                  .filter((i: any) => i.status !== 'cancelled')
+                  .map((item: any) => (
+                    <div key={item.id} className="flex justify-between text-[#252525]">
+                      <span className="truncate pr-2">
+                        {item.quantity}x {item.item_name}
+                        {item.variant_name ? ` (${item.variant_name})` : ''}
+                      </span>
+                      <span className="font-medium shrink-0">
+                        {currencySymbol}{Number(item.subtotal || 0).toFixed(2)}
+                      </span>
+                    </div>
+                  ))}
+              </div>
+            )}
+
             <div className="border-t border-b border-dashed border-black/[0.06] py-2 space-y-1 text-xs">
               <div className="flex justify-between text-[#5A5D58]">
                 <span>Subtotal</span>
-                <span>₹{Number(invoiceData.order?.subtotal || 0).toFixed(2)}</span>
+                <span>{currencySymbol}{Number(invoiceData.order?.subtotal || 0).toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-[#5A5D58]">
-                <span>GST (5%)</span>
-                <span>₹{Number(invoiceData.order?.tax_amount || 0).toFixed(2)}</span>
+                <span>GST</span>
+                <span>{currencySymbol}{Number(invoiceData.order?.tax_amount || 0).toFixed(2)}</span>
               </div>
+              {Number(invoiceData.order?.service_charge || 0) > 0 && (
+                <div className="flex justify-between text-[#5A5D58]">
+                  <span>Service Charge</span>
+                  <span>{currencySymbol}{Number(invoiceData.order.service_charge).toFixed(2)}</span>
+                </div>
+              )}
+              {Number(invoiceData.order?.packaging_charge || 0) > 0 && (
+                <div className="flex justify-between text-[#5A5D58]">
+                  <span>Packaging Charge</span>
+                  <span>{currencySymbol}{Number(invoiceData.order.packaging_charge).toFixed(2)}</span>
+                </div>
+              )}
+              {Number(invoiceData.order?.discount_amount || 0) > 0 && (
+                <div className="flex justify-between text-[#B4D58A]">
+                  <span>Discount</span>
+                  <span>-{currencySymbol}{Number(invoiceData.order.discount_amount).toFixed(2)}</span>
+                </div>
+              )}
               <div className="flex justify-between font-bold text-sm text-[#252525] pt-1">
                 <span>Total Paid</span>
                 <span className="text-[#B4D58A]">
-                  ₹{Number(invoiceData.order?.paid_amount || invoiceData.order?.total_amount).toFixed(2)}
+                  {currencySymbol}{Number(invoiceData.order?.paid_amount || invoiceData.order?.total_amount).toFixed(2)}
                 </span>
               </div>
               {invoiceData.change_amount > 0 && (
                 <div className="flex justify-between text-xs text-[#5A5D58]">
                   <span>Change Returned</span>
-                  <span>₹{Number(invoiceData.change_amount).toFixed(2)}</span>
+                  <span>{currencySymbol}{Number(invoiceData.change_amount).toFixed(2)}</span>
                 </div>
               )}
             </div>
 
-            <div className="flex gap-2 pt-2">
+            <div className="no-print flex gap-2 pt-2">
               <Button
                 variant="outline"
                 onClick={() => window.print()}
