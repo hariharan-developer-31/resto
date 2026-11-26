@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\V1\AddonController;
+use App\Http\Controllers\Api\V1\AnalyticsController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\BranchController;
 use App\Http\Controllers\Api\V1\CategoryController;
@@ -14,6 +15,7 @@ use App\Http\Controllers\Api\V1\RecipeController;
 use App\Http\Controllers\Api\V1\ReservationController;
 use App\Http\Controllers\Api\V1\RestaurantController;
 use App\Http\Controllers\Api\V1\RolePermissionController;
+use App\Http\Controllers\Api\V1\SubscriptionController;
 use App\Http\Controllers\Api\V1\SuperAdminController;
 use App\Http\Controllers\Api\V1\SupplierController;
 use App\Http\Controllers\Api\V1\SystemController;
@@ -136,6 +138,19 @@ Route::prefix('v1')->group(function () {
         // Purchase Orders
         Route::apiResource('purchase-orders', PurchaseOrderController::class)->except(['destroy']);
         Route::post('/purchase-orders/{id}/receive', [PurchaseOrderController::class, 'receive']);
+
+        // Business Analytics & Executive Reports (Phase 8)
+        Route::get('/analytics/overview', [AnalyticsController::class, 'overview']);
+        Route::get('/analytics/menu-engineering', [AnalyticsController::class, 'menuEngineering']);
+        Route::get('/analytics/table-efficiency', [AnalyticsController::class, 'tableEfficiency']);
+        Route::get('/reports/eod', [AnalyticsController::class, 'eodReport']);
+        Route::get('/reports/tax', [AnalyticsController::class, 'taxReport']);
+
+        // Multi-Restaurant SaaS Subscription & Quotas (Phase 8)
+        Route::get('/subscription/plans', [SubscriptionController::class, 'plans']);
+        Route::get('/subscription/current', [SubscriptionController::class, 'current']);
+        Route::post('/subscription/upgrade', [SubscriptionController::class, 'upgrade']);
+        Route::post('/super-admin/plans', [SubscriptionController::class, 'storePlan']);
 
         // Audit Logs Explorer
         Route::get('/audit-logs', [SystemController::class, 'auditLogs']);

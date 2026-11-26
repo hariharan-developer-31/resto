@@ -717,6 +717,76 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
+        // 17. Seed SaaS Subscription Plans (Phase 8)
+        $planStarter = \App\Models\SubscriptionPlan::firstOrCreate(
+            ['slug' => 'starter'],
+            [
+                'name' => 'Starter Plan',
+                'description' => 'Ideal for single-location cafes, food trucks, and small dining outlets.',
+                'monthly_price' => 1999.00,
+                'annual_price' => 19990.00,
+                'currency' => 'INR',
+                'max_branches' => 1,
+                'max_tables_per_branch' => 10,
+                'max_staff_members' => 5,
+                'features' => ['pos', 'waiter_station', 'menu_catalog', 'dining_tables', 'basic_reports'],
+                'sort_order' => 1,
+                'is_active' => true,
+            ]
+        );
+
+        $planPro = \App\Models\SubscriptionPlan::firstOrCreate(
+            ['slug' => 'pro'],
+            [
+                'name' => 'Growth Pro',
+                'description' => 'Built for multi-location casual dining, restobars, and bustling family restaurants.',
+                'monthly_price' => 4999.00,
+                'annual_price' => 49990.00,
+                'currency' => 'INR',
+                'max_branches' => 3,
+                'max_tables_per_branch' => 30,
+                'max_staff_members' => 20,
+                'features' => ['pos', 'waiter_station', 'kitchen_kds', 'qr_ordering', 'inventory', 'suppliers', 'purchase_orders', 'advanced_analytics', 'eod_z_reports'],
+                'sort_order' => 2,
+                'is_active' => true,
+            ]
+        );
+
+        $planEnterprise = \App\Models\SubscriptionPlan::firstOrCreate(
+            ['slug' => 'enterprise'],
+            [
+                'name' => 'Enterprise Elite',
+                'description' => 'Unlimited scaling for regional restaurant chains, hotel dining, and multi-brand franchises.',
+                'monthly_price' => 9999.00,
+                'annual_price' => 99990.00,
+                'currency' => 'INR',
+                'max_branches' => 999,
+                'max_tables_per_branch' => 999,
+                'max_staff_members' => 999,
+                'features' => ['pos', 'waiter_station', 'kitchen_kds', 'qr_ordering', 'inventory', 'suppliers', 'purchase_orders', 'recipe_bom', 'advanced_analytics', 'eod_z_reports', 'custom_domain', 'priority_support'],
+                'sort_order' => 3,
+                'is_active' => true,
+            ]
+        );
+
+        $restaurant->update([
+            'current_plan_id' => $planPro->id,
+            'subscription_status' => 'active',
+        ]);
+
+        \App\Models\RestaurantSubscription::firstOrCreate(
+            ['restaurant_id' => $restaurant->id, 'plan_id' => $planPro->id],
+            [
+                'billing_cycle' => 'monthly',
+                'amount_paid' => 4999.00,
+                'status' => 'active',
+                'starts_at' => now()->startOfMonth(),
+                'renews_at' => now()->startOfMonth()->addMonth(),
+                'payment_gateway' => 'razorpay',
+                'payment_reference' => 'SUB-INITIAL-PRO',
+            ]
+        );
+
         // Audit log of system initial setup
         AuditLog::create([
             'restaurant_id' => $restaurant->id,

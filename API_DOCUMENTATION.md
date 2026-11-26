@@ -345,3 +345,44 @@ All endpoints under `/public/` do not require Sanctum user authentication.
 - `POST /purchase-orders` – Issue PO with line items (`inventory_item_id`, `quantity_ordered`, `unit_cost`), computes subtotal + 5% input GST.
 - `GET /purchase-orders/{id}` – View PO with items and supplier details.
 - `POST /purchase-orders/{id}/receive` – Receive shipment goods. Updates received quantities, marks PO as `received` (or `partially_received`), automatically increments inventory `current_stock`, and records audited `purchase_in` stock movements.
+
+---
+
+## 12. Business Analytics, Executive Reports & SaaS Subscriptions (Phase 8)
+
+### 12.1 Revenue & Sales Overview Analytics
+- **Endpoint:** `GET /analytics/overview`
+- **Auth:** `Bearer <token>` (`dashboard.view`)
+- **Query Parameters:**
+  - `start_date`: e.g. `2026-11-01`
+  - `end_date`: e.g. `2026-11-26`
+  - `branch_id`: Optional branch filter
+- **Response `200 OK`:** Returns aggregated gross revenue, net food sales, tax liabilities, average order value (AOV), total guests served, Recharts-ready daily revenue trend array, order type distributions (Dine-in vs Takeaway vs Delivery), payment tender breakdown (Cash vs UPI vs Card), and 24-hour dining volume rush.
+
+### 12.2 Menu Engineering & Product Mix
+- **Endpoint:** `GET /analytics/menu-engineering`
+- **Auth:** `Bearer <token>` (`dashboard.view`)
+- **Response `200 OK`:** Returns top 15 ranked dishes by cumulative sales revenue and portions sold, average unit price, and category contribution percentages.
+
+### 12.3 Table Turnaround & Occupancy Efficiency
+- **Endpoint:** `GET /analytics/table-efficiency`
+- **Auth:** `Bearer <token>` (`dashboard.view`)
+- **Response `200 OK`:** Returns average table turnaround duration in minutes (from seating to settlement), floor occupancy percentage, and section-by-section table utilization.
+
+### 12.4 End-of-Day (EOD) Z-Report
+- **Endpoint:** `GET /reports/eod`
+- **Auth:** `Bearer <token>` (`dashboard.view`)
+- **Query Parameters:** `date` (defaults to today)
+- **Response `200 OK`:** Returns printable register balance sheet including gross sales, net sales, discounts, CGST (2.5%), SGST (2.5%), total tax collected, tender reconciliation (cash, UPI, card), order statistics, and cancelled orders audit.
+
+### 12.5 GST & Tax Compliance Ledger
+- **Endpoint:** `GET /reports/tax`
+- **Auth:** `Bearer <token>` (`dashboard.view`)
+- **Query Parameters:** `start_date`, `end_date`
+- **Response `200 OK`:** Returns taxable sales value, CGST (2.5%), SGST (2.5%), total tax liability, and tax invoice counts.
+
+### 12.6 Multi-Restaurant SaaS Subscription & Quotas
+- `GET /subscription/plans` – Returns public / tenant list of available subscription tiers (`Starter`, `Growth Pro`, `Enterprise Elite`).
+- `GET /subscription/current` – Returns tenant's active subscription tier, billing cycle, renewal date, and live resource quota meters for branches, dining tables, and staff member accounts.
+- `POST /subscription/upgrade` – Upgrade or switch subscription tier with payment reference. Immediately expands tenant quotas.
+- `POST /super-admin/plans` – Super Admin endpoint to create new custom subscription tiers.
