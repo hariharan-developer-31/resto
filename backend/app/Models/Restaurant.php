@@ -68,39 +68,26 @@ class Restaurant extends Model
     }
 
     /**
-     * Check if restaurant can add another branch
+     * White-label unlimited access methods (no subscription restrictions)
      */
     public function canAddBranch(): bool
     {
-        $plan = $this->getActivePlan();
-        return $this->branches()->count() < $plan->max_branches;
+        return true;
     }
 
-    /**
-     * Check if branch can add another table
-     */
     public function canAddTable(int $branchId): bool
     {
-        $plan = $this->getActivePlan();
-        $tableCount = DiningTable::where('branch_id', $branchId)->count();
-        return $tableCount < $plan->max_tables_per_branch;
+        return true;
     }
 
-    /**
-     * Check if restaurant can add another employee
-     */
     public function canAddStaff(): bool
     {
-        $plan = $this->getActivePlan();
-        return $this->users()->count() < $plan->max_staff_members;
+        return true;
     }
 
-    /**
-     * Check if tenant has specific feature enabled
-     */
     public function hasFeature(string $featureKey): bool
     {
-        return $this->getActivePlan()->hasFeature($featureKey);
+        return true;
     }
 
     public function branches(): HasMany
