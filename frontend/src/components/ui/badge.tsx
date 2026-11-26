@@ -8,9 +8,7 @@ const badgeVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-[#C2B0DC] text-white shadow-xs",
-        lilac:
-          "bg-[#C2B0DC] text-white shadow-xs",
+          "bg-[#B4D58A] text-[#252525] shadow-xs",
         mint:
           "bg-[#B4D58A] text-[#252525] shadow-xs",
         butter:
@@ -20,17 +18,19 @@ const badgeVariants = cva(
         white:
           "bg-white text-[#252525] shadow-[0_2px_10px_rgba(60,40,80,0.12)]",
         secondary:
-          "bg-[#B4D58A] text-[#252525]",
+          "bg-[#F3DA8A] text-[#252525]",
         success:
           "bg-[#B4D58A] text-[#252525]",
         warning:
           "bg-[#F3DA8A] text-[#252525]",
         info:
-          "bg-[#C2B0DC] text-white",
+          "bg-[#B4D58A] text-[#252525]",
         danger:
           "bg-[#F2AFC0] text-white",
         outline:
           "border border-[#252525]/15 text-[#252525] bg-white/80",
+        lilac:
+          "bg-[#B4D58A] text-[#252525] shadow-xs",
       },
     },
     defaultVariants: {

@@ -229,7 +229,7 @@ export default function ReservationsPage() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'confirmed':
-        return <Badge className="bg-[#C2B0DC]/20 text-[#C2B0DC] border-[#CFE2F7]">Confirmed</Badge>;
+        return <Badge className="bg-[#B4D58A]/20 text-[#B4D58A] border-[#CFE2F7]">Confirmed</Badge>;
       case 'checked_in':
         return <Badge className="bg-[#F3E8FF] text-[#7C3AED] border-[#E9D5FF]">Checked In</Badge>;
       case 'seated':
@@ -252,7 +252,7 @@ export default function ReservationsPage() {
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-bold tracking-tight text-[#252525]">Table Reservations & Seating</h1>
-            <Badge variant="outline" className="text-[#C2B0DC] border-[#C2B0DC]/20 bg-[#FAF9F6]">
+            <Badge variant="outline" className="text-[#B4D58A] border-[#B4D58A]/20 bg-[#FAF9F6]">
               Phase 7
             </Badge>
           </div>
@@ -275,7 +275,7 @@ export default function ReservationsPage() {
 
           <Button
             onClick={() => setIsCreateModalOpen(true)}
-            className="bg-[#C2B0DC] hover:bg-[#B19CCF] text-white shadow-sm"
+            className="bg-[#B4D58A] hover:bg-[#9EC271] text-white shadow-sm"
           >
             <Plus className="w-4 h-4 mr-2" />
             New Reservation
@@ -291,7 +291,7 @@ export default function ReservationsPage() {
               <p className="text-xs font-medium text-[#5A5D58]">Today's Bookings</p>
               <h3 className="text-2xl font-bold text-[#252525] mt-1">{totalBookings}</h3>
             </div>
-            <div className="w-10 h-10 rounded-full bg-[#FAF9F6] flex items-center justify-center text-[#C2B0DC]">
+            <div className="w-10 h-10 rounded-full bg-[#FAF9F6] flex items-center justify-center text-[#B4D58A]">
               <CalendarDays className="w-5 h-5" />
             </div>
           </CardContent>
@@ -301,9 +301,9 @@ export default function ReservationsPage() {
           <CardContent className="p-4 flex items-center justify-between">
             <div>
               <p className="text-xs font-medium text-[#5A5D58]">Confirmed / Upcoming</p>
-              <h3 className="text-2xl font-bold text-[#C2B0DC] mt-1">{confirmedBookings}</h3>
+              <h3 className="text-2xl font-bold text-[#B4D58A] mt-1">{confirmedBookings}</h3>
             </div>
-            <div className="w-10 h-10 rounded-full bg-[#C2B0DC]/20 flex items-center justify-center text-[#C2B0DC]">
+            <div className="w-10 h-10 rounded-full bg-[#B4D58A]/20 flex items-center justify-center text-[#B4D58A]">
               <Clock className="w-5 h-5" />
             </div>
           </CardContent>
@@ -345,7 +345,7 @@ export default function ReservationsPage() {
                   onClick={() => setStatusFilter(status)}
                   className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                     statusFilter === status
-                      ? 'bg-[#C2B0DC] text-white'
+                      ? 'bg-[#B4D58A] text-white'
                       : 'bg-[#F3DA8A]/25 text-[#5A5D58] hover:bg-black/[0.06] hover:text-[#252525]'
                   }`}
                 >
@@ -396,7 +396,7 @@ export default function ReservationsPage() {
               {isLoading ? (
                 <tr>
                   <td colSpan={6} className="px-6 py-12 text-center text-[#5A5D58]">
-                    <RefreshCw className="w-6 h-6 animate-spin mx-auto text-[#C2B0DC] mb-2" />
+                    <RefreshCw className="w-6 h-6 animate-spin mx-auto text-[#B4D58A] mb-2" />
                     Loading reservations...
                   </td>
                 </tr>
@@ -426,7 +426,7 @@ export default function ReservationsPage() {
 
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2 text-xs font-medium text-[#252525]">
-                        <Clock className="w-3.5 h-3.5 text-[#C2B0DC]" />
+                        <Clock className="w-3.5 h-3.5 text-[#B4D58A]" />
                         <span>{res.reservation_time}</span>
                         <span className="text-[#8E928B]">({res.reservation_date})</span>
                       </div>
@@ -451,7 +451,7 @@ export default function ReservationsPage() {
                             setActiveReservation(res);
                             setIsAssignTableModalOpen(true);
                           }}
-                          className="h-7 text-xs border-dashed border-[#C2B0DC] text-[#C2B0DC] hover:bg-[#C2B0DC]/20"
+                          className="h-7 text-xs border-dashed border-[#B4D58A] text-[#B4D58A] hover:bg-[#B4D58A]/20"
                         >
                           <Plus className="w-3 h-3 mr-1" /> Assign Table
                         </Button>
@@ -574,7 +574,7 @@ export default function ReservationsPage() {
           <div className="bg-white rounded-xl shadow-xl max-w-lg w-full p-6 border border-black/[0.06] animate-in fade-in-0 zoom-in-95">
             <div className="flex items-center justify-between pb-4 border-b border-black/[0.06]">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-[#C2B0DC]/20 text-[#C2B0DC] flex items-center justify-center">
+                <div className="w-8 h-8 rounded-lg bg-[#B4D58A]/20 text-[#B4D58A] flex items-center justify-center">
                   <CalendarDays className="w-4 h-4" />
                 </div>
                 <div>
@@ -652,7 +652,7 @@ export default function ReservationsPage() {
                   <select
                     value={resTime}
                     onChange={(e) => setResTime(e.target.value)}
-                    className="w-full h-9 px-3 rounded-md border border-black/[0.06] bg-white text-xs text-[#252525] focus:outline-hidden focus:ring-1 focus:ring-[#C2B0DC]"
+                    className="w-full h-9 px-3 rounded-md border border-black/[0.06] bg-white text-xs text-[#252525] focus:outline-hidden focus:ring-1 focus:ring-[#B4D58A]"
                   >
                     <option value="12:30">12:30 PM (Lunch)</option>
                     <option value="13:00">01:00 PM (Lunch)</option>
@@ -673,7 +673,7 @@ export default function ReservationsPage() {
                 <select
                   value={selectedTableId}
                   onChange={(e) => setSelectedTableId(e.target.value)}
-                  className="w-full h-9 px-3 rounded-md border border-black/[0.06] bg-white text-xs text-[#252525] focus:outline-hidden focus:ring-1 focus:ring-[#C2B0DC]"
+                  className="w-full h-9 px-3 rounded-md border border-black/[0.06] bg-white text-xs text-[#252525] focus:outline-hidden focus:ring-1 focus:ring-[#B4D58A]"
                 >
                   <option value="">Leave Unassigned (Assign at Door)</option>
                   {diningTables.map((t) => (
@@ -706,7 +706,7 @@ export default function ReservationsPage() {
                 <Button
                   type="submit"
                   disabled={createMutation.isPending}
-                  className="text-xs h-9 bg-[#C2B0DC] hover:bg-[#B19CCF] text-white"
+                  className="text-xs h-9 bg-[#B4D58A] hover:bg-[#9EC271] text-white"
                 >
                   {createMutation.isPending ? 'Confirming...' : 'Confirm Reservation'}
                 </Button>
@@ -743,10 +743,10 @@ export default function ReservationsPage() {
                       key={t.id}
                       onClick={() => assignTableMutation.mutate({ id: activeReservation.id, tableId: t.id })}
                       disabled={assignTableMutation.isPending}
-                      className="w-full flex items-center justify-between p-3 rounded-lg border border-black/[0.06] hover:border-[#C2B0DC] hover:bg-[#FAF9F6] transition-all text-left"
+                      className="w-full flex items-center justify-between p-3 rounded-lg border border-black/[0.06] hover:border-[#B4D58A] hover:bg-[#FAF9F6] transition-all text-left"
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-md bg-[#FAF9F6] text-[#C2B0DC] font-bold text-xs flex items-center justify-center border border-[#C2B0DC]/20">
+                        <div className="w-9 h-9 rounded-md bg-[#FAF9F6] text-[#B4D58A] font-bold text-xs flex items-center justify-center border border-[#B4D58A]/20">
                           {t.table_number}
                         </div>
                         <div>

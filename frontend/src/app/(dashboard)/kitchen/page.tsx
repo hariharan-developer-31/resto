@@ -163,7 +163,7 @@ export default function KitchenPage() {
       <div className="bg-white rounded-2xl border border-black/[0.06] p-3.5 shadow-xs flex flex-wrap items-center justify-between gap-3 shrink-0">
         {/* Left: Brand & Mode Toggle */}
         <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-xl bg-[#C2B0DC]/20 text-[#C2B0DC] flex items-center justify-center shrink-0">
+          <div className="h-10 w-10 rounded-xl bg-[#B4D58A]/20 text-[#B4D58A] flex items-center justify-center shrink-0">
             <ChefHat className="h-6 w-6" />
           </div>
           <div>
@@ -188,7 +188,7 @@ export default function KitchenPage() {
             </div>
             <div className="px-3 py-1 border-r border-black/[0.06] text-center">
               <span className="text-[#5A5D58] block">Cooking</span>
-              <span className="font-bold text-[#C2B0DC]">{summaryData.preparing_items || 0}</span>
+              <span className="font-bold text-[#B4D58A]">{summaryData.preparing_items || 0}</span>
             </div>
             <div className="px-3 py-1 border-r border-black/[0.06] text-center">
               <span className="text-[#5A5D58] block">Ready</span>
@@ -211,7 +211,7 @@ export default function KitchenPage() {
             title={soundEnabled ? 'Disable Kitchen Chime' : 'Enable Kitchen Chime'}
             className={`p-2 rounded-xl border transition-all ${
               soundEnabled
-                ? 'bg-[#C2B0DC]/20 border-[#C2B0DC] text-[#C2B0DC]'
+                ? 'bg-[#B4D58A]/20 border-[#B4D58A] text-[#B4D58A]'
                 : 'bg-white border-black/[0.06] text-[#5A5D58] hover:bg-[#FAF9F6]'
             }`}
           >
@@ -224,7 +224,7 @@ export default function KitchenPage() {
               onClick={() => setViewMode('active')}
               className={`px-3 py-1.5 rounded-lg transition-all ${
                 viewMode === 'active'
-                  ? 'bg-white text-[#C2B0DC] shadow-xs'
+                  ? 'bg-white text-[#B4D58A] shadow-xs'
                   : 'text-[#5A5D58] hover:text-[#252525]'
               }`}
             >
@@ -234,7 +234,7 @@ export default function KitchenPage() {
               onClick={() => setViewMode('completed')}
               className={`px-3 py-1.5 rounded-lg transition-all ${
                 viewMode === 'completed'
-                  ? 'bg-white text-[#C2B0DC] shadow-xs'
+                  ? 'bg-white text-[#B4D58A] shadow-xs'
                   : 'text-[#5A5D58] hover:text-[#252525]'
               }`}
             >
@@ -259,7 +259,7 @@ export default function KitchenPage() {
               onClick={() => setSelectedStation(st.id)}
               className={`px-3.5 py-2 text-xs font-semibold rounded-xl shrink-0 transition-all flex items-center gap-2 ${
                 isSelected
-                  ? 'bg-[#C2B0DC] text-white shadow-xs'
+                  ? 'bg-[#B4D58A] text-white shadow-xs'
                   : 'bg-white text-[#5A5D58] border border-black/[0.06] hover:bg-[#F3DA8A]/25'
               }`}
             >
@@ -267,7 +267,7 @@ export default function KitchenPage() {
               {count > 0 && (
                 <span
                   className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
-                    isSelected ? 'bg-white text-[#C2B0DC]' : 'bg-[#F3DA8A]/25 text-[#252525]'
+                    isSelected ? 'bg-white text-[#B4D58A]' : 'bg-[#F3DA8A]/25 text-[#252525]'
                   }`}
                 >
                   {count}
@@ -326,11 +326,11 @@ export default function KitchenPage() {
                     <div>
                       {/* KOT & Table */}
                       <div className="flex items-center gap-2">
-                        <span className="font-mono text-xs font-bold text-[#C2B0DC]">
+                        <span className="font-mono text-xs font-bold text-[#B4D58A]">
                           {ticket.kot_number}
                         </span>
                         {ticket.round_number > 1 && (
-                          <span className="text-[10px] bg-[#C2B0DC] text-white px-1.5 py-0.5 rounded font-bold tracking-wide uppercase">
+                          <span className="text-[10px] bg-[#B4D58A] text-white px-1.5 py-0.5 rounded font-bold tracking-wide uppercase">
                             ROUND {ticket.round_number}
                           </span>
                         )}
@@ -387,7 +387,7 @@ export default function KitchenPage() {
                             <div className="flex-1 min-w-0">
                               {/* Quantity & Dish Name */}
                               <div className="flex items-baseline gap-1.5">
-                                <span className="font-bold text-sm text-[#C2B0DC]">
+                                <span className="font-bold text-sm text-[#B4D58A]">
                                   {item.quantity}x
                                 </span>
                                 <span
@@ -438,7 +438,7 @@ export default function KitchenPage() {
                                       status: 'ready',
                                     })
                                   }
-                                  className="h-7 px-2.5 text-[11px] font-semibold rounded-lg bg-[#C2B0DC]/20 text-[#C2B0DC] border border-[#C2B0DC]/40 hover:bg-[#CFE2F7] flex items-center gap-1 transition-colors"
+                                  className="h-7 px-2.5 text-[11px] font-semibold rounded-lg bg-[#B4D58A]/20 text-[#B4D58A] border border-[#B4D58A]/40 hover:bg-[#CFE2F7] flex items-center gap-1 transition-colors"
                                 >
                                   <Check className="h-3 w-3" /> Cooking...
                                 </button>
@@ -454,7 +454,7 @@ export default function KitchenPage() {
 
                           {/* Cooking Instructions Highlight */}
                           {item.special_instructions && (
-                            <div className="bg-[#FEF5E7] border border-[#F5E6CC] rounded-lg p-1.5 text-[11px] text-[#B19CCF] font-semibold">
+                            <div className="bg-[#FEF5E7] border border-[#F5E6CC] rounded-lg p-1.5 text-[11px] text-[#9EC271] font-semibold">
                               ⚠️ Note: {item.special_instructions}
                             </div>
                           )}

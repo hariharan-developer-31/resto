@@ -181,7 +181,7 @@ export default function ReservePage() {
                 <select
                   value={resBranchId}
                   onChange={(e) => setResBranchId(Number(e.target.value))}
-                  className="w-full h-12 px-4 rounded-2xl border border-black/[0.08] bg-white text-sm text-[#252525] outline-none focus:border-[#C2B0DC] focus:ring-4 focus:ring-[#C2B0DC]/20 font-medium"
+                  className="w-full h-12 px-4 rounded-2xl border border-black/[0.08] bg-white text-sm text-[#252525] outline-none focus:border-[#B4D58A] focus:ring-4 focus:ring-[#B4D58A]/20 font-medium"
                 >
                   {branches.map((b: any) => (
                     <option key={b.id} value={b.id}>
@@ -218,7 +218,7 @@ export default function ReservePage() {
                   <select
                     value={resGuests}
                     onChange={(e) => setResGuests(Number(e.target.value))}
-                    className="w-full h-12 px-4 rounded-2xl border border-black/[0.08] bg-white text-sm text-[#252525] outline-none focus:border-[#C2B0DC] focus:ring-4 focus:ring-[#C2B0DC]/20 font-medium"
+                    className="w-full h-12 px-4 rounded-2xl border border-black/[0.08] bg-white text-sm text-[#252525] outline-none focus:border-[#B4D58A] focus:ring-4 focus:ring-[#B4D58A]/20 font-medium"
                   >
                     {[1, 2, 3, 4, 5, 6, 8, 10, 12].map((num) => (
                       <option key={num} value={num}>
@@ -236,7 +236,7 @@ export default function ReservePage() {
                     required
                     value={resDate}
                     onChange={(e) => setResDate(e.target.value)}
-                    className="w-full h-12 px-4 rounded-2xl border border-black/[0.08] bg-white text-sm text-[#252525] outline-none focus:border-[#C2B0DC] focus:ring-4 focus:ring-[#C2B0DC]/20 font-medium"
+                    className="w-full h-12 px-4 rounded-2xl border border-black/[0.08] bg-white text-sm text-[#252525] outline-none focus:border-[#B4D58A] focus:ring-4 focus:ring-[#B4D58A]/20 font-medium"
                   />
                 </div>
               </div>
@@ -249,7 +249,7 @@ export default function ReservePage() {
                 <select
                   value={resTime}
                   onChange={(e) => setResTime(e.target.value)}
-                  className="w-full h-12 px-4 rounded-2xl border border-black/[0.08] bg-white text-sm text-[#252525] outline-none focus:border-[#C2B0DC] focus:ring-4 focus:ring-[#C2B0DC]/20 font-medium"
+                  className="w-full h-12 px-4 rounded-2xl border border-black/[0.08] bg-white text-sm text-[#252525] outline-none focus:border-[#B4D58A] focus:ring-4 focus:ring-[#B4D58A]/20 font-medium"
                 >
                   {['12:00', '12:30', '13:00', '13:30', '14:00', '19:00', '19:30', '20:00', '20:30', '21:00', '21:30'].map(
                     (slot) => (

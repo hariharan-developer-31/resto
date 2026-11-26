@@ -50,7 +50,7 @@ export default function RestaurantsPage() {
   const [currency, setCurrency] = useState('INR');
   const [currencySymbol, setCurrencySymbol] = useState('₹');
   const [timezone, setTimezone] = useState('Asia/Kolkata');
-  const [primaryColor, setPrimaryColor] = useState('#C2B0DC');
+  const [primaryColor, setPrimaryColor] = useState('#B4D58A');
   const [description, setDescription] = useState('');
 
   // Fetch restaurants
@@ -77,7 +77,7 @@ export default function RestaurantsPage() {
     setCurrency('INR');
     setCurrencySymbol('₹');
     setTimezone('Asia/Kolkata');
-    setPrimaryColor('#C2B0DC');
+    setPrimaryColor('#B4D58A');
     setDescription('');
     setIsModalOpen(true);
   };
@@ -93,7 +93,7 @@ export default function RestaurantsPage() {
     setCurrency(r.currency || 'INR');
     setCurrencySymbol(r.currency_symbol || '₹');
     setTimezone(r.timezone || 'Asia/Kolkata');
-    setPrimaryColor(r.primary_color || '#C2B0DC');
+    setPrimaryColor(r.primary_color || '#B4D58A');
     setDescription(r.description || '');
     setIsModalOpen(true);
   };
@@ -202,7 +202,7 @@ export default function RestaurantsPage() {
             placeholder="Search restaurants by name, slug or email..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full h-10 pl-9 pr-4 rounded-[10px] border border-black/[0.06] bg-white text-sm text-[#252525] placeholder:text-[#8E928B] outline-none focus:border-[#C2B0DC]"
+            className="w-full h-10 pl-9 pr-4 rounded-[10px] border border-black/[0.06] bg-white text-sm text-[#252525] placeholder:text-[#8E928B] outline-none focus:border-[#B4D58A]"
           />
         </div>
       </div>
@@ -233,7 +233,7 @@ export default function RestaurantsPage() {
                     <div className="flex items-center gap-3">
                       <div
                         className="h-10 w-10 rounded-xl flex items-center justify-center text-white font-bold font-bold text-lg shadow-2xs"
-                        style={{ backgroundColor: r.primary_color || '#C2B0DC' }}
+                        style={{ backgroundColor: r.primary_color || '#B4D58A' }}
                       >
                         {r.name.charAt(0)}
                       </div>
@@ -417,7 +417,7 @@ export default function RestaurantsPage() {
                 <Input
                   label="Brand Color"
                   type="text"
-                  placeholder="#C2B0DC"
+                  placeholder="#B4D58A"
                   value={primaryColor}
                   onChange={(e) => setPrimaryColor(e.target.value)}
                 />
@@ -432,7 +432,7 @@ export default function RestaurantsPage() {
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Brief description of culinary concept, cuisine, and service format..."
-                  className="w-full rounded-[10px] border border-black/[0.06] p-3 text-sm text-[#252525] placeholder:text-[#8E928B] outline-none focus:border-[#C2B0DC]"
+                  className="w-full rounded-[10px] border border-black/[0.06] p-3 text-sm text-[#252525] placeholder:text-[#8E928B] outline-none focus:border-[#B4D58A]"
                 />
               </div>
 

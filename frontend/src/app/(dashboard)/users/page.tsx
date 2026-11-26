@@ -248,7 +248,7 @@ export default function UsersManagementPage() {
             placeholder="Search by name, email, or username..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full h-10 pl-9 pr-4 rounded-[10px] border border-black/[0.06] bg-white text-sm text-[#252525] placeholder:text-[#8E928B] outline-none focus:border-[#C2B0DC]"
+            className="w-full h-10 pl-9 pr-4 rounded-[10px] border border-black/[0.06] bg-white text-sm text-[#252525] placeholder:text-[#8E928B] outline-none focus:border-[#B4D58A]"
           />
         </div>
 
@@ -300,7 +300,7 @@ export default function UsersManagementPage() {
                     <tr key={u.id} className="hover:bg-[#FAF9F6]/60 transition-colors">
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-2.5">
-                          <div className="h-8 w-8 rounded-lg bg-[#C2B0DC]/20 text-[#C2B0DC] font-semibold flex items-center justify-center shrink-0">
+                          <div className="h-8 w-8 rounded-lg bg-[#B4D58A]/20 text-[#B4D58A] font-semibold flex items-center justify-center shrink-0">
                             {u.name.charAt(0)}
                           </div>
                           <div>
@@ -332,7 +332,7 @@ export default function UsersManagementPage() {
 
                       <td className="py-3 px-4">
                         {roleName === 'Super Admin' ? (
-                          <span className="text-[11px] font-medium text-[#C2B0DC]">
+                          <span className="text-[11px] font-medium text-[#B4D58A]">
                             Universal (All Restaurants)
                           </span>
                         ) : u.restaurants && u.restaurants.length > 0 ? (
@@ -366,7 +366,7 @@ export default function UsersManagementPage() {
                           <button
                             onClick={() => openResetPasswordModal(u)}
                             title="Reset Password"
-                            className="p-1.5 rounded-lg border border-black/[0.06] text-[#5A5D58] hover:text-[#C2B0DC] hover:bg-white transition-colors"
+                            className="p-1.5 rounded-lg border border-black/[0.06] text-[#5A5D58] hover:text-[#B4D58A] hover:bg-white transition-colors"
                           >
                             <KeyRound className="h-3.5 w-3.5" />
                           </button>
@@ -485,7 +485,7 @@ export default function UsersManagementPage() {
                   <select
                     value={role}
                     onChange={(e) => setRole(e.target.value)}
-                    className="w-full h-10 px-3 rounded-[10px] border border-black/[0.06] bg-white text-sm text-[#252525] outline-none focus:border-[#C2B0DC]"
+                    className="w-full h-10 px-3 rounded-[10px] border border-black/[0.06] bg-white text-sm text-[#252525] outline-none focus:border-[#B4D58A]"
                     required
                   >
                     {rolesList.map((r: any) => (
@@ -527,7 +527,7 @@ export default function UsersManagementPage() {
                               setSelectedRestaurantIds(selectedRestaurantIds.filter((id) => id !== rest.id));
                             }
                           }}
-                          className="rounded border-black/[0.06] text-[#C2B0DC] focus:ring-[#C2B0DC]"
+                          className="rounded border-black/[0.06] text-[#B4D58A] focus:ring-[#B4D58A]"
                         />
                         <span className="font-medium text-[#252525]">{rest.name}</span>
                         <span className="text-[10px] text-[#5A5D58]">({rest.slug})</span>

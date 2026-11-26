@@ -268,7 +268,7 @@ export default function RestaurantBranchesPage() {
                       <span>Hours: {b.opening_time || '10:00'} – {b.closing_time || '23:00'}</span>
                     </p>
                     <p className="flex items-center gap-1.5 font-medium text-[#252525]">
-                      <Percent className="h-3.5 w-3.5 text-[#C2B0DC] shrink-0" />
+                      <Percent className="h-3.5 w-3.5 text-[#B4D58A] shrink-0" />
                       <span>Branch GST/Tax: {b.tax_rate}%</span>
                     </p>
                   </div>
@@ -442,7 +442,7 @@ export default function RestaurantBranchesPage() {
                   id="mainBranchCheck"
                   checked={isMainBranch}
                   onChange={(e) => setIsMainBranch(e.target.checked)}
-                  className="rounded border-black/[0.06] text-[#C2B0DC] focus:ring-[#C2B0DC]"
+                  className="rounded border-black/[0.06] text-[#B4D58A] focus:ring-[#B4D58A]"
                 />
                 <label htmlFor="mainBranchCheck" className="text-xs font-medium text-[#252525] cursor-pointer">
                   Set as Main / Flagship Branch

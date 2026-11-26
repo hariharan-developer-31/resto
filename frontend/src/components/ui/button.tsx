@@ -4,14 +4,12 @@ import { cn } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-2xl text-sm font-semibold tracking-wide transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C2B0DC]/40 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98]",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-2xl text-sm font-semibold tracking-wide transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B4D58A]/40 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98]",
   {
     variants: {
       variant: {
         default:
-          "bg-[#C2B0DC] text-white hover:brightness-105 shadow-[0_8px_24px_rgba(60,40,80,0.22)] uppercase tracking-wider",
-        lilac:
-          "bg-[#C2B0DC] text-white hover:brightness-105 shadow-[0_8px_24px_rgba(60,40,80,0.22)] uppercase tracking-wider",
+          "bg-[#B4D58A] text-[#252525] hover:brightness-105 shadow-[0_8px_24px_rgba(60,40,80,0.16)] uppercase tracking-wider",
         mint:
           "bg-[#B4D58A] text-[#252525] hover:brightness-105 shadow-[0_8px_24px_rgba(60,40,80,0.16)] uppercase tracking-wider",
         butter:
@@ -21,9 +19,9 @@ const buttonVariants = cva(
         white:
           "bg-white text-[#252525] hover:bg-white/95 shadow-[0_8px_24px_rgba(60,40,80,0.16)] uppercase tracking-wider",
         secondary:
-          "bg-[#B4D58A] text-[#252525] hover:brightness-105 shadow-[0_6px_20px_rgba(60,40,80,0.12)]",
+          "bg-[#F3DA8A] text-[#252525] hover:brightness-105 shadow-[0_6px_20px_rgba(60,40,80,0.12)]",
         outline:
-          "border border-white/60 bg-white/20 backdrop-blur-md text-white hover:bg-white/30 transition-all",
+          "border border-white/60 bg-white/20 backdrop-blur-md text-[#252525] hover:bg-white/30 transition-all",
         outlineDark:
           "border border-[#252525]/15 bg-white/60 text-[#252525] hover:bg-white transition-all",
         ghost:
@@ -31,9 +29,11 @@ const buttonVariants = cva(
         ghostWhite:
           "text-white hover:bg-white/10",
         subtle:
-          "bg-[#C2B0DC]/20 text-[#252525] hover:bg-[#C2B0DC]/30",
+          "bg-[#B4D58A]/25 text-[#252525] hover:bg-[#B4D58A]/35",
         danger:
           "bg-[#F2AFC0] text-white hover:brightness-95 shadow-[0_6px_20px_rgba(242,175,192,0.4)]",
+        lilac:
+          "bg-[#B4D58A] text-[#252525] hover:brightness-105 shadow-[0_8px_24px_rgba(60,40,80,0.16)] uppercase tracking-wider",
       },
       size: {
         default: "h-11 px-5 py-2.5",

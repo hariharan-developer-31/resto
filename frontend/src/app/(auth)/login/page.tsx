@@ -7,18 +7,11 @@ import { apiRequest, ApiError } from '@/lib/api-client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import Link from 'next/link';
 import {
   Sparkles,
-  Lock,
-  UserCheck,
-  Building,
-  KeyRound,
-  ShieldCheck,
   Check,
-  ArrowRight,
 } from 'lucide-react';
 
 export default function LoginPage() {
@@ -30,12 +23,12 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
 
   const demoAccounts = [
-    { role: 'Super Admin', email: 'superadmin@resto.com', desc: 'Universal multi-tenant control', color: 'bg-[#C2B0DC]/25 text-[#252525] border-[#C2B0DC]' },
-    { role: 'Restaurant Admin', email: 'admin@grandfeast.com', desc: 'The Grand Feast owner', color: 'bg-[#B4D58A]/25 text-[#252525] border-[#B4D58A]' },
-    { role: 'Branch Manager', email: 'manager@grandfeast.com', desc: 'Downtown Flagship manager', color: 'bg-[#F3DA8A]/25 text-[#252525] border-[#F3DA8A]' },
-    { role: 'Cashier / POS', email: 'cashier@grandfeast.com', desc: 'Billing & Table checkout', color: 'bg-[#F2AFC0]/25 text-[#252525] border-[#F2AFC0]' },
-    { role: 'Waiter', email: 'waiter@grandfeast.com', desc: 'Table orders & status', color: 'bg-[#C2B0DC]/20 text-[#252525] border-[#C2B0DC]' },
-    { role: 'Kitchen Chef', email: 'kitchen@grandfeast.com', desc: 'Kitchen KDS preparation', color: 'bg-[#B4D58A]/20 text-[#252525] border-[#B4D58A]' },
+    { role: 'Super Admin', email: 'superadmin@resto.com', desc: 'Universal multi-tenant control', color: 'bg-[#B4D58A]/30 text-[#252525] border-[#B4D58A]' },
+    { role: 'Restaurant Admin', email: 'admin@grandfeast.com', desc: 'The Grand Feast owner', color: 'bg-[#F3DA8A]/30 text-[#252525] border-[#F3DA8A]' },
+    { role: 'Branch Manager', email: 'manager@grandfeast.com', desc: 'Downtown Flagship manager', color: 'bg-[#F2AFC0]/30 text-[#252525] border-[#F2AFC0]' },
+    { role: 'Cashier / POS', email: 'cashier@grandfeast.com', desc: 'Billing & Table checkout', color: 'bg-[#B4D58A]/20 text-[#252525] border-[#B4D58A]' },
+    { role: 'Waiter', email: 'waiter@grandfeast.com', desc: 'Table orders & status', color: 'bg-[#F3DA8A]/20 text-[#252525] border-[#F3DA8A]' },
+    { role: 'Kitchen Chef', email: 'kitchen@grandfeast.com', desc: 'Kitchen KDS preparation', color: 'bg-[#F2AFC0]/20 text-[#252525] border-[#F2AFC0]' },
   ];
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -78,28 +71,28 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center bg-[#C2B0DC] px-4 py-12 sm:px-6 lg:px-8 overflow-hidden font-poppins">
+    <div className="relative min-h-screen flex items-center justify-center bg-[#B4D58A] px-4 py-12 sm:px-6 lg:px-8 overflow-hidden font-poppins">
       {/* Decorative floating blur spheres */}
-      <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-white/20 blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-32 -right-32 w-96 h-96 rounded-full bg-[#F2AFC0]/30 blur-3xl pointer-events-none" />
-      <div className="absolute top-1/4 right-10 w-64 h-64 rounded-full bg-[#F3DA8A]/25 blur-2xl pointer-events-none" />
+      <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-white/30 blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-32 -right-32 w-96 h-96 rounded-full bg-[#F3DA8A]/30 blur-3xl pointer-events-none" />
+      <div className="absolute top-1/4 right-10 w-64 h-64 rounded-full bg-[#F2AFC0]/25 blur-2xl pointer-events-none" />
 
       <div className="relative z-10 w-full max-w-lg space-y-6 animate-slide-up">
         {/* Brand header */}
         <div className="text-center space-y-3">
-          <Link href="/" className="inline-flex h-14 w-14 items-center justify-center rounded-3xl bg-white text-[#C2B0DC] shadow-[0_10px_30px_rgba(60,40,80,0.2)] mb-1 hover:scale-105 transition-transform">
-            <Sparkles className="h-7 w-7" />
+          <Link href="/" className="inline-flex h-14 w-14 items-center justify-center rounded-3xl bg-white text-[#252525] shadow-[0_10px_30px_rgba(60,40,80,0.15)] mb-1 hover:scale-105 transition-transform font-bold">
+            <Sparkles className="h-7 w-7 text-[#B4D58A]" />
           </Link>
-          <h1 className="font-baloo text-4xl sm:text-5xl font-extrabold tracking-tight text-white leading-none">
+          <h1 className="font-baloo text-4xl sm:text-5xl font-extrabold tracking-tight text-[#252525] leading-none">
             Restaurant OS
           </h1>
-          <p className="text-sm font-medium text-white/90 uppercase tracking-widest">
+          <p className="text-sm font-bold text-[#252525]/85 uppercase tracking-widest">
             Creative Multi-Tenant Operating Platform
           </p>
         </div>
 
         {/* Login Card */}
-        <Card className="rounded-3xl border-none shadow-[0_20px_60px_rgba(60,40,80,0.22)] bg-white/95 backdrop-blur-xl p-2 sm:p-4">
+        <Card className="rounded-3xl border-none shadow-[0_20px_60px_rgba(60,40,80,0.18)] bg-white/95 backdrop-blur-xl p-2 sm:p-4">
           <CardHeader className="space-y-1.5 pb-4">
             <CardTitle className="text-2xl font-bold text-[#252525]">Sign in to station</CardTitle>
             <CardDescription className="text-sm text-[#5A5D58]">
@@ -134,16 +127,16 @@ export default function LoginPage() {
                   placeholder="••••••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="flex h-12 w-full rounded-2xl border border-black/[0.08] bg-white px-4 py-3 text-sm text-[#252525] placeholder:text-[#8E928B] transition-all outline-none focus:border-[#C2B0DC] focus:ring-4 focus:ring-[#C2B0DC]/20 font-medium"
+                  className="flex h-12 w-full rounded-2xl border border-black/[0.08] bg-white px-4 py-3 text-sm text-[#252525] placeholder:text-[#8E928B] transition-all outline-none focus:border-[#B4D58A] focus:ring-4 focus:ring-[#B4D58A]/20 font-medium"
                   required
                 />
               </div>
 
               <Button
                 type="submit"
-                variant="lilac"
+                variant="mint"
                 size="lg"
-                className="w-full mt-2"
+                className="w-full mt-2 font-bold"
                 isLoading={isLoading}
               >
                 Sign In
@@ -169,7 +162,7 @@ export default function LoginPage() {
                       onClick={() => selectDemoAccount(account.email)}
                       className={`text-left p-3 rounded-2xl border transition-all text-xs cursor-pointer ${
                         isSelected
-                          ? 'border-[#C2B0DC] bg-[#C2B0DC]/20 shadow-xs'
+                          ? 'border-[#B4D58A] bg-[#B4D58A]/25 shadow-xs font-bold'
                           : 'border-black/[0.06] bg-black/[0.02] hover:bg-black/[0.04]'
                       }`}
                     >
@@ -198,7 +191,7 @@ export default function LoginPage() {
         </Card>
 
         {/* System Footnote */}
-        <p className="text-center text-xs text-white/80 font-medium tracking-wide">
+        <p className="text-center text-xs text-[#252525]/75 font-semibold tracking-wide">
           Restaurant OS · Multi-Tenant RBAC Security
         </p>
       </div>

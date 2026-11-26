@@ -99,7 +99,7 @@ export default function AuditLogsPage() {
               ) : (
                 logs.map((log: any) => (
                   <tr key={log.id} className="hover:bg-[#FAF9F6]/60 transition-colors">
-                    <td className="py-3 px-4 font-mono font-medium text-[#C2B0DC]">
+                    <td className="py-3 px-4 font-mono font-medium text-[#B4D58A]">
                       {log.action}
                     </td>
                     <td className="py-3 px-4 font-medium text-[#252525]">

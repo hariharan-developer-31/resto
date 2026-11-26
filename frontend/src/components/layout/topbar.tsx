@@ -7,7 +7,6 @@ import {
   Menu,
   Building2,
   GitBranch,
-  Sparkles,
 } from 'lucide-react';
 
 interface TopbarProps {
@@ -34,15 +33,15 @@ export function Topbar({ onMenuClick }: TopbarProps) {
       <div className="flex items-center gap-4">
         <button
           onClick={onMenuClick}
-          className="p-2.5 text-[#252525] hover:bg-[#C2B0DC]/20 rounded-2xl md:hidden transition-colors"
+          className="p-2.5 text-[#252525] hover:bg-[#B4D58A]/20 rounded-2xl md:hidden transition-colors"
         >
           <Menu className="h-5 w-5" />
         </button>
 
         {/* Restaurant Switcher */}
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 px-4 py-2 bg-[#C2B0DC]/15 rounded-2xl text-xs font-semibold text-[#252525]">
-            <Building2 className="h-4 w-4 text-[#C2B0DC]" />
+          <div className="flex items-center gap-2 px-4 py-2 bg-[#B4D58A]/20 rounded-2xl text-xs font-semibold text-[#252525]">
+            <Building2 className="h-4 w-4 text-[#252525]" />
             {availableRestaurants.length > 1 ? (
               <select
                 value={activeRestaurant?.id || ''}
@@ -67,7 +66,7 @@ export function Topbar({ onMenuClick }: TopbarProps) {
 
           {/* Branch Switcher */}
           {activeRestaurant && availableBranches.length > 0 && (
-            <div className="hidden sm:flex items-center gap-2 px-4 py-2 bg-[#B4D58A]/20 rounded-2xl text-xs font-semibold text-[#252525]">
+            <div className="hidden sm:flex items-center gap-2 px-4 py-2 bg-[#F3DA8A]/25 rounded-2xl text-xs font-semibold text-[#252525]">
               <GitBranch className="h-4 w-4 text-[#252525]" />
               {availableBranches.length > 1 ? (
                 <select
@@ -104,11 +103,11 @@ export function Topbar({ onMenuClick }: TopbarProps) {
 
         {/* User Role Badge */}
         {user?.is_super_admin ? (
-          <Badge variant="lilac" className="text-xs uppercase tracking-wider py-1 px-3">
+          <Badge variant="mint" className="text-xs uppercase tracking-wider py-1 px-3 font-bold">
             Super Admin
           </Badge>
         ) : (
-          <Badge variant="butter" className="text-xs uppercase tracking-wider py-1 px-3">
+          <Badge variant="butter" className="text-xs uppercase tracking-wider py-1 px-3 font-bold">
             {user?.roles?.[0] || 'Staff'}
           </Badge>
         )}

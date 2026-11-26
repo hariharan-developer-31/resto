@@ -89,7 +89,7 @@ export default function DashboardPage() {
       value: formatCurrency(overview.today_revenue),
       sub: 'Settled orders today',
       icon: DollarSign,
-      color: 'text-[#C2B0DC] bg-[#C2B0DC]/20',
+      color: 'text-[#B4D58A] bg-[#B4D58A]/20',
       highlight: true,
     },
     {
@@ -111,14 +111,14 @@ export default function DashboardPage() {
       value: overview.active_tables,
       sub: 'Currently seated',
       icon: Grid,
-      color: 'text-[#C2B0DC] bg-[#EBF3FB]',
+      color: 'text-[#B4D58A] bg-[#EBF3FB]',
     },
     {
       title: 'Total Orders',
       value: overview.total_orders,
       sub: 'All-time volume',
       icon: UtensilsCrossed,
-      color: 'text-[#C2B0DC] bg-[#C2B0DC]/20',
+      color: 'text-[#B4D58A] bg-[#B4D58A]/20',
     },
     {
       title: 'Cancelled Orders',
@@ -167,7 +167,7 @@ export default function DashboardPage() {
       value: overview.total_users,
       sub: 'All registered accounts',
       icon: ShieldCheck,
-      color: 'text-[#C2B0DC] bg-[#EBF3FB]',
+      color: 'text-[#B4D58A] bg-[#EBF3FB]',
     },
   ];
 
@@ -219,7 +219,7 @@ export default function DashboardPage() {
             <Card
               key={m.title}
               className={`border-black/[0.06] hover:border-[#D8D4CA] transition-all p-4 ${
-                m.highlight ? 'bg-gradient-to-br from-white to-[#C2B0DC]/20/30' : ''
+                m.highlight ? 'bg-gradient-to-br from-white to-[#B4D58A]/20/30' : ''
               }`}
             >
               <div className="flex items-center justify-between mb-2">
@@ -264,8 +264,8 @@ export default function DashboardPage() {
                 <AreaChart data={revenueTrends} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                   <defs>
                     <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#C2B0DC" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#C2B0DC" stopOpacity={0.0} />
+                      <stop offset="5%" stopColor="#B4D58A" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#B4D58A" stopOpacity={0.0} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="black/[0.04]" vertical={false} />
@@ -297,7 +297,7 @@ export default function DashboardPage() {
                   <Area
                     type="monotone"
                     dataKey="revenue"
-                    stroke="#C2B0DC"
+                    stroke="#B4D58A"
                     strokeWidth={2.5}
                     fillOpacity={1}
                     fill="url(#colorRevenue)"
@@ -391,7 +391,7 @@ export default function DashboardPage() {
                   <tr key={rp.id} className="hover:bg-[#FAF9F6]/60 transition-colors">
                     <td className="py-3.5 px-5 font-semibold text-[#252525]">
                       <div className="flex items-center gap-2.5">
-                        <div className="h-7 w-7 rounded-lg bg-[#C2B0DC]/20 text-[#C2B0DC] font-bold flex items-center justify-center text-xs">
+                        <div className="h-7 w-7 rounded-lg bg-[#B4D58A]/20 text-[#B4D58A] font-bold flex items-center justify-center text-xs">
                           {rp.name.charAt(0)}
                         </div>
                         <div>
@@ -405,7 +405,7 @@ export default function DashboardPage() {
                     <td className="py-3.5 px-4 text-[#252525]">
                       {rp.branches_count} location{rp.branches_count !== 1 ? 's' : ''}
                     </td>
-                    <td className="py-3.5 px-4 font-semibold text-[#C2B0DC]">
+                    <td className="py-3.5 px-4 font-semibold text-[#B4D58A]">
                       {rp.active_tables} table{rp.active_tables !== 1 ? 's' : ''} occupied
                     </td>
                     <td className="py-3.5 px-4 font-mono font-medium text-[#252525]">
@@ -447,7 +447,7 @@ export default function DashboardPage() {
               recentOrders.map((ord: any) => (
                 <div key={ord.id} className="p-4 flex items-center justify-between hover:bg-[#FAF9F6]/50 transition-colors text-xs">
                   <div className="flex items-center gap-3">
-                    <div className="h-9 w-9 rounded-xl bg-[#FAF9F6] border border-black/[0.06] flex items-center justify-center font-semibold text-[#C2B0DC]">
+                    <div className="h-9 w-9 rounded-xl bg-[#FAF9F6] border border-black/[0.06] flex items-center justify-center font-semibold text-[#B4D58A]">
                       {ord.order_type === 'dine_in' ? 'DIN' : 'TAK'}
                     </div>
                     <div>
@@ -494,7 +494,7 @@ export default function DashboardPage() {
               </CardDescription>
             </div>
             <Link href="/audit-logs">
-              <Button variant="ghost" size="sm" className="text-xs gap-1 text-[#C2B0DC]">
+              <Button variant="ghost" size="sm" className="text-xs gap-1 text-[#B4D58A]">
                 Full Log <ArrowUpRight className="h-3.5 w-3.5" />
               </Button>
             </Link>
@@ -506,7 +506,7 @@ export default function DashboardPage() {
               recentActivities.map((act: any) => (
                 <div key={act.id} className="p-4 flex items-center justify-between hover:bg-[#FAF9F6]/50 transition-colors text-xs">
                   <div className="flex items-center gap-3">
-                    <div className="h-8 w-8 rounded-full bg-[#EBF3FB] text-[#C2B0DC] flex items-center justify-center shrink-0">
+                    <div className="h-8 w-8 rounded-full bg-[#EBF3FB] text-[#B4D58A] flex items-center justify-center shrink-0">
                       <ShieldCheck className="h-4 w-4" />
                     </div>
                     <div>

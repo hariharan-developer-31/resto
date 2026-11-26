@@ -123,32 +123,32 @@ export default function RestaurantWebsite() {
   });
 
   return (
-    <div className="min-h-screen bg-white text-[#252525] font-poppins selection:bg-[#C2B0DC] selection:text-white">
-      {/* 1. SIGNATURE HERO SECTION (Soft Lilac: #C2B0DC) */}
-      <section className="relative min-h-screen flex flex-col justify-between bg-[#C2B0DC] text-white px-6 sm:px-12 pt-7 pb-16 overflow-hidden">
+    <div className="min-h-screen bg-white text-[#252525] font-poppins selection:bg-[#B4D58A] selection:text-[#252525]">
+      {/* 1. SIGNATURE HERO SECTION (Soft Mint Green: #B4D58A) */}
+      <section className="relative min-h-screen flex flex-col justify-between bg-[#B4D58A] text-[#252525] px-6 sm:px-12 pt-7 pb-16 overflow-hidden">
         {/* Subtle decorative floating spheres */}
-        <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-white/10 blur-3xl pointer-events-none" />
-        <div className="absolute top-1/2 -left-24 w-80 h-80 rounded-full bg-[#F2AFC0]/20 blur-2xl pointer-events-none" />
+        <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-white/20 blur-3xl pointer-events-none" />
+        <div className="absolute top-1/2 -left-24 w-80 h-80 rounded-full bg-[#F3DA8A]/25 blur-2xl pointer-events-none" />
 
         {/* Minimal Header */}
         <header className="relative z-20 flex items-center justify-between w-full max-w-7xl mx-auto">
           {/* Brand Name using Baloo 2 ExtraBold */}
-          <Link href="/" className="font-baloo text-2xl sm:text-3xl font-extrabold tracking-tight text-white hover:opacity-90 transition-opacity">
+          <Link href="/" className="font-baloo text-2xl sm:text-3xl font-extrabold tracking-tight text-[#252525] hover:opacity-90 transition-opacity">
             {restaurant.name}
           </Link>
 
           {/* Desktop Nav Links */}
-          <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-white/90">
-            <a href="#story" className="nav-link hover:text-white">
+          <nav className="hidden md:flex items-center gap-8 text-sm font-semibold text-[#252525]/90">
+            <a href="#story" className="nav-link hover:text-[#252525]">
               Heritage
             </a>
-            <a href="#menu" className="nav-link hover:text-white">
+            <a href="#menu" className="nav-link hover:text-[#252525]">
               Digital Menu
             </a>
-            <a href="#locations" className="nav-link hover:text-white">
+            <a href="#locations" className="nav-link hover:text-[#252525]">
               Branches
             </a>
-            <Link href="/reserve" className="nav-link hover:text-white">
+            <Link href="/reserve" className="nav-link hover:text-[#252525]">
               Reservations
             </Link>
           </nav>
@@ -165,7 +165,7 @@ export default function RestaurantWebsite() {
             </Button>
             <Link href="/login">
               <Button
-                variant="outline"
+                variant="outlineDark"
                 size="default"
                 className="text-xs"
               >
@@ -178,18 +178,18 @@ export default function RestaurantWebsite() {
         {/* Central Visual Composition */}
         <div className="relative z-10 my-auto py-12 max-w-5xl mx-auto text-center space-y-8 animate-slide-up">
           {/* Eyebrow Chip */}
-          <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white/20 backdrop-blur-md text-white text-xs font-semibold uppercase tracking-widest shadow-xs">
+          <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white/50 backdrop-blur-md text-[#252525] text-xs font-bold uppercase tracking-widest shadow-xs">
             <Sparkles className="h-3.5 w-3.5" />
             <span>Royal Flavors · Handcrafted Dum Heritage</span>
           </div>
 
           {/* Oversized Signature Typography */}
-          <h1 className="font-bold text-4xl sm:text-6xl md:text-7xl lg:text-8xl tracking-tight leading-[0.98] text-white">
+          <h1 className="font-bold text-4xl sm:text-6xl md:text-7xl lg:text-8xl tracking-tight leading-[0.98] text-[#252525]">
             CULINARY ARTISTRY <br />
-            <span className="font-extrabold text-white opacity-95">FOR THE SOUL</span>
+            <span className="font-extrabold text-[#252525] opacity-90">FOR THE SOUL</span>
           </h1>
 
-          <p className="text-base sm:text-lg text-white/90 max-w-2xl mx-auto font-medium leading-relaxed">
+          <p className="text-base sm:text-lg text-[#252525]/85 max-w-2xl mx-auto font-medium leading-relaxed">
             Every creation is an immersive symphony of slow-cooked earthen biryanis, clay-oven tandoor delicacies, and handcrafted heritage curries.
           </p>
 
@@ -199,13 +199,13 @@ export default function RestaurantWebsite() {
               <Button
                 variant="white"
                 size="lg"
-                className="shadow-[0_14px_40px_rgba(60,40,80,0.22)]"
+                className="shadow-[0_14px_40px_rgba(60,40,80,0.18)]"
               >
                 Explore Digital Menu
               </Button>
             </a>
             <Button
-              variant="outline"
+              variant="outlineDark"
               size="lg"
               onClick={() => setReservationModalOpen(true)}
             >
@@ -216,7 +216,7 @@ export default function RestaurantWebsite() {
 
         {/* Floating Layered Feature Pills */}
         <div className="relative z-10 max-w-5xl mx-auto w-full grid grid-cols-1 sm:grid-cols-3 gap-4 pt-6">
-          <div className="bg-white/95 backdrop-blur-md rounded-3xl p-5 shadow-[0_12px_36px_rgba(60,40,80,0.2)] text-[#252525] flex items-center gap-4 animate-float-slow">
+          <div className="bg-white/95 backdrop-blur-md rounded-3xl p-5 shadow-[0_12px_36px_rgba(60,40,80,0.15)] text-[#252525] flex items-center gap-4 animate-float-slow">
             <div className="h-12 w-12 rounded-2xl bg-[#F3DA8A] flex items-center justify-center text-[#252525] shrink-0 font-bold">
               <Flame className="h-6 w-6" />
             </div>
@@ -226,8 +226,8 @@ export default function RestaurantWebsite() {
             </div>
           </div>
 
-          <div className="bg-white/95 backdrop-blur-md rounded-3xl p-5 shadow-[0_12px_36px_rgba(60,40,80,0.2)] text-[#252525] flex items-center gap-4 animate-float-medium">
-            <div className="h-12 w-12 rounded-2xl bg-[#B4D58A] flex items-center justify-center text-[#252525] shrink-0 font-bold">
+          <div className="bg-white/95 backdrop-blur-md rounded-3xl p-5 shadow-[0_12px_36px_rgba(60,40,80,0.15)] text-[#252525] flex items-center gap-4 animate-float-medium">
+            <div className="h-12 w-12 rounded-2xl bg-[#F2AFC0] flex items-center justify-center text-white shrink-0 font-bold">
               <Award className="h-6 w-6" />
             </div>
             <div>
@@ -236,8 +236,8 @@ export default function RestaurantWebsite() {
             </div>
           </div>
 
-          <div className="bg-white/95 backdrop-blur-md rounded-3xl p-5 shadow-[0_12px_36px_rgba(60,40,80,0.2)] text-[#252525] flex items-center gap-4 animate-float-gentle">
-            <div className="h-12 w-12 rounded-2xl bg-[#F2AFC0] flex items-center justify-center text-white shrink-0 font-bold">
+          <div className="bg-white/95 backdrop-blur-md rounded-3xl p-5 shadow-[0_12px_36px_rgba(60,40,80,0.15)] text-[#252525] flex items-center gap-4 animate-float-gentle">
+            <div className="h-12 w-12 rounded-2xl bg-[#F3DA8A] flex items-center justify-center text-[#252525] shrink-0 font-bold">
               <QrCode className="h-6 w-6" />
             </div>
             <div>
@@ -248,11 +248,11 @@ export default function RestaurantWebsite() {
         </div>
       </section>
 
-      {/* 2. CULINARY HERITAGE STORY (Soft Mint Green: #B4D58A) */}
-      <section id="story" className="py-24 sm:py-32 bg-[#B4D58A] px-6 sm:px-12 relative overflow-hidden">
+      {/* 2. CULINARY HERITAGE STORY (Butter Yellow: #F3DA8A) */}
+      <section id="story" className="py-24 sm:py-32 bg-[#F3DA8A] px-6 sm:px-12 relative overflow-hidden">
         <div className="max-w-6xl mx-auto space-y-16">
           <div className="text-center space-y-4 max-w-3xl mx-auto">
-            <Badge variant="white" className="uppercase tracking-widest text-[11px] py-1 px-4">
+            <Badge variant="white" className="uppercase tracking-widest text-[11px] py-1 px-4 font-bold">
               Our Culinary Philosophy
             </Badge>
             <h2 className="font-bold text-3xl sm:text-5xl lg:text-6xl text-[#252525] tracking-tight">
@@ -264,8 +264,8 @@ export default function RestaurantWebsite() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-white rounded-3xl p-8 shadow-[0_14px_40px_rgba(60,40,80,0.14)] space-y-4 hover:-translate-y-1.5 transition-transform">
-              <div className="h-14 w-14 rounded-2xl bg-[#C2B0DC] text-white flex items-center justify-center font-bold shadow-xs">
+            <div className="bg-white rounded-3xl p-8 shadow-[0_14px_40px_rgba(60,40,80,0.12)] space-y-4 hover:-translate-y-1.5 transition-transform">
+              <div className="h-14 w-14 rounded-2xl bg-[#B4D58A] text-[#252525] flex items-center justify-center font-bold shadow-xs">
                 <Flame className="h-7 w-7" />
               </div>
               <h3 className="text-xl font-bold text-[#252525]">Authentic Dum Cooking</h3>
@@ -274,8 +274,8 @@ export default function RestaurantWebsite() {
               </p>
             </div>
 
-            <div className="bg-white rounded-3xl p-8 shadow-[0_14px_40px_rgba(60,40,80,0.14)] space-y-4 hover:-translate-y-1.5 transition-transform">
-              <div className="h-14 w-14 rounded-2xl bg-[#F3DA8A] text-[#252525] flex items-center justify-center font-bold shadow-xs">
+            <div className="bg-white rounded-3xl p-8 shadow-[0_14px_40px_rgba(60,40,80,0.12)] space-y-4 hover:-translate-y-1.5 transition-transform">
+              <div className="h-14 w-14 rounded-2xl bg-[#F2AFC0] text-white flex items-center justify-center font-bold shadow-xs">
                 <Sparkles className="h-7 w-7" />
               </div>
               <h3 className="text-xl font-bold text-[#252525]">Clay-Oven Tandoori</h3>
@@ -284,8 +284,8 @@ export default function RestaurantWebsite() {
               </p>
             </div>
 
-            <div className="bg-white rounded-3xl p-8 shadow-[0_14px_40px_rgba(60,40,80,0.14)] space-y-4 hover:-translate-y-1.5 transition-transform">
-              <div className="h-14 w-14 rounded-2xl bg-[#F2AFC0] text-white flex items-center justify-center font-bold shadow-xs">
+            <div className="bg-white rounded-3xl p-8 shadow-[0_14px_40px_rgba(60,40,80,0.12)] space-y-4 hover:-translate-y-1.5 transition-transform">
+              <div className="h-14 w-14 rounded-2xl bg-[#B4D58A] text-[#252525] flex items-center justify-center font-bold shadow-xs">
                 <QrCode className="h-7 w-7" />
               </div>
               <h3 className="text-xl font-bold text-[#252525]">Seamless Table QR Ordering</h3>
@@ -297,17 +297,17 @@ export default function RestaurantWebsite() {
         </div>
       </section>
 
-      {/* 3. DIGITAL MENU CATALOG (Butter Yellow: #F3DA8A) */}
-      <section id="menu" className="py-24 sm:py-32 bg-[#F3DA8A] px-6 sm:px-12 relative">
+      {/* 3. DIGITAL MENU CATALOG (Clean White with Mint & Butter Accents) */}
+      <section id="menu" className="py-24 sm:py-32 bg-[#FAF9F6] px-6 sm:px-12 relative">
         <div className="max-w-6xl mx-auto space-y-12">
           <div className="text-center space-y-4 max-w-3xl mx-auto">
-            <Badge variant="white" className="uppercase tracking-widest text-[11px] py-1 px-4">
+            <Badge variant="mint" className="uppercase tracking-widest text-[11px] py-1 px-4 font-bold">
               Seasonal Selections
             </Badge>
             <h2 className="font-bold text-3xl sm:text-5xl lg:text-6xl text-[#252525] tracking-tight">
               THE ARTISANAL MENU
             </h2>
-            <p className="text-base text-[#252525]/80 font-medium">
+            <p className="text-base text-[#5A5D58] font-medium">
               Prepared to order using locally sourced ingredients, ground spices, and heritage culinary techniques.
             </p>
           </div>
@@ -318,8 +318,8 @@ export default function RestaurantWebsite() {
               onClick={() => setSelectedCategory('all')}
               className={`px-5 py-2.5 text-xs font-bold uppercase tracking-wider rounded-2xl shrink-0 transition-all cursor-pointer ${
                 selectedCategory === 'all'
-                  ? 'bg-white text-[#252525] shadow-[0_8px_24px_rgba(60,40,80,0.18)] scale-105'
-                  : 'bg-white/50 text-[#252525] hover:bg-white/80'
+                  ? 'bg-[#B4D58A] text-[#252525] shadow-[0_8px_24px_rgba(180,213,138,0.35)] scale-105'
+                  : 'bg-white text-[#5A5D58] hover:bg-[#F3DA8A]/30 border border-black/[0.04]'
               }`}
             >
               All Creations
@@ -330,8 +330,8 @@ export default function RestaurantWebsite() {
                 onClick={() => setSelectedCategory(String(cat.id))}
                 className={`px-5 py-2.5 text-xs font-bold uppercase tracking-wider rounded-2xl shrink-0 transition-all cursor-pointer ${
                   selectedCategory === String(cat.id)
-                    ? 'bg-white text-[#252525] shadow-[0_8px_24px_rgba(60,40,80,0.18)] scale-105'
-                    : 'bg-white/50 text-[#252525] hover:bg-white/80'
+                    ? 'bg-[#B4D58A] text-[#252525] shadow-[0_8px_24px_rgba(180,213,138,0.35)] scale-105'
+                    : 'bg-white text-[#5A5D58] hover:bg-[#F3DA8A]/30 border border-black/[0.04]'
                 }`}
               >
                 {cat.name}
@@ -347,7 +347,7 @@ export default function RestaurantWebsite() {
               return (
                 <div
                   key={item.id}
-                  className="bg-white rounded-3xl p-6 flex flex-col justify-between shadow-[0_12px_36px_rgba(60,40,80,0.1)] hover:-translate-y-1 transition-all"
+                  className="bg-white rounded-3xl p-6 flex flex-col justify-between shadow-[0_12px_36px_rgba(60,40,80,0.08)] hover:-translate-y-1 transition-all border border-black/[0.04]"
                 >
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
@@ -362,7 +362,7 @@ export default function RestaurantWebsite() {
                           }`}
                         />
                       </div>
-                      <span className="text-[10px] font-bold uppercase tracking-wider bg-[#C2B0DC]/20 text-[#252525] px-2.5 py-1 rounded-full">
+                      <span className="text-[10px] font-bold uppercase tracking-wider bg-[#B4D58A]/20 text-[#252525] px-2.5 py-1 rounded-full">
                         {item.kitchen_station}
                       </span>
                     </div>
@@ -407,7 +407,7 @@ export default function RestaurantWebsite() {
       <section id="locations" className="py-24 sm:py-32 bg-[#F2AFC0] px-6 sm:px-12 relative">
         <div className="max-w-6xl mx-auto space-y-12">
           <div className="text-center space-y-4 max-w-3xl mx-auto">
-            <Badge variant="white" className="uppercase tracking-widest text-[11px] py-1 px-4">
+            <Badge variant="white" className="uppercase tracking-widest text-[11px] py-1 px-4 font-bold">
               Physical Spaces
             </Badge>
             <h2 className="font-bold text-3xl sm:text-5xl lg:text-6xl text-white tracking-tight">
@@ -422,12 +422,12 @@ export default function RestaurantWebsite() {
             {branches.map((b: any) => (
               <div
                 key={b.id}
-                className="bg-white rounded-3xl p-8 space-y-6 shadow-[0_14px_40px_rgba(60,40,80,0.16)] hover:-translate-y-1.5 transition-transform"
+                className="bg-white rounded-3xl p-8 space-y-6 shadow-[0_14px_40px_rgba(60,40,80,0.14)] hover:-translate-y-1.5 transition-transform"
               >
                 <div className="flex items-start justify-between">
                   <div>
                     <h3 className="text-2xl font-bold text-[#252525]">{b.name}</h3>
-                    <span className="text-xs font-bold text-[#C2B0DC] block mt-0.5">{b.code}</span>
+                    <span className="text-xs font-bold text-[#B4D58A] block mt-0.5">{b.code}</span>
                   </div>
                   <Badge variant="mint" className="text-xs font-bold">
                     Open Today
@@ -436,19 +436,19 @@ export default function RestaurantWebsite() {
 
                 <div className="space-y-3 text-xs text-[#5A5D58]">
                   <div className="flex items-center gap-3">
-                    <MapPin className="h-4 w-4 text-[#C2B0DC] shrink-0" />
+                    <MapPin className="h-4 w-4 text-[#B4D58A] shrink-0" />
                     <span>
                       {b.address}, {b.city}
                     </span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <Clock className="h-4 w-4 text-[#B4D58A] shrink-0" />
+                    <Clock className="h-4 w-4 text-[#F3DA8A] shrink-0" />
                     <span>
                       Daily Service: {b.opening_time || '11:00'} – {b.closing_time || '23:00'}
                     </span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <Phone className="h-4 w-4 text-[#F3DA8A] shrink-0" />
+                    <Phone className="h-4 w-4 text-[#B4D58A] shrink-0" />
                     <span>{b.phone}</span>
                   </div>
                 </div>
@@ -457,9 +457,9 @@ export default function RestaurantWebsite() {
                   <Button
                     onClick={() => {
                       setResBranchId(b.id);
-                      setReservationModalOpen(true)}
-                    }
-                    variant="lilac"
+                      setReservationModalOpen(true);
+                    }}
+                    variant="mint"
                     size="default"
                     className="w-full text-xs"
                   >
@@ -483,10 +483,10 @@ export default function RestaurantWebsite() {
           </div>
 
           <div className="flex items-center gap-6 font-semibold text-xs uppercase tracking-wider">
-            <Link href="/login" className="text-[#252525] hover:text-[#C2B0DC] transition-colors">
+            <Link href="/login" className="text-[#252525] hover:text-[#B4D58A] transition-colors">
               Staff Portal
             </Link>
-            <Link href="/reserve" className="text-[#252525] hover:text-[#C2B0DC] transition-colors">
+            <Link href="/reserve" className="text-[#252525] hover:text-[#B4D58A] transition-colors">
               Table Reservations
             </Link>
             <span className="text-[#8E928B]">Terms & Privacy</span>
@@ -497,7 +497,7 @@ export default function RestaurantWebsite() {
       {/* RESERVATION BOOKING MODAL */}
       {reservationModalOpen && (
         <div className="fixed inset-0 z-50 bg-[#252525]/30 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-md w-full shadow-[0_20px_60px_rgba(60,40,80,0.25)] p-8 space-y-6 animate-slide-up">
+          <div className="bg-white rounded-3xl max-w-md w-full shadow-[0_20px_60px_rgba(60,40,80,0.22)] p-8 space-y-6 animate-slide-up">
             <div className="flex items-center justify-between pb-4 border-b border-black/[0.06]">
               <div>
                 <h3 className="font-bold text-2xl text-[#252525]">Reserve a Table</h3>
@@ -526,7 +526,7 @@ export default function RestaurantWebsite() {
                 <select
                   value={resBranchId}
                   onChange={(e) => setResBranchId(Number(e.target.value))}
-                  className="w-full h-12 px-4 rounded-2xl border border-black/[0.08] bg-white text-sm text-[#252525] outline-none focus:border-[#C2B0DC] focus:ring-4 focus:ring-[#C2B0DC]/20 font-medium"
+                  className="w-full h-12 px-4 rounded-2xl border border-black/[0.08] bg-white text-sm text-[#252525] outline-none focus:border-[#B4D58A] focus:ring-4 focus:ring-[#B4D58A]/20 font-medium"
                 >
                   {branches.map((b: any) => (
                     <option key={b.id} value={b.id}>
@@ -563,7 +563,7 @@ export default function RestaurantWebsite() {
                   <select
                     value={resGuests}
                     onChange={(e) => setResGuests(Number(e.target.value))}
-                    className="w-full h-12 px-4 rounded-2xl border border-black/[0.08] bg-white text-sm text-[#252525] outline-none focus:border-[#C2B0DC] focus:ring-4 focus:ring-[#C2B0DC]/20 font-medium"
+                    className="w-full h-12 px-4 rounded-2xl border border-black/[0.08] bg-white text-sm text-[#252525] outline-none focus:border-[#B4D58A] focus:ring-4 focus:ring-[#B4D58A]/20 font-medium"
                   >
                     {[1, 2, 3, 4, 5, 6, 8, 10, 12].map((n) => (
                       <option key={n} value={n}>
@@ -581,7 +581,7 @@ export default function RestaurantWebsite() {
                     required
                     value={resDate}
                     onChange={(e) => setResDate(e.target.value)}
-                    className="w-full h-12 px-4 rounded-2xl border border-black/[0.08] bg-white text-sm text-[#252525] outline-none focus:border-[#C2B0DC] focus:ring-4 focus:ring-[#C2B0DC]/20 font-medium"
+                    className="w-full h-12 px-4 rounded-2xl border border-black/[0.08] bg-white text-sm text-[#252525] outline-none focus:border-[#B4D58A] focus:ring-4 focus:ring-[#B4D58A]/20 font-medium"
                   />
                 </div>
               </div>
@@ -594,7 +594,7 @@ export default function RestaurantWebsite() {
                 <select
                   value={resTime}
                   onChange={(e) => setResTime(e.target.value)}
-                  className="w-full h-12 px-4 rounded-2xl border border-black/[0.08] bg-white text-sm text-[#252525] outline-none focus:border-[#C2B0DC] focus:ring-4 focus:ring-[#C2B0DC]/20 font-medium"
+                  className="w-full h-12 px-4 rounded-2xl border border-black/[0.08] bg-white text-sm text-[#252525] outline-none focus:border-[#B4D58A] focus:ring-4 focus:ring-[#B4D58A]/20 font-medium"
                 >
                   {['12:00', '12:30', '13:00', '13:30', '19:00', '19:30', '20:00', '20:30', '21:00'].map(
                     (t) => (
@@ -618,7 +618,7 @@ export default function RestaurantWebsite() {
             <Button
               onClick={() => reservationMutation.mutate()}
               isLoading={reservationMutation.isPending}
-              variant="lilac"
+              variant="mint"
               size="lg"
               className="w-full"
             >
@@ -631,7 +631,7 @@ export default function RestaurantWebsite() {
       {/* RESERVATION SUCCESS CONFIRMATION MODAL */}
       {reservationSuccess && (
         <div className="fixed inset-0 z-50 bg-[#252525]/30 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-md w-full shadow-[0_20px_60px_rgba(60,40,80,0.25)] p-8 text-center space-y-5 animate-slide-up">
+          <div className="bg-white rounded-3xl max-w-md w-full shadow-[0_20px_60px_rgba(60,40,80,0.22)] p-8 text-center space-y-5 animate-slide-up">
             <div className="h-16 w-16 rounded-full bg-[#B4D58A] text-[#252525] flex items-center justify-center mx-auto shadow-md">
               <CheckCircle2 className="h-8 w-8" />
             </div>

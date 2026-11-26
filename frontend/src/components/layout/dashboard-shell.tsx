@@ -23,9 +23,9 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
 
   if (!isHydrated || !isAuthenticated) {
     return (
-      <div className="flex h-screen w-full items-center justify-center bg-[#C2B0DC]/20">
+      <div className="flex h-screen w-full items-center justify-center bg-[#B4D58A]/20">
         <div className="flex flex-col items-center gap-4 p-8 rounded-3xl bg-white shadow-[0_12px_36px_rgba(60,40,80,0.15)] animate-float-gentle">
-          <Loader2 className="h-10 w-10 animate-spin text-[#C2B0DC]" />
+          <Loader2 className="h-10 w-10 animate-spin text-[#B4D58A]" />
           <p className="font-baloo text-lg text-[#252525]">
             Loading Restaurant OS...
           </p>

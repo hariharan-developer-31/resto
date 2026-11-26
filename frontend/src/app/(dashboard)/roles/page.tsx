@@ -168,7 +168,7 @@ export default function RolesPermissionsPage() {
               }}
               className={`px-3.5 py-2 rounded-[10px] text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
                 isSelected
-                  ? 'bg-[#C2B0DC] text-white shadow-xs'
+                  ? 'bg-[#B4D58A] text-white shadow-xs'
                   : 'bg-white border border-black/[0.06] text-[#5A5D58] hover:bg-[#FAF9F6] hover:text-[#252525]'
               }`}
             >
@@ -185,7 +185,7 @@ export default function RolesPermissionsPage() {
 
       {/* Current Role Details & Permission Matrix */}
       {currentRole?.name === 'Super Admin' && (
-        <div className="flex items-center gap-3 p-4 rounded-xl bg-[#C2B0DC]/20 border border-[#F2DFD6] text-xs text-[#B19CCF]">
+        <div className="flex items-center gap-3 p-4 rounded-xl bg-[#B4D58A]/20 border border-[#F2DFD6] text-xs text-[#9EC271]">
           <Info className="h-5 w-5 shrink-0" />
           <span>
             The <strong>Super Admin</strong> role has universal system authorization across all restaurants, branches, financial records, and operational functions by architecture design.
@@ -213,7 +213,7 @@ export default function RolesPermissionsPage() {
                   <button
                     type="button"
                     onClick={() => selectAllInGroup(perms)}
-                    className="text-[11px] font-medium text-[#C2B0DC] hover:text-[#B19CCF] cursor-pointer"
+                    className="text-[11px] font-medium text-[#B4D58A] hover:text-[#9EC271] cursor-pointer"
                   >
                     {hasAllInGroup ? 'Deselect All' : 'Select All'}
                   </button>
@@ -237,7 +237,7 @@ export default function RolesPermissionsPage() {
                         checked={isChecked}
                         disabled={currentRole?.name === 'Super Admin'}
                         onChange={() => togglePermission(perm.name)}
-                        className="rounded border-black/[0.06] text-[#C2B0DC] focus:ring-[#C2B0DC] cursor-pointer"
+                        className="rounded border-black/[0.06] text-[#B4D58A] focus:ring-[#B4D58A] cursor-pointer"
                       />
                     </label>
                   );

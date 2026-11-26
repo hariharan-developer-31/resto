@@ -162,7 +162,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         {/* Brand Header */}
         <div className="flex h-20 items-center justify-between px-7 border-b border-black/[0.04]">
           <Link href="/dashboard" className="flex items-center gap-3 group">
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#C2B0DC] text-white shadow-[0_6px_20px_rgba(194,176,220,0.4)] group-hover:scale-105 transition-transform">
+            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#B4D58A] text-[#252525] shadow-[0_6px_20px_rgba(180,213,138,0.4)] group-hover:scale-105 transition-transform font-bold">
               <Sparkles className="h-5 w-5" />
             </div>
             <div>
@@ -203,21 +203,21 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                         className={cn(
                           "group flex items-center justify-between rounded-2xl px-3.5 py-2.5 text-sm font-medium transition-all duration-200",
                           isActive
-                            ? "bg-[#C2B0DC] text-white font-semibold shadow-[0_6px_20px_rgba(194,176,220,0.35)]"
+                            ? "bg-[#B4D58A] text-[#252525] font-bold shadow-[0_6px_20px_rgba(180,213,138,0.35)]"
                             : "text-[#5A5D58] hover:bg-[#F3DA8A]/25 hover:text-[#252525]"
                         )}
                       >
                         <div className="flex items-center gap-3">
                           <Icon className={cn(
                             "h-4 w-4 transition-colors",
-                            isActive ? "text-white" : "text-[#5A5D58] group-hover:text-[#252525]"
+                            isActive ? "text-[#252525]" : "text-[#5A5D58] group-hover:text-[#252525]"
                           )} />
                           <span>{item.label}</span>
                         </div>
                         {item.badge ? (
                           <span className={cn(
                             "text-[9px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full",
-                            isActive ? "bg-white/30 text-white" : "bg-[#B4D58A]/30 text-[#252525]"
+                            isActive ? "bg-white/40 text-[#252525]" : "bg-[#F3DA8A]/40 text-[#252525]"
                           )}>
                             {item.badge}
                           </span>
@@ -235,7 +235,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         <div className="p-4 border-t border-black/[0.04]">
           <div className="flex items-center justify-between gap-3 p-3 rounded-2xl bg-[#F3DA8A]/20">
             <div className="flex items-center gap-3 min-w-0">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#C2B0DC] text-sm font-bold text-white shadow-xs">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#B4D58A] text-sm font-bold text-[#252525] shadow-xs">
                 {user?.name?.charAt(0) || 'U'}
               </div>
               <div className="min-w-0 flex-1">

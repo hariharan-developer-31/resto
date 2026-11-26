@@ -341,7 +341,7 @@ export default function InventoryManagementPage() {
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-bold tracking-tight text-[#252525]">Inventory & Supply Chain</h1>
-            <Badge variant="outline" className="text-[#C2B0DC] border-[#C2B0DC]/20 bg-[#FAF9F6]">
+            <Badge variant="outline" className="text-[#B4D58A] border-[#B4D58A]/20 bg-[#FAF9F6]">
               Phase 7
             </Badge>
           </div>
@@ -369,7 +369,7 @@ export default function InventoryManagementPage() {
           {activeTab === 'stock' && (
             <Button
               onClick={() => setIsAddItemModalOpen(true)}
-              className="bg-[#C2B0DC] hover:bg-[#B19CCF] text-white shadow-sm"
+              className="bg-[#B4D58A] hover:bg-[#9EC271] text-white shadow-sm"
             >
               <Plus className="w-4 h-4 mr-2" /> Add Material
             </Button>
@@ -378,7 +378,7 @@ export default function InventoryManagementPage() {
           {activeTab === 'suppliers' && (
             <Button
               onClick={() => setIsAddSupplierModalOpen(true)}
-              className="bg-[#C2B0DC] hover:bg-[#B19CCF] text-white shadow-sm"
+              className="bg-[#B4D58A] hover:bg-[#9EC271] text-white shadow-sm"
             >
               <Plus className="w-4 h-4 mr-2" /> New Supplier
             </Button>
@@ -398,7 +398,7 @@ export default function InventoryManagementPage() {
                 }
                 setIsCreatePoModalOpen(true);
               }}
-              className="bg-[#C2B0DC] hover:bg-[#B19CCF] text-white shadow-sm"
+              className="bg-[#B4D58A] hover:bg-[#9EC271] text-white shadow-sm"
             >
               <Plus className="w-4 h-4 mr-2" /> Create PO
             </Button>
@@ -414,7 +414,7 @@ export default function InventoryManagementPage() {
               <p className="text-xs font-medium text-[#5A5D58]">Tracked Ingredients</p>
               <h3 className="text-2xl font-bold text-[#252525] mt-1">{totalItemCount}</h3>
             </div>
-            <div className="w-10 h-10 rounded-full bg-[#FAF9F6] flex items-center justify-center text-[#C2B0DC]">
+            <div className="w-10 h-10 rounded-full bg-[#FAF9F6] flex items-center justify-center text-[#B4D58A]">
               <Boxes className="w-5 h-5" />
             </div>
           </CardContent>
@@ -438,9 +438,9 @@ export default function InventoryManagementPage() {
           <CardContent className="p-4 flex items-center justify-between">
             <div>
               <p className="text-xs font-medium text-[#5A5D58]">Active Suppliers</p>
-              <h3 className="text-2xl font-bold text-[#C2B0DC] mt-1">{suppliers.length}</h3>
+              <h3 className="text-2xl font-bold text-[#B4D58A] mt-1">{suppliers.length}</h3>
             </div>
-            <div className="w-10 h-10 rounded-full bg-[#C2B0DC]/20 flex items-center justify-center text-[#C2B0DC]">
+            <div className="w-10 h-10 rounded-full bg-[#B4D58A]/20 flex items-center justify-center text-[#B4D58A]">
               <Truck className="w-5 h-5" />
             </div>
           </CardContent>
@@ -465,7 +465,7 @@ export default function InventoryManagementPage() {
           onClick={() => setActiveTab('stock')}
           className={`pb-3 text-sm font-semibold flex items-center gap-2 border-b-2 transition-colors ${
             activeTab === 'stock'
-              ? 'border-[#C2B0DC] text-[#C2B0DC]'
+              ? 'border-[#B4D58A] text-[#B4D58A]'
               : 'border-transparent text-[#5A5D58] hover:text-[#252525]'
           }`}
         >
@@ -480,7 +480,7 @@ export default function InventoryManagementPage() {
           onClick={() => setActiveTab('alerts')}
           className={`pb-3 text-sm font-semibold flex items-center gap-2 border-b-2 transition-colors ${
             activeTab === 'alerts'
-              ? 'border-[#C2B0DC] text-[#C2B0DC]'
+              ? 'border-[#B4D58A] text-[#B4D58A]'
               : 'border-transparent text-[#5A5D58] hover:text-[#252525]'
           }`}
         >
@@ -497,7 +497,7 @@ export default function InventoryManagementPage() {
           onClick={() => setActiveTab('suppliers')}
           className={`pb-3 text-sm font-semibold flex items-center gap-2 border-b-2 transition-colors ${
             activeTab === 'suppliers'
-              ? 'border-[#C2B0DC] text-[#C2B0DC]'
+              ? 'border-[#B4D58A] text-[#B4D58A]'
               : 'border-transparent text-[#5A5D58] hover:text-[#252525]'
           }`}
         >
@@ -512,7 +512,7 @@ export default function InventoryManagementPage() {
           onClick={() => setActiveTab('orders')}
           className={`pb-3 text-sm font-semibold flex items-center gap-2 border-b-2 transition-colors ${
             activeTab === 'orders'
-              ? 'border-[#C2B0DC] text-[#C2B0DC]'
+              ? 'border-[#B4D58A] text-[#B4D58A]'
               : 'border-transparent text-[#5A5D58] hover:text-[#252525]'
           }`}
         >
@@ -537,7 +537,7 @@ export default function InventoryManagementPage() {
                     onClick={() => setCategoryFilter(cat)}
                     className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                       categoryFilter === cat
-                        ? 'bg-[#C2B0DC] text-white'
+                        ? 'bg-[#B4D58A] text-white'
                         : 'bg-[#F3DA8A]/25 text-[#5A5D58] hover:bg-black/[0.06] hover:text-[#252525]'
                     }`}
                   >
@@ -578,7 +578,7 @@ export default function InventoryManagementPage() {
                   {isInvLoading ? (
                     <tr>
                       <td colSpan={8} className="px-6 py-12 text-center text-[#5A5D58]">
-                        <RefreshCw className="w-6 h-6 animate-spin mx-auto text-[#C2B0DC] mb-2" />
+                        <RefreshCw className="w-6 h-6 animate-spin mx-auto text-[#B4D58A] mb-2" />
                         Loading inventory catalog...
                       </td>
                     </tr>
@@ -730,7 +730,7 @@ export default function InventoryManagementPage() {
                               }
                               setIsCreatePoModalOpen(true);
                             }}
-                            className="h-7 text-xs bg-[#C2B0DC] hover:bg-[#B19CCF] text-white"
+                            className="h-7 text-xs bg-[#B4D58A] hover:bg-[#9EC271] text-white"
                           >
                             Order Now
                           </Button>
@@ -750,7 +750,7 @@ export default function InventoryManagementPage() {
         <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {suppliers.map((sup) => (
-              <Card key={sup.id} className="border-black/[0.06] bg-white shadow-xs hover:border-[#C2B0DC] transition-all">
+              <Card key={sup.id} className="border-black/[0.06] bg-white shadow-xs hover:border-[#B4D58A] transition-all">
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-base text-[#252525] font-bold">{sup.name}</CardTitle>
@@ -868,7 +868,7 @@ export default function InventoryManagementPage() {
           <div className="bg-white rounded-xl shadow-xl max-w-lg w-full p-6 border border-black/[0.06] animate-in fade-in-0 zoom-in-95">
             <div className="flex items-center justify-between pb-4 border-b border-black/[0.06]">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-[#C2B0DC]/20 text-[#C2B0DC] flex items-center justify-center">
+                <div className="w-8 h-8 rounded-lg bg-[#B4D58A]/20 text-[#B4D58A] flex items-center justify-center">
                   <Boxes className="w-4 h-4" />
                 </div>
                 <div>
@@ -1033,7 +1033,7 @@ export default function InventoryManagementPage() {
                 <Button
                   type="submit"
                   disabled={addItemMutation.isPending}
-                  className="text-xs h-9 bg-[#C2B0DC] hover:bg-[#B19CCF] text-white"
+                  className="text-xs h-9 bg-[#B4D58A] hover:bg-[#9EC271] text-white"
                 >
                   {addItemMutation.isPending ? 'Registering...' : 'Register Material'}
                 </Button>
@@ -1146,7 +1146,7 @@ export default function InventoryManagementPage() {
                 <Button
                   type="submit"
                   disabled={adjustStockMutation.isPending}
-                  className="text-xs h-9 bg-[#C2B0DC] hover:bg-[#B19CCF] text-white"
+                  className="text-xs h-9 bg-[#B4D58A] hover:bg-[#9EC271] text-white"
                 >
                   {adjustStockMutation.isPending ? 'Saving...' : 'Record Adjustment'}
                 </Button>
@@ -1162,7 +1162,7 @@ export default function InventoryManagementPage() {
           <div className="bg-white rounded-xl shadow-xl max-w-lg w-full p-6 border border-black/[0.06] animate-in fade-in-0 zoom-in-95">
             <div className="flex items-center justify-between pb-4 border-b border-black/[0.06]">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-[#C2B0DC]/20 text-[#C2B0DC] flex items-center justify-center">
+                <div className="w-8 h-8 rounded-lg bg-[#B4D58A]/20 text-[#B4D58A] flex items-center justify-center">
                   <Truck className="w-4 h-4" />
                 </div>
                 <div>
@@ -1281,7 +1281,7 @@ export default function InventoryManagementPage() {
                 <Button
                   type="submit"
                   disabled={addSupplierMutation.isPending}
-                  className="text-xs h-9 bg-[#C2B0DC] hover:bg-[#B19CCF] text-white"
+                  className="text-xs h-9 bg-[#B4D58A] hover:bg-[#9EC271] text-white"
                 >
                   {addSupplierMutation.isPending ? 'Saving...' : 'Register Supplier'}
                 </Button>
@@ -1297,7 +1297,7 @@ export default function InventoryManagementPage() {
           <div className="bg-white rounded-xl shadow-xl max-w-lg w-full p-6 border border-black/[0.06] animate-in fade-in-0 zoom-in-95">
             <div className="flex items-center justify-between pb-3 border-b border-black/[0.06]">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-[#FAF9F6] text-[#C2B0DC] flex items-center justify-center">
+                <div className="w-8 h-8 rounded-lg bg-[#FAF9F6] text-[#B4D58A] flex items-center justify-center">
                   <ClipboardList className="w-4 h-4" />
                 </div>
                 <div>
@@ -1375,7 +1375,7 @@ export default function InventoryManagementPage() {
                         ]);
                       }
                     }}
-                    className="h-7 text-xs text-[#C2B0DC]"
+                    className="h-7 text-xs text-[#B4D58A]"
                   >
                     + Add Item
                   </Button>
@@ -1475,7 +1475,7 @@ export default function InventoryManagementPage() {
                 <Button
                   type="submit"
                   disabled={createPoMutation.isPending || poItems.length === 0}
-                  className="text-xs h-9 bg-[#C2B0DC] hover:bg-[#B19CCF] text-white"
+                  className="text-xs h-9 bg-[#B4D58A] hover:bg-[#9EC271] text-white"
                 >
                   {createPoMutation.isPending ? 'Issuing...' : 'Issue Purchase Order'}
                 </Button>

@@ -208,9 +208,9 @@ export default function TablesManagementPage() {
       case 'available':
         return { badge: 'success', border: 'border-[#D5EAD9]', bg: 'bg-[#B4D58A]/20', text: 'text-[#B4D58A]', dot: 'bg-[#B4D58A]' };
       case 'occupied':
-        return { badge: 'default', border: 'border-[#F2DFD6]', bg: 'bg-[#C2B0DC]/20', text: 'text-[#C2B0DC]', dot: 'bg-[#C2B0DC]' };
+        return { badge: 'default', border: 'border-[#F2DFD6]', bg: 'bg-[#B4D58A]/20', text: 'text-[#B4D58A]', dot: 'bg-[#B4D58A]' };
       case 'reserved':
-        return { badge: 'secondary', border: 'border-[#D9E6F2]', bg: 'bg-[#EBF3FB]', text: 'text-[#C2B0DC]', dot: 'bg-[#C2B0DC]' };
+        return { badge: 'secondary', border: 'border-[#D9E6F2]', bg: 'bg-[#EBF3FB]', text: 'text-[#B4D58A]', dot: 'bg-[#B4D58A]' };
       case 'billing':
         return { badge: 'warning', border: 'border-[#F5E6CC]', bg: 'bg-[#F3DA8A]/25', text: 'text-[#F3DA8A]', dot: 'bg-[#F3DA8A]' };
       case 'cleaning':
@@ -273,27 +273,27 @@ export default function TablesManagementPage() {
         <div
           onClick={() => setStatusFilter(statusFilter === 'occupied' ? 'All' : 'occupied')}
           className={`p-3 rounded-xl border text-xs cursor-pointer transition-all ${
-            statusFilter === 'occupied' ? 'border-[#C2B0DC] bg-[#C2B0DC]/20' : 'border-black/[0.06] bg-white hover:bg-[#FAF9F6]'
+            statusFilter === 'occupied' ? 'border-[#B4D58A] bg-[#B4D58A]/20' : 'border-black/[0.06] bg-white hover:bg-[#FAF9F6]'
           }`}
         >
           <div className="flex items-center justify-between">
             <span className="text-[#5A5D58] uppercase font-semibold text-[10px]">Occupied</span>
-            <span className="h-2 w-2 rounded-full bg-[#C2B0DC]" />
+            <span className="h-2 w-2 rounded-full bg-[#B4D58A]" />
           </div>
-          <span className="font-bold text-xl font-bold text-[#C2B0DC] block mt-1">{statusCounts.occupied}</span>
+          <span className="font-bold text-xl font-bold text-[#B4D58A] block mt-1">{statusCounts.occupied}</span>
         </div>
 
         <div
           onClick={() => setStatusFilter(statusFilter === 'reserved' ? 'All' : 'reserved')}
           className={`p-3 rounded-xl border text-xs cursor-pointer transition-all ${
-            statusFilter === 'reserved' ? 'border-[#C2B0DC] bg-[#EBF3FB]' : 'border-black/[0.06] bg-white hover:bg-[#FAF9F6]'
+            statusFilter === 'reserved' ? 'border-[#B4D58A] bg-[#EBF3FB]' : 'border-black/[0.06] bg-white hover:bg-[#FAF9F6]'
           }`}
         >
           <div className="flex items-center justify-between">
             <span className="text-[#5A5D58] uppercase font-semibold text-[10px]">Reserved</span>
-            <span className="h-2 w-2 rounded-full bg-[#C2B0DC]" />
+            <span className="h-2 w-2 rounded-full bg-[#B4D58A]" />
           </div>
-          <span className="font-bold text-xl font-bold text-[#C2B0DC] block mt-1">{statusCounts.reserved}</span>
+          <span className="font-bold text-xl font-bold text-[#B4D58A] block mt-1">{statusCounts.reserved}</span>
         </div>
 
         <div
@@ -329,7 +329,7 @@ export default function TablesManagementPage() {
           onClick={() => setSelectedLocation('All')}
           className={`px-3 py-1.5 rounded-[10px] text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
             selectedLocation === 'All'
-              ? 'bg-[#C2B0DC] text-white shadow-xs'
+              ? 'bg-[#B4D58A] text-white shadow-xs'
               : 'bg-white border border-black/[0.06] text-[#5A5D58] hover:bg-[#FAF9F6]'
           }`}
         >
@@ -344,7 +344,7 @@ export default function TablesManagementPage() {
               onClick={() => setSelectedLocation(loc)}
               className={`px-3 py-1.5 rounded-[10px] text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
                 isSelected
-                  ? 'bg-[#C2B0DC] text-white shadow-xs'
+                  ? 'bg-[#B4D58A] text-white shadow-xs'
                   : 'bg-white border border-black/[0.06] text-[#5A5D58] hover:bg-[#FAF9F6]'
               }`}
             >
@@ -394,7 +394,7 @@ export default function TablesManagementPage() {
                     <button
                       onClick={() => openQrModal(table)}
                       title="View QR Code & Table Standee"
-                      className="p-1.5 rounded-lg border border-black/[0.06] bg-[#FAF9F6] text-[#C2B0DC] hover:bg-[#C2B0DC]/20 transition-colors cursor-pointer"
+                      className="p-1.5 rounded-lg border border-black/[0.06] bg-[#FAF9F6] text-[#B4D58A] hover:bg-[#B4D58A]/20 transition-colors cursor-pointer"
                     >
                       <QrCode className="h-4 w-4" />
                     </button>
@@ -420,7 +420,7 @@ export default function TablesManagementPage() {
 
                     <div className="flex items-center justify-between pt-1 border-t border-black/[0.04]">
                       <span className="text-[11px] text-[#8E928B]">Assigned Waiter:</span>
-                      <span className="font-medium text-[11px] text-[#C2B0DC]">
+                      <span className="font-medium text-[11px] text-[#B4D58A]">
                         {table.waiter?.name || 'Unassigned'}
                       </span>
                     </div>
@@ -518,7 +518,7 @@ export default function TablesManagementPage() {
                   placeholder="e.g. AC Dining Hall, Rooftop, Patio"
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
-                  className="w-full h-10 px-3 rounded-[10px] border border-black/[0.06] bg-white text-sm text-[#252525] outline-none focus:border-[#C2B0DC]"
+                  className="w-full h-10 px-3 rounded-[10px] border border-black/[0.06] bg-white text-sm text-[#252525] outline-none focus:border-[#B4D58A]"
                 />
               </div>
 
@@ -529,7 +529,7 @@ export default function TablesManagementPage() {
                 <select
                   value={waiterId}
                   onChange={(e) => setWaiterId(e.target.value ? Number(e.target.value) : '')}
-                  className="w-full h-10 px-3 rounded-[10px] border border-black/[0.06] bg-white text-sm text-[#252525] outline-none focus:border-[#C2B0DC]"
+                  className="w-full h-10 px-3 rounded-[10px] border border-black/[0.06] bg-white text-sm text-[#252525] outline-none focus:border-[#B4D58A]"
                 >
                   <option value="">None (Unassigned)</option>
                   {waiters.map((w: any) => (
@@ -557,7 +557,7 @@ export default function TablesManagementPage() {
           <div className="w-full max-w-md rounded-2xl bg-white border border-black/[0.06] shadow-2xl p-6 space-y-5">
             <div className="flex items-center justify-between pb-3 border-b border-black/[0.06]">
               <div className="flex items-center gap-2">
-                <QrCode className="h-5 w-5 text-[#C2B0DC]" />
+                <QrCode className="h-5 w-5 text-[#B4D58A]" />
                 <h2 className="font-bold text-lg font-semibold text-[#252525]">
                   Table {selectedTable.table_number} — QR Standee
                 </h2>
@@ -570,7 +570,7 @@ export default function TablesManagementPage() {
             {/* Printable Standee Card */}
             <div
               ref={printRef}
-              className="p-6 rounded-2xl border-2 border-dashed border-[#C2B0DC]/30 bg-[#FAF9F6] flex flex-col items-center text-center space-y-4"
+              className="p-6 rounded-2xl border-2 border-dashed border-[#B4D58A]/30 bg-[#FAF9F6] flex flex-col items-center text-center space-y-4"
             >
               <div className="space-y-1">
                 <span className="font-bold text-lg font-bold text-[#252525] block">
@@ -592,7 +592,7 @@ export default function TablesManagementPage() {
               </div>
 
               <div className="space-y-1">
-                <span className="font-bold text-3xl font-extrabold text-[#C2B0DC] block">
+                <span className="font-bold text-3xl font-extrabold text-[#B4D58A] block">
                   TABLE {selectedTable.table_number}
                 </span>
                 <p className="text-xs font-medium text-[#252525]">

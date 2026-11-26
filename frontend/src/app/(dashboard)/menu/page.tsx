@@ -312,7 +312,7 @@ export default function MenuCatalogPage() {
           onClick={() => setSelectedCategoryId(null)}
           className={`px-3.5 py-1.5 rounded-[10px] text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
             selectedCategoryId === null
-              ? 'bg-[#C2B0DC] text-white shadow-xs'
+              ? 'bg-[#B4D58A] text-white shadow-xs'
               : 'bg-white border border-black/[0.06] text-[#5A5D58] hover:bg-[#FAF9F6] hover:text-[#252525]'
           }`}
         >
@@ -327,7 +327,7 @@ export default function MenuCatalogPage() {
               onClick={() => setSelectedCategoryId(c.id)}
               className={`px-3.5 py-1.5 rounded-[10px] text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
                 isSelected
-                  ? 'bg-[#C2B0DC] text-white shadow-xs'
+                  ? 'bg-[#B4D58A] text-white shadow-xs'
                   : 'bg-white border border-black/[0.06] text-[#5A5D58] hover:bg-[#FAF9F6] hover:text-[#252525]'
               }`}
             >
@@ -346,7 +346,7 @@ export default function MenuCatalogPage() {
             placeholder="Search food by title or description..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full h-10 pl-9 pr-4 rounded-[10px] border border-black/[0.06] bg-white text-sm text-[#252525] placeholder:text-[#8E928B] outline-none focus:border-[#C2B0DC]"
+            className="w-full h-10 pl-9 pr-4 rounded-[10px] border border-black/[0.06] bg-white text-sm text-[#252525] placeholder:text-[#8E928B] outline-none focus:border-[#B4D58A]"
           />
         </div>
 
@@ -579,7 +579,7 @@ export default function MenuCatalogPage() {
                   <select
                     value={itemCategoryId}
                     onChange={(e) => setItemCategoryId(Number(e.target.value))}
-                    className="w-full h-10 px-3 rounded-[10px] border border-black/[0.06] bg-white text-sm text-[#252525] outline-none focus:border-[#C2B0DC]"
+                    className="w-full h-10 px-3 rounded-[10px] border border-black/[0.06] bg-white text-sm text-[#252525] outline-none focus:border-[#B4D58A]"
                     required
                   >
                     <option value="">Select Category</option>
@@ -596,7 +596,7 @@ export default function MenuCatalogPage() {
                   <select
                     value={itemType}
                     onChange={(e) => setItemType(e.target.value)}
-                    className="w-full h-10 px-3 rounded-[10px] border border-black/[0.06] bg-white text-sm text-[#252525] outline-none focus:border-[#C2B0DC]"
+                    className="w-full h-10 px-3 rounded-[10px] border border-black/[0.06] bg-white text-sm text-[#252525] outline-none focus:border-[#B4D58A]"
                   >
                     <option value="veg">🟢 Veg</option>
                     <option value="non_veg">🔴 Non-Veg</option>
@@ -629,7 +629,7 @@ export default function MenuCatalogPage() {
                   <select
                     value={itemStation}
                     onChange={(e) => setItemStation(e.target.value)}
-                    className="w-full h-10 px-3 rounded-[10px] border border-black/[0.06] bg-white text-sm text-[#252525] outline-none focus:border-[#C2B0DC]"
+                    className="w-full h-10 px-3 rounded-[10px] border border-black/[0.06] bg-white text-sm text-[#252525] outline-none focus:border-[#B4D58A]"
                   >
                     <option value="main">Main Kitchen</option>
                     <option value="grill">Grill / Tandoor</option>
@@ -648,7 +648,7 @@ export default function MenuCatalogPage() {
                   value={itemDescription}
                   onChange={(e) => setItemDescription(e.target.value)}
                   placeholder="Appetizing description of ingredients and preparation method..."
-                  className="w-full rounded-[10px] border border-black/[0.06] p-3 text-sm text-[#252525] placeholder:text-[#8E928B] outline-none focus:border-[#C2B0DC]"
+                  className="w-full rounded-[10px] border border-black/[0.06] p-3 text-sm text-[#252525] placeholder:text-[#8E928B] outline-none focus:border-[#B4D58A]"
                 />
               </div>
 
@@ -661,7 +661,7 @@ export default function MenuCatalogPage() {
                   <button
                     type="button"
                     onClick={() => setVariantsList([...variantsList, { name: '', price: '', is_default: false }])}
-                    className="text-xs font-medium text-[#C2B0DC] hover:underline"
+                    className="text-xs font-medium text-[#B4D58A] hover:underline"
                   >
                     + Add Variant
                   </button>
@@ -719,7 +719,7 @@ export default function MenuCatalogPage() {
                               if (e.target.checked) setSelectedAddonIds([...selectedAddonIds, a.id]);
                               else setSelectedAddonIds(selectedAddonIds.filter((id) => id !== a.id));
                             }}
-                            className="rounded border-black/[0.06] text-[#C2B0DC] focus:ring-[#C2B0DC]"
+                            className="rounded border-black/[0.06] text-[#B4D58A] focus:ring-[#B4D58A]"
                           />
                           <span>{a.name} (+₹{a.price})</span>
                         </label>

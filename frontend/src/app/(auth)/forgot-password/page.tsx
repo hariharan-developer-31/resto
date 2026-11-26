@@ -42,24 +42,24 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center bg-[#C2B0DC] px-4 py-12 overflow-hidden font-poppins">
-      <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-white/20 blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-32 -right-32 w-96 h-96 rounded-full bg-[#F3DA8A]/25 blur-3xl pointer-events-none" />
+    <div className="relative min-h-screen flex items-center justify-center bg-[#B4D58A] px-4 py-12 overflow-hidden font-poppins">
+      <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-white/30 blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-32 -right-32 w-96 h-96 rounded-full bg-[#F3DA8A]/30 blur-3xl pointer-events-none" />
 
       <div className="relative z-10 w-full max-w-md space-y-6 animate-slide-up">
         <div className="text-center space-y-3">
-          <Link href="/" className="inline-flex h-14 w-14 items-center justify-center rounded-3xl bg-white text-[#C2B0DC] shadow-[0_10px_30px_rgba(60,40,80,0.2)] mb-1">
-            <Sparkles className="h-7 w-7" />
+          <Link href="/" className="inline-flex h-14 w-14 items-center justify-center rounded-3xl bg-white text-[#252525] shadow-[0_10px_30px_rgba(60,40,80,0.15)] mb-1 font-bold">
+            <Sparkles className="h-7 w-7 text-[#B4D58A]" />
           </Link>
-          <h1 className="font-baloo text-3xl sm:text-4xl font-extrabold tracking-tight text-white leading-none">
+          <h1 className="font-baloo text-3xl sm:text-4xl font-extrabold tracking-tight text-[#252525] leading-none">
             Password Recovery
           </h1>
-          <p className="text-sm font-medium text-white/90">
+          <p className="text-sm font-bold text-[#252525]/85">
             Reset your access credentials securely
           </p>
         </div>
 
-        <Card className="rounded-3xl border-none shadow-[0_20px_60px_rgba(60,40,80,0.22)] bg-white/95 backdrop-blur-xl p-2 sm:p-4">
+        <Card className="rounded-3xl border-none shadow-[0_20px_60px_rgba(60,40,80,0.18)] bg-white/95 backdrop-blur-xl p-2 sm:p-4">
           <CardHeader className="space-y-1.5 pb-4">
             <CardTitle className="text-2xl font-bold text-[#252525]">Forgot Password</CardTitle>
             <CardDescription className="text-sm text-[#5A5D58]">
@@ -78,7 +78,7 @@ export default function ForgotPasswordPage() {
                   required
                 />
 
-                <Button type="submit" variant="lilac" size="lg" className="w-full" isLoading={isLoading}>
+                <Button type="submit" variant="mint" size="lg" className="w-full font-bold" isLoading={isLoading}>
                   Send Reset Link
                 </Button>
               </form>

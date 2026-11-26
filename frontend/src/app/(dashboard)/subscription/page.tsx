@@ -113,7 +113,7 @@ export default function SubscriptionManagementPage() {
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-bold tracking-tight text-[#252525]">SaaS Subscription & Plan Quotas</h1>
-            <Badge variant="outline" className="text-[#C2B0DC] border-[#C2B0DC]/20 bg-[#FAF9F6]">
+            <Badge variant="outline" className="text-[#B4D58A] border-[#B4D58A]/20 bg-[#FAF9F6]">
               Phase 8
             </Badge>
           </div>
@@ -137,7 +137,7 @@ export default function SubscriptionManagementPage() {
       <Card className="border-black/[0.06] bg-white shadow-xs overflow-hidden">
         <div className="bg-[#FAF9F6] p-6 border-b border-black/[0.06] flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-[#C2B0DC]/20 text-[#C2B0DC] flex items-center justify-center font-bold">
+            <div className="w-12 h-12 rounded-xl bg-[#B4D58A]/20 text-[#B4D58A] flex items-center justify-center font-bold">
               <Zap className="w-6 h-6" />
             </div>
             <div>
@@ -171,7 +171,7 @@ export default function SubscriptionManagementPage() {
             <div className="p-4 rounded-xl border border-black/[0.06] bg-[#FAF9F6]">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-semibold text-[#252525] flex items-center gap-1.5">
-                  <Building2 className="w-4 h-4 text-[#C2B0DC]" /> Branch Locations
+                  <Building2 className="w-4 h-4 text-[#B4D58A]" /> Branch Locations
                 </span>
                 <span className="text-xs font-bold text-[#252525]">
                   {quotas?.branches?.current || 1} / {quotas?.branches?.max || 3}
@@ -179,7 +179,7 @@ export default function SubscriptionManagementPage() {
               </div>
               <div className="w-full bg-black/[0.06] rounded-full h-2">
                 <div
-                  className="bg-[#C2B0DC] h-2 rounded-full transition-all"
+                  className="bg-[#B4D58A] h-2 rounded-full transition-all"
                   style={{
                     width: `${Math.min(100, ((quotas?.branches?.current || 1) / (quotas?.branches?.max || 3)) * 100)}%`,
                   }}
@@ -194,7 +194,7 @@ export default function SubscriptionManagementPage() {
             <div className="p-4 rounded-xl border border-black/[0.06] bg-[#FAF9F6]">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-semibold text-[#252525] flex items-center gap-1.5">
-                  <Grid className="w-4 h-4 text-[#C2B0DC]" /> Dining Tables
+                  <Grid className="w-4 h-4 text-[#B4D58A]" /> Dining Tables
                 </span>
                 <span className="text-xs font-bold text-[#252525]">
                   {quotas?.tables?.current || 6} / {quotas?.tables?.max || 30}
@@ -202,7 +202,7 @@ export default function SubscriptionManagementPage() {
               </div>
               <div className="w-full bg-black/[0.06] rounded-full h-2">
                 <div
-                  className="bg-[#C2B0DC] h-2 rounded-full transition-all"
+                  className="bg-[#B4D58A] h-2 rounded-full transition-all"
                   style={{
                     width: `${Math.min(100, ((quotas?.tables?.current || 6) / (quotas?.tables?.max || 30)) * 100)}%`,
                   }}
@@ -250,7 +250,7 @@ export default function SubscriptionManagementPage() {
           <button
             onClick={() => setBillingCycle('monthly')}
             className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-              billingCycle === 'monthly' ? 'bg-[#C2B0DC] text-white shadow-xs' : 'text-[#5A5D58] hover:text-[#252525]'
+              billingCycle === 'monthly' ? 'bg-[#B4D58A] text-white shadow-xs' : 'text-[#5A5D58] hover:text-[#252525]'
             }`}
           >
             Monthly Billing
@@ -258,7 +258,7 @@ export default function SubscriptionManagementPage() {
           <button
             onClick={() => setBillingCycle('annual')}
             className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
-              billingCycle === 'annual' ? 'bg-[#C2B0DC] text-white shadow-xs' : 'text-[#5A5D58] hover:text-[#252525]'
+              billingCycle === 'annual' ? 'bg-[#B4D58A] text-white shadow-xs' : 'text-[#5A5D58] hover:text-[#252525]'
             }`}
           >
             <span>Annual Billing</span>
@@ -279,12 +279,12 @@ export default function SubscriptionManagementPage() {
               key={plan.id}
               className={`border transition-all relative flex flex-col justify-between ${
                 isPro
-                  ? 'border-[#C2B0DC] shadow-md ring-1 ring-[#C2B0DC]'
-                  : 'border-black/[0.06] bg-white shadow-xs hover:border-[#C2B0DC]'
+                  ? 'border-[#B4D58A] shadow-md ring-1 ring-[#B4D58A]'
+                  : 'border-black/[0.06] bg-white shadow-xs hover:border-[#B4D58A]'
               }`}
             >
               {isPro && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-[#C2B0DC] text-white text-[11px] font-bold shadow-xs">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-[#B4D58A] text-white text-[11px] font-bold shadow-xs">
                   Most Popular for Busy Restaurants
                 </div>
               )}
@@ -342,8 +342,8 @@ export default function SubscriptionManagementPage() {
                       }}
                       className={`w-full text-xs h-9 ${
                         isPro
-                          ? 'bg-[#C2B0DC] hover:bg-[#B19CCF] text-white shadow-xs'
-                          : 'bg-[#FAF9F6] text-[#252525] hover:bg-[#C2B0DC]/20 border border-black/[0.06]'
+                          ? 'bg-[#B4D58A] hover:bg-[#9EC271] text-white shadow-xs'
+                          : 'bg-[#FAF9F6] text-[#252525] hover:bg-[#B4D58A]/20 border border-black/[0.06]'
                       }`}
                     >
                       <span>Upgrade to {plan.name}</span>
@@ -363,7 +363,7 @@ export default function SubscriptionManagementPage() {
           <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 border border-black/[0.06] animate-in fade-in-0 zoom-in-95">
             <div className="flex items-center justify-between pb-3 border-b border-black/[0.06]">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-[#C2B0DC]/20 text-[#C2B0DC] flex items-center justify-center">
+                <div className="w-8 h-8 rounded-lg bg-[#B4D58A]/20 text-[#B4D58A] flex items-center justify-center">
                   <Sparkles className="w-4 h-4" />
                 </div>
                 <div>
@@ -388,7 +388,7 @@ export default function SubscriptionManagementPage() {
                 </div>
                 <div className="flex justify-between text-sm pt-1 border-t border-black/[0.06]">
                   <span className="font-bold">Total Investment:</span>
-                  <strong className="text-[#C2B0DC] font-bold">
+                  <strong className="text-[#B4D58A] font-bold">
                     ₹{Number(billingCycle === 'annual' ? selectedPlanForUpgrade.annual_price : selectedPlanForUpgrade.monthly_price).toLocaleString()}
                   </strong>
                 </div>
@@ -412,7 +412,7 @@ export default function SubscriptionManagementPage() {
                 size="sm"
                 onClick={handleUpgradeSubmit}
                 disabled={upgradeMutation.isPending}
-                className="text-xs bg-[#C2B0DC] hover:bg-[#B19CCF] text-white"
+                className="text-xs bg-[#B4D58A] hover:bg-[#9EC271] text-white"
               >
                 {upgradeMutation.isPending ? 'Processing...' : 'Confirm Upgrade'}
               </Button>

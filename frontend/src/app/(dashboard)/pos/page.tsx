@@ -355,7 +355,7 @@ export default function PosPage() {
               }}
               className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${
                 orderType === 'dine_in'
-                  ? 'bg-white text-[#C2B0DC] shadow-xs'
+                  ? 'bg-white text-[#B4D58A] shadow-xs'
                   : 'text-[#5A5D58] hover:text-[#252525]'
               }`}
             >
@@ -369,7 +369,7 @@ export default function PosPage() {
               }}
               className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${
                 orderType === 'takeaway'
-                  ? 'bg-white text-[#C2B0DC] shadow-xs'
+                  ? 'bg-white text-[#B4D58A] shadow-xs'
                   : 'text-[#5A5D58] hover:text-[#252525]'
               }`}
             >
@@ -383,7 +383,7 @@ export default function PosPage() {
               }}
               className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${
                 orderType === 'delivery'
-                  ? 'bg-white text-[#C2B0DC] shadow-xs'
+                  ? 'bg-white text-[#B4D58A] shadow-xs'
                   : 'text-[#5A5D58] hover:text-[#252525]'
               }`}
             >
@@ -406,9 +406,9 @@ export default function PosPage() {
                     onClick={() => setSelectedTable(t)}
                     className={`px-2.5 py-1 text-xs font-semibold rounded-md shrink-0 border transition-all flex items-center gap-1.5 ${
                       isSelected
-                        ? 'bg-[#C2B0DC] text-white border-[#C2B0DC] shadow-xs'
+                        ? 'bg-[#B4D58A] text-white border-[#B4D58A] shadow-xs'
                         : isOccupied
-                        ? 'bg-[#C2B0DC]/20 text-[#C2B0DC] border-[#CFE2F7] hover:bg-[#CFE2F7]'
+                        ? 'bg-[#B4D58A]/20 text-[#B4D58A] border-[#CFE2F7] hover:bg-[#CFE2F7]'
                         : isBilled
                         ? 'bg-[#F5EDF9] text-[#8E44AD] border-[#E8D7F1]'
                         : 'bg-white text-[#252525] border-black/[0.06] hover:bg-[#F3DA8A]/25'
@@ -420,7 +420,7 @@ export default function PosPage() {
                         isSelected
                           ? 'bg-white'
                           : isOccupied
-                          ? 'bg-[#C2B0DC]'
+                          ? 'bg-[#B4D58A]'
                           : isBilled
                           ? 'bg-[#8E44AD]'
                           : 'bg-[#B4D58A]'
@@ -456,7 +456,7 @@ export default function PosPage() {
 
         {/* ACTIVE TABLE ORDER NOTIFICATION BANNER */}
         {orderType === 'dine_in' && selectedTable && activeTableOrder && (
-          <div className="bg-[#C2B0DC]/20 border-b border-[#CFE2F7] px-4 py-2 flex items-center justify-between text-xs text-[#C2B0DC] shrink-0">
+          <div className="bg-[#B4D58A]/20 border-b border-[#CFE2F7] px-4 py-2 flex items-center justify-between text-xs text-[#B4D58A] shrink-0">
             <div className="flex items-center gap-2">
               <span className="font-bold">Table {selectedTable.table_number} has an Active Order</span>
               <span>· {activeTableOrder.order_number}</span>
@@ -464,7 +464,7 @@ export default function PosPage() {
               <span>· Total: ₹{Number(activeTableOrder.total_amount).toFixed(2)}</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-[11px] text-[#C2B0DC]">Adding items fires Round {activeTableOrder.round_count + 1}</span>
+              <span className="text-[11px] text-[#B4D58A]">Adding items fires Round {activeTableOrder.round_count + 1}</span>
               <Button
                 size="sm"
                 variant="outline"
@@ -472,7 +472,7 @@ export default function PosPage() {
                   setSettlementOrder(activeTableOrder);
                   setTenderAmount(Number(activeTableOrder.total_amount));
                 }}
-                className="h-7 px-2.5 text-xs bg-white text-[#C2B0DC] border-[#C2B0DC] hover:bg-[#C2B0DC]/20"
+                className="h-7 px-2.5 text-xs bg-white text-[#B4D58A] border-[#B4D58A] hover:bg-[#B4D58A]/20"
               >
                 Settle Table Bill
               </Button>
@@ -536,7 +536,7 @@ export default function PosPage() {
             onClick={() => setSelectedCategory('all')}
             className={`px-3 py-1.5 text-xs font-semibold rounded-lg shrink-0 transition-all ${
               selectedCategory === 'all'
-                ? 'bg-[#C2B0DC] text-white shadow-xs'
+                ? 'bg-[#B4D58A] text-white shadow-xs'
                 : 'bg-white text-[#5A5D58] border border-black/[0.06] hover:bg-[#F3DA8A]/25'
             }`}
           >
@@ -548,7 +548,7 @@ export default function PosPage() {
               onClick={() => setSelectedCategory(String(cat.id))}
               className={`px-3 py-1.5 text-xs font-semibold rounded-lg shrink-0 transition-all ${
                 selectedCategory === String(cat.id)
-                  ? 'bg-[#C2B0DC] text-white shadow-xs'
+                  ? 'bg-[#B4D58A] text-white shadow-xs'
                   : 'bg-white text-[#5A5D58] border border-black/[0.06] hover:bg-[#F3DA8A]/25'
               }`}
             >
@@ -584,7 +584,7 @@ export default function PosPage() {
                     onClick={() => handleItemClick(item)}
                     className={`p-3 rounded-xl border text-left flex flex-col justify-between transition-all group relative ${
                       item.is_available
-                        ? 'bg-white border-black/[0.06] hover:border-[#C2B0DC] hover:shadow-xs active:scale-[0.98]'
+                        ? 'bg-white border-black/[0.06] hover:border-[#B4D58A] hover:shadow-xs active:scale-[0.98]'
                         : 'bg-[#F9F9F8] border-black/[0.06] opacity-50 cursor-not-allowed'
                     }`}
                   >
@@ -615,7 +615,7 @@ export default function PosPage() {
 
                     {/* Bottom: Price and Variant Tag */}
                     <div className="mt-2 pt-2 border-t border-black/[0.04] flex items-center justify-between">
-                      <span className="text-xs font-bold text-[#C2B0DC]">
+                      <span className="text-xs font-bold text-[#B4D58A]">
                         ₹{Number(item.base_price).toFixed(2)}
                       </span>
 
@@ -624,7 +624,7 @@ export default function PosPage() {
                           Customize +
                         </span>
                       ) : (
-                        <span className="h-5 w-5 rounded-full bg-[#C2B0DC]/20 text-[#C2B0DC] flex items-center justify-center group-hover:bg-[#C2B0DC] group-hover:text-white transition-colors">
+                        <span className="h-5 w-5 rounded-full bg-[#B4D58A]/20 text-[#B4D58A] flex items-center justify-center group-hover:bg-[#B4D58A] group-hover:text-white transition-colors">
                           <Plus className="h-3 w-3" />
                         </span>
                       )}
@@ -702,7 +702,7 @@ export default function PosPage() {
                         {item.name}
                       </span>
                       {item.variantName && (
-                        <span className="text-[10px] bg-[#C2B0DC]/20 text-[#C2B0DC] px-1.5 py-0.2 rounded font-medium">
+                        <span className="text-[10px] bg-[#B4D58A]/20 text-[#B4D58A] px-1.5 py-0.2 rounded font-medium">
                           {item.variantName}
                         </span>
                       )}
@@ -717,7 +717,7 @@ export default function PosPage() {
 
                     {/* Special Note */}
                     {item.specialInstructions && (
-                      <div className="text-[10px] italic text-[#C2B0DC] mt-0.5">
+                      <div className="text-[10px] italic text-[#B4D58A] mt-0.5">
                         Note: {item.specialInstructions}
                       </div>
                     )}
@@ -775,7 +775,7 @@ export default function PosPage() {
             )}
             <div className="pt-2 border-t border-black/[0.06] flex justify-between items-baseline">
               <span className="font-bold text-sm text-[#252525]">Grand Total</span>
-              <span className="font-bold text-lg text-[#C2B0DC]">₹{grandTotal.toFixed(2)}</span>
+              <span className="font-bold text-lg text-[#B4D58A]">₹{grandTotal.toFixed(2)}</span>
             </div>
           </div>
 
@@ -785,7 +785,7 @@ export default function PosPage() {
             <Button
               disabled={cart.length === 0 || fireKotMutation.isPending}
               onClick={() => fireKotMutation.mutate()}
-              className="bg-[#C2B0DC] hover:bg-[#B19CCF] text-white text-xs font-semibold h-10 flex items-center justify-center gap-1.5 shadow-xs"
+              className="bg-[#B4D58A] hover:bg-[#9EC271] text-white text-xs font-semibold h-10 flex items-center justify-center gap-1.5 shadow-xs"
             >
               <Send className="h-3.5 w-3.5" />
               {fireKotMutation.isPending ? 'Sending...' : 'Fire KOT'}
@@ -847,7 +847,7 @@ export default function PosPage() {
                         onClick={() => setSelectedVariant(variant)}
                         className={`p-3 rounded-xl border flex items-center justify-between cursor-pointer transition-all ${
                           selectedVariant?.id === variant.id
-                            ? 'bg-[#C2B0DC]/20 border-[#C2B0DC] text-[#252525] font-semibold'
+                            ? 'bg-[#B4D58A]/20 border-[#B4D58A] text-[#252525] font-semibold'
                             : 'bg-white border-black/[0.06] hover:bg-[#FAF9F6]'
                         }`}
                       >
@@ -857,11 +857,11 @@ export default function PosPage() {
                             name="variant"
                             checked={selectedVariant?.id === variant.id}
                             onChange={() => setSelectedVariant(variant)}
-                            className="text-[#C2B0DC] focus:ring-[#C2B0DC]"
+                            className="text-[#B4D58A] focus:ring-[#B4D58A]"
                           />
                           <span className="text-xs">{variant.name}</span>
                         </div>
-                        <span className="text-xs font-bold text-[#C2B0DC]">
+                        <span className="text-xs font-bold text-[#B4D58A]">
                           ₹{Number(variant.price).toFixed(2)}
                         </span>
                       </label>
@@ -939,7 +939,7 @@ export default function PosPage() {
                 onClick={() =>
                   addToCartDirect(customizingItem, selectedVariant, selectedAddons, itemNote)
                 }
-                className="bg-[#C2B0DC] hover:bg-[#B19CCF] text-white text-xs font-semibold px-4 h-9"
+                className="bg-[#B4D58A] hover:bg-[#9EC271] text-white text-xs font-semibold px-4 h-9"
               >
                 Add to Cart
               </Button>
@@ -957,7 +957,7 @@ export default function PosPage() {
                 <CheckCircle2 className="h-6 w-6" />
               </div>
               <h3 className="font-bold text-base text-[#252525]">KOT Dispatched to Kitchen</h3>
-              <p className="text-xs font-mono font-bold text-[#C2B0DC] mt-0.5">
+              <p className="text-xs font-mono font-bold text-[#B4D58A] mt-0.5">
                 {kotData.kot_number}
               </p>
               <p className="text-[11px] text-[#5A5D58]">
@@ -978,7 +978,7 @@ export default function PosPage() {
                       </span>
                     )}
                     {item.special_instructions && (
-                      <span className="text-[10px] text-[#C2B0DC] italic block">
+                      <span className="text-[10px] text-[#B4D58A] italic block">
                         Note: {item.special_instructions}
                       </span>
                     )}
@@ -1000,7 +1000,7 @@ export default function PosPage() {
               </Button>
               <Button
                 onClick={() => setKotData(null)}
-                className="flex-1 bg-[#C2B0DC] hover:bg-[#B19CCF] text-white text-xs h-9"
+                className="flex-1 bg-[#B4D58A] hover:bg-[#9EC271] text-white text-xs h-9"
               >
                 Done
               </Button>
@@ -1032,7 +1032,7 @@ export default function PosPage() {
             {/* Total Due Banner */}
             <div className="bg-[#FAF9F6] p-3 rounded-xl border border-black/[0.06] flex items-center justify-between">
               <span className="text-xs font-semibold text-[#5A5D58]">Total Amount Due</span>
-              <span className="text-xl font-bold text-[#C2B0DC]">
+              <span className="text-xl font-bold text-[#B4D58A]">
                 ₹{Number(settlementOrder.total_amount).toFixed(2)}
               </span>
             </div>
@@ -1048,7 +1048,7 @@ export default function PosPage() {
                   onClick={() => setPaymentMode('cash')}
                   className={`p-2.5 rounded-xl border text-center transition-all ${
                     paymentMode === 'cash'
-                      ? 'bg-[#C2B0DC]/20 border-[#C2B0DC] text-[#C2B0DC] font-bold shadow-xs'
+                      ? 'bg-[#B4D58A]/20 border-[#B4D58A] text-[#B4D58A] font-bold shadow-xs'
                       : 'bg-white border-black/[0.06] text-[#5A5D58]'
                   }`}
                 >
@@ -1060,7 +1060,7 @@ export default function PosPage() {
                   onClick={() => setPaymentMode('upi')}
                   className={`p-2.5 rounded-xl border text-center transition-all ${
                     paymentMode === 'upi'
-                      ? 'bg-[#C2B0DC]/20 border-[#C2B0DC] text-[#C2B0DC] font-bold shadow-xs'
+                      ? 'bg-[#B4D58A]/20 border-[#B4D58A] text-[#B4D58A] font-bold shadow-xs'
                       : 'bg-white border-black/[0.06] text-[#5A5D58]'
                   }`}
                 >
@@ -1072,7 +1072,7 @@ export default function PosPage() {
                   onClick={() => setPaymentMode('card')}
                   className={`p-2.5 rounded-xl border text-center transition-all ${
                     paymentMode === 'card'
-                      ? 'bg-[#C2B0DC]/20 border-[#C2B0DC] text-[#C2B0DC] font-bold shadow-xs'
+                      ? 'bg-[#B4D58A]/20 border-[#B4D58A] text-[#B4D58A] font-bold shadow-xs'
                       : 'bg-white border-black/[0.06] text-[#5A5D58]'
                   }`}
                 >
@@ -1084,7 +1084,7 @@ export default function PosPage() {
                   onClick={() => setPaymentMode('split')}
                   className={`p-2.5 rounded-xl border text-center transition-all ${
                     paymentMode === 'split'
-                      ? 'bg-[#C2B0DC]/20 border-[#C2B0DC] text-[#C2B0DC] font-bold shadow-xs'
+                      ? 'bg-[#B4D58A]/20 border-[#B4D58A] text-[#B4D58A] font-bold shadow-xs'
                       : 'bg-white border-black/[0.06] text-[#5A5D58]'
                   }`}
                 >
@@ -1189,7 +1189,7 @@ export default function PosPage() {
               <h3 className="font-bold text-lg font-bold text-[#252525]">THE GRAND FEAST</h3>
               <p className="text-[11px] text-[#5A5D58]">Downtown Flagship Branch</p>
               <p className="text-[11px] text-[#5A5D58]">GSTIN: 33AAAAA0000A1Z5</p>
-              <div className="mt-2 py-1 bg-[#FAF9F6] rounded border border-black/[0.06] font-mono text-xs font-bold text-[#C2B0DC]">
+              <div className="mt-2 py-1 bg-[#FAF9F6] rounded border border-black/[0.06] font-mono text-xs font-bold text-[#B4D58A]">
                 INVOICE: {invoiceData.invoice_number}
               </div>
             </div>
@@ -1246,7 +1246,7 @@ export default function PosPage() {
               </Button>
               <Button
                 onClick={() => setInvoiceData(null)}
-                className="flex-1 bg-[#C2B0DC] hover:bg-[#B19CCF] text-white text-xs h-9"
+                className="flex-1 bg-[#B4D58A] hover:bg-[#9EC271] text-white text-xs h-9"
               >
                 Close
               </Button>

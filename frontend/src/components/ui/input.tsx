@@ -27,7 +27,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           id={inputId}
           className={cn(
             "flex h-12 w-full rounded-2xl border bg-white/90 backdrop-blur-sm px-4 py-3 text-sm text-[#252525] placeholder:text-[#8E928B] transition-all duration-200 outline-none",
-            "border-black/[0.08] hover:border-[#C2B0DC] focus:border-[#C2B0DC] focus:ring-4 focus:ring-[#C2B0DC]/20",
+            "border-black/[0.08] hover:border-[#B4D58A] focus:border-[#B4D58A] focus:ring-4 focus:ring-[#B4D58A]/20",
             error && "border-[#F2AFC0] focus:border-[#F2AFC0] focus:ring-[#F2AFC0]/30",
             className
           )}

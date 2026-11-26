@@ -152,7 +152,7 @@ export default function ReportsAndAnalyticsPage() {
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-bold tracking-tight text-[#252525]">Executive Reports & Analytics</h1>
-            <Badge variant="outline" className="text-[#C2B0DC] border-[#C2B0DC]/20 bg-[#FAF9F6]">
+            <Badge variant="outline" className="text-[#B4D58A] border-[#B4D58A]/20 bg-[#FAF9F6]">
               Phase 8
             </Badge>
           </div>
@@ -175,7 +175,7 @@ export default function ReportsAndAnalyticsPage() {
           {activeTab === 'eod' && (
             <Button
               onClick={handlePrintZReport}
-              className="bg-[#C2B0DC] hover:bg-[#B19CCF] text-white shadow-sm"
+              className="bg-[#B4D58A] hover:bg-[#9EC271] text-white shadow-sm"
             >
               <Printer className="w-4 h-4 mr-2" /> Print Z-Report
             </Button>
@@ -189,7 +189,7 @@ export default function ReportsAndAnalyticsPage() {
           onClick={() => setActiveTab('overview')}
           className={`pb-3 text-sm font-semibold flex items-center gap-2 border-b-2 whitespace-nowrap transition-colors ${
             activeTab === 'overview'
-              ? 'border-[#C2B0DC] text-[#C2B0DC]'
+              ? 'border-[#B4D58A] text-[#B4D58A]'
               : 'border-transparent text-[#5A5D58] hover:text-[#252525]'
           }`}
         >
@@ -201,7 +201,7 @@ export default function ReportsAndAnalyticsPage() {
           onClick={() => setActiveTab('menu')}
           className={`pb-3 text-sm font-semibold flex items-center gap-2 border-b-2 whitespace-nowrap transition-colors ${
             activeTab === 'menu'
-              ? 'border-[#C2B0DC] text-[#C2B0DC]'
+              ? 'border-[#B4D58A] text-[#B4D58A]'
               : 'border-transparent text-[#5A5D58] hover:text-[#252525]'
           }`}
         >
@@ -213,7 +213,7 @@ export default function ReportsAndAnalyticsPage() {
           onClick={() => setActiveTab('efficiency')}
           className={`pb-3 text-sm font-semibold flex items-center gap-2 border-b-2 whitespace-nowrap transition-colors ${
             activeTab === 'efficiency'
-              ? 'border-[#C2B0DC] text-[#C2B0DC]'
+              ? 'border-[#B4D58A] text-[#B4D58A]'
               : 'border-transparent text-[#5A5D58] hover:text-[#252525]'
           }`}
         >
@@ -225,7 +225,7 @@ export default function ReportsAndAnalyticsPage() {
           onClick={() => setActiveTab('eod')}
           className={`pb-3 text-sm font-semibold flex items-center gap-2 border-b-2 whitespace-nowrap transition-colors ${
             activeTab === 'eod'
-              ? 'border-[#C2B0DC] text-[#C2B0DC]'
+              ? 'border-[#B4D58A] text-[#B4D58A]'
               : 'border-transparent text-[#5A5D58] hover:text-[#252525]'
           }`}
         >
@@ -237,7 +237,7 @@ export default function ReportsAndAnalyticsPage() {
           onClick={() => setActiveTab('tax')}
           className={`pb-3 text-sm font-semibold flex items-center gap-2 border-b-2 whitespace-nowrap transition-colors ${
             activeTab === 'tax'
-              ? 'border-[#C2B0DC] text-[#C2B0DC]'
+              ? 'border-[#B4D58A] text-[#B4D58A]'
               : 'border-transparent text-[#5A5D58] hover:text-[#252525]'
           }`}
         >
@@ -253,7 +253,7 @@ export default function ReportsAndAnalyticsPage() {
           <Card className="border-black/[0.06] bg-white shadow-xs">
             <CardContent className="p-4 flex flex-col md:flex-row items-center justify-between gap-4">
               <div className="flex items-center gap-2 text-xs font-semibold text-[#252525]">
-                <Calendar className="w-4 h-4 text-[#C2B0DC]" />
+                <Calendar className="w-4 h-4 text-[#B4D58A]" />
                 <span>Date Range:</span>
               </div>
 
@@ -292,7 +292,7 @@ export default function ReportsAndAnalyticsPage() {
             <Card className="border-black/[0.06] bg-white shadow-xs">
               <CardContent className="p-4">
                 <p className="text-xs font-medium text-[#5A5D58]">Net Food Sales</p>
-                <h3 className="text-2xl font-bold text-[#C2B0DC] mt-1">
+                <h3 className="text-2xl font-bold text-[#B4D58A] mt-1">
                   ₹{Number(summary?.total_net_sales || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}
                 </h3>
                 <p className="text-[11px] text-[#5A5D58] mt-1">Excl. taxes & discounts</p>
@@ -312,7 +312,7 @@ export default function ReportsAndAnalyticsPage() {
             <Card className="border-black/[0.06] bg-white shadow-xs">
               <CardContent className="p-4">
                 <p className="text-xs font-medium text-[#5A5D58]">Average Order Value</p>
-                <h3 className="text-2xl font-bold text-[#C2B0DC] mt-1">
+                <h3 className="text-2xl font-bold text-[#B4D58A] mt-1">
                   ₹{Number(summary?.average_order_value || 0).toFixed(2)}
                 </h3>
                 <p className="text-[11px] text-[#5A5D58] mt-1">Across {summary?.total_orders || 0} completed orders</p>
@@ -334,8 +334,8 @@ export default function ReportsAndAnalyticsPage() {
                   <AreaChart data={dailyTrend} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                     <defs>
                       <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#C2B0DC" stopOpacity={0.4} />
-                        <stop offset="95%" stopColor="#C2B0DC" stopOpacity={0.0} />
+                        <stop offset="5%" stopColor="#B4D58A" stopOpacity={0.4} />
+                        <stop offset="95%" stopColor="#B4D58A" stopOpacity={0.0} />
                       </linearGradient>
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" stroke="black/[0.04]" vertical={false} />
@@ -345,7 +345,7 @@ export default function ReportsAndAnalyticsPage() {
                       formatter={(val: any) => [`₹${val}`, 'Revenue']}
                       contentStyle={{ backgroundColor: '#FFFFFF', borderColor: 'black/[0.06]', borderRadius: '8px' }}
                     />
-                    <Area type="monotone" dataKey="revenue" stroke="#C2B0DC" strokeWidth={2.5} fillOpacity={1} fill="url(#colorRevenue)" />
+                    <Area type="monotone" dataKey="revenue" stroke="#B4D58A" strokeWidth={2.5} fillOpacity={1} fill="url(#colorRevenue)" />
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
@@ -358,7 +358,7 @@ export default function ReportsAndAnalyticsPage() {
             <Card className="border-black/[0.06] bg-white shadow-xs">
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-bold text-[#252525] flex items-center gap-2">
-                  <UtensilsCrossed className="w-4 h-4 text-[#C2B0DC]" />
+                  <UtensilsCrossed className="w-4 h-4 text-[#B4D58A]" />
                   Dining Channels
                 </CardTitle>
               </CardHeader>
@@ -393,7 +393,7 @@ export default function ReportsAndAnalyticsPage() {
             <Card className="border-black/[0.06] bg-white shadow-xs">
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-bold text-[#252525] flex items-center gap-2">
-                  <CreditCard className="w-4 h-4 text-[#C2B0DC]" />
+                  <CreditCard className="w-4 h-4 text-[#B4D58A]" />
                   Tender Reconciliations
                 </CardTitle>
               </CardHeader>
@@ -439,7 +439,7 @@ export default function ReportsAndAnalyticsPage() {
                       <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="black/[0.04]" />
                       <XAxis dataKey="hour" fontSize={10} stroke="#8E928B" tickLine={false} />
                       <Tooltip formatter={(val: any) => [`${val} orders`, 'Volume']} />
-                      <Bar dataKey="orders" fill="#C2B0DC" radius={[4, 4, 0, 0]} />
+                      <Bar dataKey="orders" fill="#B4D58A" radius={[4, 4, 0, 0]} />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
@@ -462,7 +462,7 @@ export default function ReportsAndAnalyticsPage() {
                   <h3 className="text-xl font-bold text-[#252525] mt-1">₹{Number(cat.revenue).toLocaleString()}</h3>
                   <div className="flex items-center justify-between text-xs text-[#5A5D58] mt-1">
                     <span>{cat.quantity} sold</span>
-                    <strong className="text-[#C2B0DC]">{cat.percentage}% of total</strong>
+                    <strong className="text-[#B4D58A]">{cat.percentage}% of total</strong>
                   </div>
                 </CardContent>
               </Card>
@@ -494,7 +494,7 @@ export default function ReportsAndAnalyticsPage() {
                     <tr key={dish.id} className="hover:bg-[#FAF9F6]/50 transition-colors">
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
-                          <span className="w-6 h-6 rounded-full bg-[#FAF9F6] text-[#C2B0DC] font-bold text-xs flex items-center justify-center border border-[#C2B0DC]/20">
+                          <span className="w-6 h-6 rounded-full bg-[#FAF9F6] text-[#B4D58A] font-bold text-xs flex items-center justify-center border border-[#B4D58A]/20">
                             {idx + 1}
                           </span>
                           <span className="font-semibold text-[#252525]">{dish.name}</span>
@@ -533,10 +533,10 @@ export default function ReportsAndAnalyticsPage() {
               <CardContent className="p-4 flex items-center justify-between">
                 <div>
                   <p className="text-xs font-medium text-[#5A5D58]">Avg Table Turnaround</p>
-                  <h3 className="text-2xl font-bold text-[#C2B0DC] mt-1">{tableData?.average_turnaround_minutes || 45} mins</h3>
+                  <h3 className="text-2xl font-bold text-[#B4D58A] mt-1">{tableData?.average_turnaround_minutes || 45} mins</h3>
                   <p className="text-[11px] text-[#5A5D58] mt-0.5">Seated to bill settled</p>
                 </div>
-                <div className="w-10 h-10 rounded-full bg-[#C2B0DC]/20 text-[#C2B0DC] flex items-center justify-center">
+                <div className="w-10 h-10 rounded-full bg-[#B4D58A]/20 text-[#B4D58A] flex items-center justify-center">
                   <Clock className="w-5 h-5" />
                 </div>
               </CardContent>
@@ -613,7 +613,7 @@ export default function ReportsAndAnalyticsPage() {
               <Button
                 size="sm"
                 onClick={handlePrintZReport}
-                className="bg-[#C2B0DC] hover:bg-[#B19CCF] text-white text-xs"
+                className="bg-[#B4D58A] hover:bg-[#9EC271] text-white text-xs"
               >
                 <Printer className="w-4 h-4 mr-1.5" /> Print / Export PDF
               </Button>
@@ -627,7 +627,7 @@ export default function ReportsAndAnalyticsPage() {
               <p className="text-[11px] text-[#5A5D58]">{eodReportData?.report_metadata?.branch_name}</p>
               <p className="text-[11px] text-[#5A5D58]">{eodReportData?.report_metadata?.branch_address}</p>
               <p className="text-[11px] font-semibold mt-1">GSTIN: {eodReportData?.report_metadata?.gst_number || '27AAAAA0000A1Z5'}</p>
-              <h3 className="font-bold text-sm mt-2 text-[#C2B0DC]">*** END-OF-DAY Z-REPORT ***</h3>
+              <h3 className="font-bold text-sm mt-2 text-[#B4D58A]">*** END-OF-DAY Z-REPORT ***</h3>
               <p className="text-[10px] text-[#8E928B]">Date: {eodReportData?.report_metadata?.report_date} | Generated: {new Date().toLocaleTimeString()}</p>
             </div>
 
@@ -728,7 +728,7 @@ export default function ReportsAndAnalyticsPage() {
               </div>
               <div className="p-4 rounded-xl border border-black/[0.06] bg-[#FAF9F6]">
                 <p className="text-xs text-[#5A5D58]">Total Tax Liability</p>
-                <h3 className="text-xl font-bold text-[#C2B0DC] mt-1">₹{Number(taxReportData?.total_tax_liability || 0).toFixed(2)}</h3>
+                <h3 className="text-xl font-bold text-[#B4D58A] mt-1">₹{Number(taxReportData?.total_tax_liability || 0).toFixed(2)}</h3>
               </div>
             </div>
           </CardContent>

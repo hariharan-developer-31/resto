@@ -266,7 +266,7 @@ function TableQrOrderContent() {
   if (tableLoading) {
     return (
       <div className="min-h-screen bg-[#FAF9F6] flex flex-col items-center justify-center p-4">
-        <div className="h-12 w-12 rounded-2xl bg-[#C2B0DC] text-white flex items-center justify-center font-bold animate-pulse mb-3">
+        <div className="h-12 w-12 rounded-2xl bg-[#B4D58A] text-white flex items-center justify-center font-bold animate-pulse mb-3">
           <Utensils className="h-6 w-6" />
         </div>
         <p className="text-xs text-[#5A5D58] font-semibold">Opening Your Table Menu...</p>
@@ -292,12 +292,12 @@ function TableQrOrderContent() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FAF9F6] text-[#252525] flex flex-col pb-24 selection:bg-[#C2B0DC]/20 selection:text-[#C2B0DC]">
+    <div className="min-h-screen bg-[#FAF9F6] text-[#252525] flex flex-col pb-24 selection:bg-[#B4D58A]/20 selection:text-[#B4D58A]">
       {/* 1. TOP TABLE BANNER & DIGITAL BELL BAR */}
       <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-black/[0.06] p-3 shadow-xs">
         <div className="max-w-md mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="h-9 w-9 rounded-xl bg-[#C2B0DC] text-white flex items-center justify-center font-bold text-sm shadow-xs">
+            <div className="h-9 w-9 rounded-xl bg-[#B4D58A] text-white flex items-center justify-center font-bold text-sm shadow-xs">
               {table.table_number}
             </div>
             <div>
@@ -305,7 +305,7 @@ function TableQrOrderContent() {
                 <span className="font-bold text-xs text-[#252525]">Table {table.table_number}</span>
                 <span className="text-[10px] text-[#5A5D58]">· {table.location}</span>
               </div>
-              <span className="text-[10px] text-[#C2B0DC] font-semibold block leading-tight">
+              <span className="text-[10px] text-[#B4D58A] font-semibold block leading-tight">
                 {restaurant?.name || 'The Grand Feast'}
               </span>
             </div>
@@ -314,7 +314,7 @@ function TableQrOrderContent() {
           {/* Digital Bell Button */}
           <button
             onClick={() => setBellModalOpen(true)}
-            className="flex items-center gap-1.5 bg-[#FAF9F6] hover:bg-[#C2B0DC]/20 border border-black/[0.06] hover:border-[#C2B0DC] text-[#C2B0DC] text-xs font-semibold px-3 py-1.5 rounded-xl transition-all shadow-xs"
+            className="flex items-center gap-1.5 bg-[#FAF9F6] hover:bg-[#B4D58A]/20 border border-black/[0.06] hover:border-[#B4D58A] text-[#B4D58A] text-xs font-semibold px-3 py-1.5 rounded-xl transition-all shadow-xs"
           >
             <Bell className="h-3.5 w-3.5" />
             <span>Table Bell</span>
@@ -330,7 +330,7 @@ function TableQrOrderContent() {
               onClick={() => setActiveTab('menu')}
               className={`flex-1 py-1.5 rounded-lg transition-all ${
                 activeTab === 'menu'
-                  ? 'bg-white text-[#C2B0DC] shadow-xs'
+                  ? 'bg-white text-[#B4D58A] shadow-xs'
                   : 'text-[#5A5D58] hover:text-[#252525]'
               }`}
             >
@@ -340,11 +340,11 @@ function TableQrOrderContent() {
               onClick={() => setActiveTab('track')}
               className={`flex-1 py-1.5 rounded-lg transition-all flex items-center justify-center gap-1.5 ${
                 activeTab === 'track'
-                  ? 'bg-white text-[#C2B0DC] shadow-xs'
+                  ? 'bg-white text-[#B4D58A] shadow-xs'
                   : 'text-[#5A5D58] hover:text-[#252525]'
               }`}
             >
-              <Flame className="h-3.5 w-3.5 text-[#C2B0DC]" />
+              <Flame className="h-3.5 w-3.5 text-[#B4D58A]" />
               <span>Live Order Tracker</span>
               <span className="h-1.5 w-1.5 rounded-full bg-[#B4D58A] animate-pulse" />
             </button>
@@ -424,7 +424,7 @@ function TableQrOrderContent() {
                         : item.status === 'ready'
                         ? 'bg-[#B4D58A]/20 text-[#B4D58A]'
                         : item.status === 'preparing'
-                        ? 'bg-[#C2B0DC]/20 text-[#C2B0DC]'
+                        ? 'bg-[#B4D58A]/20 text-[#B4D58A]'
                         : 'bg-[#F3DA8A]/25 text-[#F3DA8A]'
                     }`}
                   >
@@ -437,7 +437,7 @@ function TableQrOrderContent() {
             {/* Bill Summary */}
             <div className="bg-[#FAF9F6] p-3 rounded-xl border border-black/[0.06] flex justify-between items-center text-xs">
               <span className="text-[#5A5D58]">Current Table Bill:</span>
-              <span className="font-bold text-sm text-[#C2B0DC]">
+              <span className="font-bold text-sm text-[#B4D58A]">
                 ₹{Number(trackingData.total_amount).toFixed(2)}
               </span>
             </div>
@@ -445,7 +445,7 @@ function TableQrOrderContent() {
             {/* Add More Items Button */}
             <Button
               onClick={() => setActiveTab('menu')}
-              className="w-full bg-[#C2B0DC] hover:bg-[#B19CCF] text-white text-xs font-semibold h-10 rounded-xl"
+              className="w-full bg-[#B4D58A] hover:bg-[#9EC271] text-white text-xs font-semibold h-10 rounded-xl"
             >
               + Order Additional Food (Round {trackingData.round_count + 1})
             </Button>
@@ -505,7 +505,7 @@ function TableQrOrderContent() {
               onClick={() => setSelectedCategory('all')}
               className={`px-3 py-1.5 text-xs font-semibold rounded-xl shrink-0 transition-all ${
                 selectedCategory === 'all'
-                  ? 'bg-[#C2B0DC] text-white shadow-xs'
+                  ? 'bg-[#B4D58A] text-white shadow-xs'
                   : 'bg-white text-[#5A5D58] border border-black/[0.06]'
               }`}
             >
@@ -517,7 +517,7 @@ function TableQrOrderContent() {
                 onClick={() => setSelectedCategory(String(c.id))}
                 className={`px-3 py-1.5 text-xs font-semibold rounded-xl shrink-0 transition-all ${
                   selectedCategory === String(c.id)
-                    ? 'bg-[#C2B0DC] text-white shadow-xs'
+                    ? 'bg-[#B4D58A] text-white shadow-xs'
                     : 'bg-white text-[#5A5D58] border border-black/[0.06]'
                 }`}
               >
@@ -563,7 +563,7 @@ function TableQrOrderContent() {
                     )}
 
                     <div className="pt-1 flex items-baseline gap-2">
-                      <span className="font-bold text-sm text-[#C2B0DC]">
+                      <span className="font-bold text-sm text-[#B4D58A]">
                         ₹{Number(item.base_price).toFixed(2)}
                       </span>
                       {hasVariants && (
@@ -578,7 +578,7 @@ function TableQrOrderContent() {
                   <Button
                     size="sm"
                     onClick={() => handleItemClick(item)}
-                    className="shrink-0 h-8 px-3 text-xs bg-[#FAF9F6] text-[#C2B0DC] hover:bg-[#C2B0DC] hover:text-white border border-black/[0.06] rounded-xl font-bold"
+                    className="shrink-0 h-8 px-3 text-xs bg-[#FAF9F6] text-[#B4D58A] hover:bg-[#B4D58A] hover:text-white border border-black/[0.06] rounded-xl font-bold"
                   >
                     {hasVariants || hasAddons ? 'Add +' : '+ Add'}
                   </Button>
@@ -594,10 +594,10 @@ function TableQrOrderContent() {
         <div className="fixed bottom-3 inset-x-3 z-40 max-w-md mx-auto">
           <button
             onClick={() => setCartOpen(true)}
-            className="w-full bg-[#C2B0DC] hover:bg-[#B19CCF] text-white p-3.5 rounded-2xl shadow-xl flex items-center justify-between text-xs font-semibold transition-all active:scale-[0.99]"
+            className="w-full bg-[#B4D58A] hover:bg-[#9EC271] text-white p-3.5 rounded-2xl shadow-xl flex items-center justify-between text-xs font-semibold transition-all active:scale-[0.99]"
           >
             <div className="flex items-center gap-2">
-              <span className="h-6 w-6 rounded-full bg-white text-[#C2B0DC] flex items-center justify-center font-bold">
+              <span className="h-6 w-6 rounded-full bg-white text-[#B4D58A] flex items-center justify-center font-bold">
                 {totalCartCount}
               </span>
               <span>View Table Cart</span>
@@ -641,7 +641,7 @@ function TableQrOrderContent() {
                       <div className="flex items-center gap-1.5">
                         <span className="text-xs font-semibold text-[#252525]">{item.name}</span>
                         {item.variantName && (
-                          <span className="text-[10px] bg-[#C2B0DC]/20 text-[#C2B0DC] px-1.5 py-0.2 rounded font-medium">
+                          <span className="text-[10px] bg-[#B4D58A]/20 text-[#B4D58A] px-1.5 py-0.2 rounded font-medium">
                             {item.variantName}
                           </span>
                         )}
@@ -654,12 +654,12 @@ function TableQrOrderContent() {
                       )}
 
                       {item.specialInstructions && (
-                        <div className="text-[10px] italic text-[#C2B0DC] mt-0.5">
+                        <div className="text-[10px] italic text-[#B4D58A] mt-0.5">
                           Note: {item.specialInstructions}
                         </div>
                       )}
 
-                      <span className="text-xs font-bold text-[#C2B0DC] block mt-1">
+                      <span className="text-xs font-bold text-[#B4D58A] block mt-1">
                         ₹{itemTotal.toFixed(2)}
                       </span>
                     </div>
@@ -713,14 +713,14 @@ function TableQrOrderContent() {
                 </div>
                 <div className="pt-2 border-t border-black/[0.06] flex justify-between font-bold text-sm text-[#252525]">
                   <span>Total Amount</span>
-                  <span className="text-[#C2B0DC]">₹{grandTotal.toFixed(2)}</span>
+                  <span className="text-[#B4D58A]">₹{grandTotal.toFixed(2)}</span>
                 </div>
               </div>
 
               <Button
                 disabled={placeOrderMutation.isPending}
                 onClick={() => placeOrderMutation.mutate()}
-                className="w-full bg-[#C2B0DC] hover:bg-[#B19CCF] text-white text-xs font-semibold h-11 rounded-xl shadow-xs"
+                className="w-full bg-[#B4D58A] hover:bg-[#9EC271] text-white text-xs font-semibold h-11 rounded-xl shadow-xs"
               >
                 {placeOrderMutation.isPending ? 'Sending to Kitchen...' : 'Place Table Order'}
               </Button>
@@ -750,7 +750,7 @@ function TableQrOrderContent() {
                     onClick={() => setSelectedVariant(v)}
                     className={`p-2.5 rounded-xl border flex items-center justify-between text-xs cursor-pointer ${
                       selectedVariant?.id === v.id
-                        ? 'bg-[#C2B0DC]/20 border-[#C2B0DC] font-bold text-[#C2B0DC]'
+                        ? 'bg-[#B4D58A]/20 border-[#B4D58A] font-bold text-[#B4D58A]'
                         : 'border-black/[0.06]'
                     }`}
                   >
@@ -794,7 +794,7 @@ function TableQrOrderContent() {
               onClick={() =>
                 addToCartDirect(customizingItem, selectedVariant, selectedAddons, itemNote)
               }
-              className="w-full bg-[#C2B0DC] hover:bg-[#B19CCF] text-white text-xs h-9 rounded-xl"
+              className="w-full bg-[#B4D58A] hover:bg-[#9EC271] text-white text-xs h-9 rounded-xl"
             >
               Add to Order
             </Button>
@@ -806,7 +806,7 @@ function TableQrOrderContent() {
       {bellModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl max-w-xs w-full border border-black/[0.06] shadow-2xl p-5 space-y-4 text-center">
-            <div className="h-12 w-12 rounded-full bg-[#C2B0DC]/20 text-[#C2B0DC] flex items-center justify-center mx-auto">
+            <div className="h-12 w-12 rounded-full bg-[#B4D58A]/20 text-[#B4D58A] flex items-center justify-center mx-auto">
               <Bell className="h-6 w-6" />
             </div>
 
@@ -827,13 +827,13 @@ function TableQrOrderContent() {
                   onClick={() => serviceRequestMutation.mutate('call_waiter')}
                   className="w-full bg-white hover:bg-[#FAF9F6] text-[#252525] border border-black/[0.06] h-10 rounded-xl font-semibold flex items-center gap-2 justify-center"
                 >
-                  <User className="h-4 w-4 text-[#C2B0DC]" /> Call Waiter to Table
+                  <User className="h-4 w-4 text-[#B4D58A]" /> Call Waiter to Table
                 </Button>
                 <Button
                   onClick={() => serviceRequestMutation.mutate('request_water')}
                   className="w-full bg-white hover:bg-[#FAF9F6] text-[#252525] border border-black/[0.06] h-10 rounded-xl font-semibold flex items-center gap-2 justify-center"
                 >
-                  <Droplets className="h-4 w-4 text-[#C2B0DC]" /> Request Fresh Water
+                  <Droplets className="h-4 w-4 text-[#B4D58A]" /> Request Fresh Water
                 </Button>
                 <Button
                   onClick={() => serviceRequestMutation.mutate('request_bill')}
@@ -863,7 +863,7 @@ export default function TableQrOrderPage() {
     <React.Suspense
       fallback={
         <div className="min-h-screen bg-[#FAF9F6] flex flex-col items-center justify-center p-4">
-          <div className="h-12 w-12 rounded-2xl bg-[#C2B0DC] text-white flex items-center justify-center font-bold animate-pulse mb-3">
+          <div className="h-12 w-12 rounded-2xl bg-[#B4D58A] text-white flex items-center justify-center font-bold animate-pulse mb-3">
             <Utensils className="h-6 w-6" />
           </div>
           <p className="text-xs text-[#5A5D58] font-semibold">Opening Your Table Menu...</p>

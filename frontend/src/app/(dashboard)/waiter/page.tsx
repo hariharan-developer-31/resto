@@ -187,7 +187,7 @@ export default function WaiterPage() {
       {/* Top Header Card */}
       <div className="bg-white rounded-2xl border border-black/[0.06] p-4 sm:p-5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="h-11 w-11 rounded-xl bg-[#C2B0DC]/20 text-[#C2B0DC] flex items-center justify-center font-bold text-lg shrink-0">
+          <div className="h-11 w-11 rounded-xl bg-[#B4D58A]/20 text-[#B4D58A] flex items-center justify-center font-bold text-lg shrink-0">
             <UserCheck className="h-6 w-6" />
           </div>
           <div>
@@ -211,7 +211,7 @@ export default function WaiterPage() {
           </div>
           <div className="px-3 py-1 text-center border-r border-black/[0.06]">
             <span className="block text-xs text-[#5A5D58]">Occupied</span>
-            <span className="text-sm font-bold text-[#C2B0DC]">{occupiedCount}</span>
+            <span className="text-sm font-bold text-[#B4D58A]">{occupiedCount}</span>
           </div>
           <div className="px-3 py-1 text-center">
             <span className="block text-xs text-[#5A5D58]">Ready to Serve</span>
@@ -236,7 +236,7 @@ export default function WaiterPage() {
           onClick={() => setFilterMode('my_tables')}
           className={`px-3.5 py-1.5 text-xs font-semibold rounded-lg shrink-0 transition-all ${
             filterMode === 'my_tables'
-              ? 'bg-[#C2B0DC] text-white shadow-xs'
+              ? 'bg-[#B4D58A] text-white shadow-xs'
               : 'bg-white text-[#5A5D58] border border-black/[0.06] hover:bg-[#F3DA8A]/25'
           }`}
         >
@@ -246,7 +246,7 @@ export default function WaiterPage() {
           onClick={() => setFilterMode('occupied')}
           className={`px-3.5 py-1.5 text-xs font-semibold rounded-lg shrink-0 transition-all ${
             filterMode === 'occupied'
-              ? 'bg-[#C2B0DC] text-white shadow-xs'
+              ? 'bg-[#B4D58A] text-white shadow-xs'
               : 'bg-white text-[#5A5D58] border border-black/[0.06] hover:bg-[#F3DA8A]/25'
           }`}
         >
@@ -290,7 +290,7 @@ export default function WaiterPage() {
                     <div className="flex items-center gap-2">
                       <h3 className="font-bold text-base text-[#252525]">{tbl.table_number}</h3>
                       {isMyTable && (
-                        <span className="text-[10px] bg-[#C2B0DC]/20 text-[#C2B0DC] px-1.5 py-0.5 rounded font-bold">
+                        <span className="text-[10px] bg-[#B4D58A]/20 text-[#B4D58A] px-1.5 py-0.5 rounded font-bold">
                           Assigned to You
                         </span>
                       )}
@@ -329,7 +329,7 @@ export default function WaiterPage() {
                       <span className="font-semibold text-[#252525]">
                         Order {tbl.active_order.order_number}
                       </span>
-                      <span className="text-[#C2B0DC] font-bold">
+                      <span className="text-[#B4D58A] font-bold">
                         Round {tbl.active_order.round_count}
                       </span>
                     </div>
@@ -351,7 +351,7 @@ export default function WaiterPage() {
                                 {item.quantity}x {item.item_name}
                               </span>
                               {item.special_instructions && (
-                                <span className="text-[10px] text-[#C2B0DC] italic block truncate">
+                                <span className="text-[10px] text-[#B4D58A] italic block truncate">
                                   {item.special_instructions}
                                 </span>
                               )}
@@ -378,11 +378,11 @@ export default function WaiterPage() {
                                     isServed
                                       ? 'bg-black/[0.06] text-[#5A5D58]'
                                       : isPreparing
-                                      ? 'bg-[#C2B0DC]/20 text-[#C2B0DC] flex items-center gap-1'
+                                      ? 'bg-[#B4D58A]/20 text-[#B4D58A] flex items-center gap-1'
                                       : 'bg-[#FEF5E7] text-[#F3DA8A]'
                                   }`}
                                 >
-                                  {isPreparing && <Flame className="h-2.5 w-2.5 text-[#C2B0DC]" />}
+                                  {isPreparing && <Flame className="h-2.5 w-2.5 text-[#B4D58A]" />}
                                   {item.status}
                                 </span>
                               )}
@@ -404,7 +404,7 @@ export default function WaiterPage() {
                     setSelectedTable(tbl);
                     setOrderPadOpen(true);
                   }}
-                  className="w-full bg-[#C2B0DC] hover:bg-[#B19CCF] text-white text-xs font-semibold h-9 flex items-center justify-center gap-1.5 shadow-xs"
+                  className="w-full bg-[#B4D58A] hover:bg-[#9EC271] text-white text-xs font-semibold h-9 flex items-center justify-center gap-1.5 shadow-xs"
                 >
                   <UtensilsCrossed className="h-3.5 w-3.5" />
                   {isOccupied ? 'Add Items (New Round)' : 'Seat Guests & Take Order'}
@@ -456,7 +456,7 @@ export default function WaiterPage() {
                   onClick={() => setPadCategory('all')}
                   className={`px-2.5 py-1 text-xs rounded-md font-medium shrink-0 ${
                     padCategory === 'all'
-                      ? 'bg-[#C2B0DC] text-white'
+                      ? 'bg-[#B4D58A] text-white'
                       : 'bg-[#F3DA8A]/25 text-[#5A5D58]'
                   }`}
                 >
@@ -468,7 +468,7 @@ export default function WaiterPage() {
                     onClick={() => setPadCategory(String(c.id))}
                     className={`px-2.5 py-1 text-xs rounded-md font-medium shrink-0 ${
                       padCategory === String(c.id)
-                        ? 'bg-[#C2B0DC] text-white'
+                        ? 'bg-[#B4D58A] text-white'
                         : 'bg-[#F3DA8A]/25 text-[#5A5D58]'
                     }`}
                   >
@@ -498,7 +498,7 @@ export default function WaiterPage() {
                         <span className="text-xs font-semibold text-[#252525] block">
                           {item.name}
                         </span>
-                        <span className="text-[11px] font-bold text-[#C2B0DC]">
+                        <span className="text-[11px] font-bold text-[#B4D58A]">
                           ₹{Number(item.base_price).toFixed(2)}
                         </span>
                       </div>
@@ -553,7 +553,7 @@ export default function WaiterPage() {
                               },
                             ]);
                           }}
-                          className="h-7 px-3 text-xs bg-[#C2B0DC]/20 text-[#C2B0DC] hover:bg-[#C2B0DC] hover:text-white"
+                          className="h-7 px-3 text-xs bg-[#B4D58A]/20 text-[#B4D58A] hover:bg-[#B4D58A] hover:text-white"
                         >
                           + Add
                         </Button>
@@ -579,7 +579,7 @@ export default function WaiterPage() {
                 <Button
                   disabled={padCart.length === 0 || fireOrderMutation.isPending}
                   onClick={() => fireOrderMutation.mutate()}
-                  className="bg-[#C2B0DC] hover:bg-[#B19CCF] text-white text-xs font-semibold h-9 px-4 flex items-center gap-1.5"
+                  className="bg-[#B4D58A] hover:bg-[#9EC271] text-white text-xs font-semibold h-9 px-4 flex items-center gap-1.5"
                 >
                   <Send className="h-3.5 w-3.5" />
                   {fireOrderMutation.isPending ? 'Firing...' : 'Fire to Kitchen'}
@@ -601,7 +601,7 @@ export default function WaiterPage() {
             <div className="space-y-1.5">
               {[
                 { status: 'available', label: 'Available (Ready for Guests)', color: 'bg-[#B4D58A]' },
-                { status: 'occupied', label: 'Occupied (Guests Seated)', color: 'bg-[#C2B0DC]' },
+                { status: 'occupied', label: 'Occupied (Guests Seated)', color: 'bg-[#B4D58A]' },
                 { status: 'billed', label: 'Billed (Bill Requested)', color: 'bg-[#8E44AD]' },
                 { status: 'cleaning', label: 'Cleaning (Table Reset)', color: 'bg-[#F3DA8A]' },
               ].map((opt) => (
@@ -615,7 +615,7 @@ export default function WaiterPage() {
                   }
                   className={`w-full p-2.5 rounded-xl border text-left flex items-center gap-2 text-xs font-semibold transition-all ${
                     statusDialogTable.status === opt.status
-                      ? 'bg-[#C2B0DC]/20 border-[#C2B0DC] text-[#C2B0DC]'
+                      ? 'bg-[#B4D58A]/20 border-[#B4D58A] text-[#B4D58A]'
                       : 'bg-white border-black/[0.06] text-[#252525] hover:bg-[#FAF9F6]'
                   }`}
                 >
