@@ -1,0 +1,17 @@
+{
+  "name": "Restaurant OS - Restaurant Operating System",
+  "short_name": "Restaurant OS",
+  "description": "Multi-tenant restaurant management system for POS, kitchen display, table sessions, and QR ordering.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FAF8F4",
+  "theme_color": "#C76B4A",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    }
+  ]
+}

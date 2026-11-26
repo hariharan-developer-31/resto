@@ -1,0 +1,60 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --primary: #C76B4A;
+    --primary-hover: #AE593B;
+    --primary-light: #F8EAE3;
+    --secondary: #66745B;
+    --secondary-light: #EEF1E9;
+
+    --bg-main: #FAF8F4;
+    --bg-card: #FFFFFF;
+    --bg-secondary: #F3F1EB;
+    --bg-input: #FFFFFF;
+    --bg-sidebar: #FFFFFF;
+
+    --text-primary: #292B28;
+    --text-secondary: #777872;
+    --text-muted: #A2A29A;
+
+    --status-success: #39845C;
+    --status-warning: #D69A3A;
+    --status-error: #C84D4D;
+    --status-info: #5185B8;
+
+    --border-default: #EAE7E0;
+    --border-light: #F1EEE8;
+  }
+
+  body {
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    font-family: var(--font-dm-sans), sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, .font-serif {
+    font-family: var(--font-dm-serif), serif;
+  }
+}
+
+/* Custom delicate scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #EAE7E0;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #D8D4CA;
+}

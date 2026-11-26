@@ -1,0 +1,1566 @@
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { apiRequest } from '@/lib/api-client';
+import { useAuthStore } from '@/lib/auth-store';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { toast } from 'sonner';
+import {
+  Boxes,
+  AlertTriangle,
+  Truck,
+  FileText,
+  Plus,
+  Search,
+  RefreshCw,
+  TrendingDown,
+  ArrowUpRight,
+  ArrowDownRight,
+  X,
+  PackageCheck,
+  CheckCircle2,
+  DollarSign,
+  ClipboardList,
+  History,
+  Phone,
+  Mail,
+  Building2,
+  SlidersHorizontal,
+} from 'lucide-react';
+
+interface Supplier {
+  id: number;
+  name: string;
+  contact_person: string | null;
+  phone: string | null;
+  email: string | null;
+  address: string | null;
+  tax_number: string | null;
+  payment_terms: string;
+  status: string;
+  inventory_items_count?: number;
+  purchase_orders_count?: number;
+}
+
+interface InventoryItem {
+  id: number;
+  restaurant_id: number;
+  branch_id: number;
+  supplier_id: number | null;
+  name: string;
+  sku: string | null;
+  category: string;
+  unit: string;
+  current_stock: string | number;
+  minimum_stock: string | number;
+  unit_cost: string | number;
+  storage_location: string | null;
+  status: 'in_stock' | 'low_stock' | 'out_of_stock';
+  supplier: { id: number; name: string; phone?: string; email?: string } | null;
+  branch?: { id: number; name: string } | null;
+}
+
+interface PurchaseOrderItem {
+  id: number;
+  inventory_item_id: number;
+  quantity_ordered: string | number;
+  quantity_received: string | number;
+  unit_cost: string | number;
+  total_price: string | number;
+  inventory_item?: InventoryItem;
+}
+
+interface PurchaseOrder {
+  id: number;
+  po_number: string;
+  supplier_id: number;
+  order_date: string;
+  expected_delivery_date: string | null;
+  status: 'draft' | 'ordered' | 'partially_received' | 'received' | 'cancelled';
+  subtotal: string | number;
+  tax_amount: string | number;
+  total_amount: string | number;
+  notes: string | null;
+  supplier?: Supplier;
+  items?: PurchaseOrderItem[];
+}
+
+export default function InventoryManagementPage() {
+  const queryClient = useQueryClient();
+  const { activeRestaurant, activeBranch } = useAuthStore((s) => ({
+    activeRestaurant: s.activeRestaurant,
+    activeBranch: s.activeBranch,
+  }));
+
+  // Active Tab
+  const [activeTab, setActiveTab] = useState<'stock' | 'alerts' | 'suppliers' | 'orders'>('stock');
+
+  // Filters
+  const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [searchQuery, setSearchQuery] = useState<string>('');
+
+  // Modals state
+  const [isAddItemModalOpen, setIsAddItemModalOpen] = useState(false);
+  const [isAdjustStockModalOpen, setIsAdjustStockModalOpen] = useState(false);
+  const [isAddSupplierModalOpen, setIsAddSupplierModalOpen] = useState(false);
+  const [isCreatePoModalOpen, setIsCreatePoModalOpen] = useState(false);
+  const [isReceivePoModalOpen, setIsReceivePoModalOpen] = useState(false);
+  const [selectedItemForAdjust, setSelectedItemForAdjust] = useState<InventoryItem | null>(null);
+  const [selectedPoForReceive, setSelectedPoForReceive] = useState<PurchaseOrder | null>(null);
+
+  // Form states: New Inventory Item
+  const [itemName, setItemName] = useState('');
+  const [itemSku, setItemSku] = useState('');
+  const [itemCategory, setItemCategory] = useState('produce');
+  const [itemUnit, setItemUnit] = useState('kg');
+  const [itemStock, setItemStock] = useState('10');
+  const [itemMinStock, setItemMinStock] = useState('5');
+  const [itemCost, setItemCost] = useState('150');
+  const [itemLocation, setItemLocation] = useState('Dry Pantry');
+  const [itemSupplierId, setItemSupplierId] = useState('');
+
+  // Form states: Stock Adjustment
+  const [adjustType, setAdjustType] = useState('wastage');
+  const [adjustQty, setAdjustQty] = useState('-1');
+  const [adjustReason, setAdjustReason] = useState('Kitchen wastage / prep discard');
+  const [adjustNotes, setAdjustNotes] = useState('');
+
+  // Form states: New Supplier
+  const [supName, setSupName] = useState('');
+  const [supContact, setSupContact] = useState('');
+  const [supPhone, setSupPhone] = useState('');
+  const [supEmail, setSupEmail] = useState('');
+  const [supAddress, setSupAddress] = useState('');
+  const [supTax, setSupTax] = useState('');
+  const [supTerms, setSupTerms] = useState('net_30');
+
+  // Form states: Create Purchase Order
+  const [poSupplierId, setPoSupplierId] = useState('');
+  const [poExpectedDate, setPoExpectedDate] = useState('');
+  const [poNotes, setPoNotes] = useState('');
+  const [poItems, setPoItems] = useState<{ inventory_item_id: number; quantity_ordered: number; unit_cost: number }[]>([]);
+
+  // Form states: Receive PO Shipment
+  const [receivedQuantities, setReceivedQuantities] = useState<{ [itemId: number]: number }>({});
+
+  useEffect(() => {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 2);
+    setPoExpectedDate(tomorrow.toISOString().split('T')[0]);
+  }, []);
+
+  // Fetch Inventory Items
+  const { data: inventoryData, isLoading: isInvLoading, refetch: refetchInv, isFetching: isInvFetching } = useQuery({
+    queryKey: ['inventory', activeRestaurant?.id, activeBranch?.id, categoryFilter, statusFilter, searchQuery],
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      if (categoryFilter !== 'all') params.append('category', categoryFilter);
+      if (statusFilter !== 'all') params.append('status', statusFilter);
+      if (searchQuery) params.append('search', searchQuery);
+
+      const res = await apiRequest(`inventory?${params.toString()}`, {
+        restaurantId: activeRestaurant?.id,
+        branchId: activeBranch?.id,
+      });
+      return res.data;
+    },
+    enabled: !!activeRestaurant?.id,
+  });
+
+  // Fetch Low Stock Alerts
+  const { data: alertsData } = useQuery({
+    queryKey: ['inventory-alerts', activeRestaurant?.id, activeBranch?.id],
+    queryFn: async () => {
+      const res = await apiRequest('inventory/alerts', {
+        restaurantId: activeRestaurant?.id,
+        branchId: activeBranch?.id,
+      });
+      return res.data;
+    },
+    enabled: !!activeRestaurant?.id,
+  });
+
+  // Fetch Suppliers
+  const { data: suppliersData, refetch: refetchSuppliers } = useQuery({
+    queryKey: ['suppliers', activeRestaurant?.id],
+    queryFn: async () => {
+      const res = await apiRequest('suppliers', {
+        restaurantId: activeRestaurant?.id,
+      });
+      return res.data;
+    },
+    enabled: !!activeRestaurant?.id,
+  });
+
+  // Fetch Purchase Orders
+  const { data: purchaseOrdersData, refetch: refetchPo } = useQuery({
+    queryKey: ['purchase-orders', activeRestaurant?.id, activeBranch?.id],
+    queryFn: async () => {
+      const res = await apiRequest('purchase-orders', {
+        restaurantId: activeRestaurant?.id,
+        branchId: activeBranch?.id,
+      });
+      return res.data;
+    },
+    enabled: !!activeRestaurant?.id,
+  });
+
+  const inventoryItems: InventoryItem[] = inventoryData?.data || [];
+  const lowStockAlerts: InventoryItem[] = alertsData || [];
+  const suppliers: Supplier[] = suppliersData || [];
+  const purchaseOrders: PurchaseOrder[] = purchaseOrdersData?.data || [];
+
+  // Summary Metrics
+  const totalItemCount = inventoryItems.length;
+  const lowStockCount = lowStockAlerts.length;
+  const totalInventoryValue = inventoryItems.reduce(
+    (sum, item) => sum + Number(item.current_stock) * Number(item.unit_cost),
+    0
+  );
+
+  // Mutations
+  const addItemMutation = useMutation({
+    mutationFn: async (payload: any) => {
+      return await apiRequest('inventory', {
+        method: 'POST',
+        restaurantId: activeRestaurant?.id,
+        branchId: activeBranch?.id,
+        body: JSON.stringify(payload),
+      });
+    },
+    onSuccess: () => {
+      toast.success('Inventory item created');
+      queryClient.invalidateQueries({ queryKey: ['inventory'] });
+      queryClient.invalidateQueries({ queryKey: ['inventory-alerts'] });
+      setIsAddItemModalOpen(false);
+      setItemName('');
+      setItemSku('');
+    },
+    onError: (err: any) => toast.error(err.message || 'Failed to create item'),
+  });
+
+  const adjustStockMutation = useMutation({
+    mutationFn: async (payload: any) => {
+      return await apiRequest('inventory/adjust', {
+        method: 'POST',
+        restaurantId: activeRestaurant?.id,
+        branchId: activeBranch?.id,
+        body: JSON.stringify(payload),
+      });
+    },
+    onSuccess: () => {
+      toast.success('Stock adjusted & movement recorded');
+      queryClient.invalidateQueries({ queryKey: ['inventory'] });
+      queryClient.invalidateQueries({ queryKey: ['inventory-alerts'] });
+      setIsAdjustStockModalOpen(false);
+      setSelectedItemForAdjust(null);
+    },
+    onError: (err: any) => toast.error(err.message || 'Failed to adjust stock'),
+  });
+
+  const addSupplierMutation = useMutation({
+    mutationFn: async (payload: any) => {
+      return await apiRequest('suppliers', {
+        method: 'POST',
+        restaurantId: activeRestaurant?.id,
+        body: JSON.stringify(payload),
+      });
+    },
+    onSuccess: () => {
+      toast.success('Supplier registered');
+      queryClient.invalidateQueries({ queryKey: ['suppliers'] });
+      setIsAddSupplierModalOpen(false);
+      setSupName('');
+      setSupContact('');
+      setSupPhone('');
+      setSupEmail('');
+    },
+    onError: (err: any) => toast.error(err.message || 'Failed to register supplier'),
+  });
+
+  const createPoMutation = useMutation({
+    mutationFn: async (payload: any) => {
+      return await apiRequest('purchase-orders', {
+        method: 'POST',
+        restaurantId: activeRestaurant?.id,
+        branchId: activeBranch?.id,
+        body: JSON.stringify(payload),
+      });
+    },
+    onSuccess: () => {
+      toast.success('Purchase order created');
+      queryClient.invalidateQueries({ queryKey: ['purchase-orders'] });
+      setIsCreatePoModalOpen(false);
+      setPoItems([]);
+    },
+    onError: (err: any) => toast.error(err.message || 'Failed to create PO'),
+  });
+
+  const receivePoMutation = useMutation({
+    mutationFn: async ({ poId, items }: { poId: number; items: any[] }) => {
+      return await apiRequest(`purchase-orders/${poId}/receive`, {
+        method: 'POST',
+        restaurantId: activeRestaurant?.id,
+        branchId: activeBranch?.id,
+        body: JSON.stringify({ items }),
+      });
+    },
+    onSuccess: () => {
+      toast.success('Shipment received and stock levels updated!');
+      queryClient.invalidateQueries({ queryKey: ['purchase-orders'] });
+      queryClient.invalidateQueries({ queryKey: ['inventory'] });
+      queryClient.invalidateQueries({ queryKey: ['inventory-alerts'] });
+      setIsReceivePoModalOpen(false);
+      setSelectedPoForReceive(null);
+    },
+    onError: (err: any) => toast.error(err.message || 'Failed to receive PO'),
+  });
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'in_stock':
+        return <Badge className="bg-[#EEF1E9] text-[#39845C] border-[#D6DFC9]">In Stock</Badge>;
+      case 'low_stock':
+        return <Badge className="bg-[#FEF7EC] text-[#D69A3A] border-[#FCE3BE]">Low Stock</Badge>;
+      case 'out_of_stock':
+        return <Badge className="bg-[#FDF2F2] text-[#C84D4D] border-[#F8D7DA]">Depleted</Badge>;
+      default:
+        return <Badge variant="outline">{status}</Badge>;
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-bold tracking-tight text-[#292B28]">Inventory & Supply Chain</h1>
+            <Badge variant="outline" className="text-[#C76B4A] border-[#F8EAE3] bg-[#FAF8F4]">
+              Phase 7
+            </Badge>
+          </div>
+          <p className="text-sm text-[#777872] mt-1">
+            Raw materials catalog, low stock replenishment alerts, supplier contacts, and purchase orders.
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              refetchInv();
+              refetchSuppliers();
+              refetchPo();
+            }}
+            disabled={isInvFetching}
+            className="border-[#EAE7E0] hover:bg-[#F3F1EB] text-[#292B28]"
+          >
+            <RefreshCw className={`w-4 h-4 mr-2 ${isInvFetching ? 'animate-spin' : ''}`} />
+            Refresh
+          </Button>
+
+          {activeTab === 'stock' && (
+            <Button
+              onClick={() => setIsAddItemModalOpen(true)}
+              className="bg-[#C76B4A] hover:bg-[#AE593B] text-white shadow-sm"
+            >
+              <Plus className="w-4 h-4 mr-2" /> Add Material
+            </Button>
+          )}
+
+          {activeTab === 'suppliers' && (
+            <Button
+              onClick={() => setIsAddSupplierModalOpen(true)}
+              className="bg-[#C76B4A] hover:bg-[#AE593B] text-white shadow-sm"
+            >
+              <Plus className="w-4 h-4 mr-2" /> New Supplier
+            </Button>
+          )}
+
+          {activeTab === 'orders' && (
+            <Button
+              onClick={() => {
+                if (inventoryItems.length > 0) {
+                  setPoItems([
+                    {
+                      inventory_item_id: inventoryItems[0].id,
+                      quantity_ordered: 10,
+                      unit_cost: Number(inventoryItems[0].unit_cost),
+                    },
+                  ]);
+                }
+                setIsCreatePoModalOpen(true);
+              }}
+              className="bg-[#C76B4A] hover:bg-[#AE593B] text-white shadow-sm"
+            >
+              <Plus className="w-4 h-4 mr-2" /> Create PO
+            </Button>
+          )}
+        </div>
+      </div>
+
+      {/* Metrics Row */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <Card className="border-[#EAE7E0] bg-white shadow-xs">
+          <CardContent className="p-4 flex items-center justify-between">
+            <div>
+              <p className="text-xs font-medium text-[#777872]">Tracked Ingredients</p>
+              <h3 className="text-2xl font-bold text-[#292B28] mt-1">{totalItemCount}</h3>
+            </div>
+            <div className="w-10 h-10 rounded-full bg-[#FAF8F4] flex items-center justify-center text-[#C76B4A]">
+              <Boxes className="w-5 h-5" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-[#EAE7E0] bg-white shadow-xs">
+          <CardContent className="p-4 flex items-center justify-between">
+            <div>
+              <p className="text-xs font-medium text-[#777872]">Low Stock Alerts</p>
+              <h3 className={`text-2xl font-bold mt-1 ${lowStockCount > 0 ? 'text-[#C84D4D]' : 'text-[#39845C]'}`}>
+                {lowStockCount}
+              </h3>
+            </div>
+            <div className="w-10 h-10 rounded-full bg-[#FEF7EC] flex items-center justify-center text-[#D69A3A]">
+              <AlertTriangle className="w-5 h-5" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-[#EAE7E0] bg-white shadow-xs">
+          <CardContent className="p-4 flex items-center justify-between">
+            <div>
+              <p className="text-xs font-medium text-[#777872]">Active Suppliers</p>
+              <h3 className="text-2xl font-bold text-[#5185B8] mt-1">{suppliers.length}</h3>
+            </div>
+            <div className="w-10 h-10 rounded-full bg-[#EBF3FC] flex items-center justify-center text-[#5185B8]">
+              <Truck className="w-5 h-5" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-[#EAE7E0] bg-white shadow-xs">
+          <CardContent className="p-4 flex items-center justify-between">
+            <div>
+              <p className="text-xs font-medium text-[#777872]">Total Stock Value</p>
+              <h3 className="text-2xl font-bold text-[#292B28] mt-1">₹{totalInventoryValue.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</h3>
+            </div>
+            <div className="w-10 h-10 rounded-full bg-[#EEF1E9] flex items-center justify-center text-[#39845C]">
+              <DollarSign className="w-5 h-5" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Tabs Navigation */}
+      <div className="border-b border-[#EAE7E0] flex items-center gap-6">
+        <button
+          onClick={() => setActiveTab('stock')}
+          className={`pb-3 text-sm font-semibold flex items-center gap-2 border-b-2 transition-colors ${
+            activeTab === 'stock'
+              ? 'border-[#C76B4A] text-[#C76B4A]'
+              : 'border-transparent text-[#777872] hover:text-[#292B28]'
+          }`}
+        >
+          <Boxes className="w-4 h-4" />
+          <span>Raw Materials Catalog</span>
+          <span className="text-xs px-2 py-0.5 rounded-full bg-[#F3F1EB] text-[#292B28] font-medium">
+            {totalItemCount}
+          </span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('alerts')}
+          className={`pb-3 text-sm font-semibold flex items-center gap-2 border-b-2 transition-colors ${
+            activeTab === 'alerts'
+              ? 'border-[#C76B4A] text-[#C76B4A]'
+              : 'border-transparent text-[#777872] hover:text-[#292B28]'
+          }`}
+        >
+          <AlertTriangle className="w-4 h-4 text-[#D69A3A]" />
+          <span>Low Stock Alerts</span>
+          {lowStockCount > 0 && (
+            <span className="text-xs px-2 py-0.5 rounded-full bg-[#FDF2F2] text-[#C84D4D] font-bold">
+              {lowStockCount}
+            </span>
+          )}
+        </button>
+
+        <button
+          onClick={() => setActiveTab('suppliers')}
+          className={`pb-3 text-sm font-semibold flex items-center gap-2 border-b-2 transition-colors ${
+            activeTab === 'suppliers'
+              ? 'border-[#C76B4A] text-[#C76B4A]'
+              : 'border-transparent text-[#777872] hover:text-[#292B28]'
+          }`}
+        >
+          <Truck className="w-4 h-4" />
+          <span>Suppliers Directory</span>
+          <span className="text-xs px-2 py-0.5 rounded-full bg-[#F3F1EB] text-[#292B28] font-medium">
+            {suppliers.length}
+          </span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('orders')}
+          className={`pb-3 text-sm font-semibold flex items-center gap-2 border-b-2 transition-colors ${
+            activeTab === 'orders'
+              ? 'border-[#C76B4A] text-[#C76B4A]'
+              : 'border-transparent text-[#777872] hover:text-[#292B28]'
+          }`}
+        >
+          <ClipboardList className="w-4 h-4" />
+          <span>Purchase Orders</span>
+          <span className="text-xs px-2 py-0.5 rounded-full bg-[#F3F1EB] text-[#292B28] font-medium">
+            {purchaseOrders.length}
+          </span>
+        </button>
+      </div>
+
+      {/* Tab 1: Stock Items Catalog */}
+      {activeTab === 'stock' && (
+        <div className="space-y-4">
+          {/* Filters Bar */}
+          <Card className="border-[#EAE7E0] bg-white shadow-xs">
+            <CardContent className="p-4 flex flex-col md:flex-row items-center justify-between gap-4">
+              <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
+                {['all', 'meat', 'poultry', 'dairy', 'produce', 'spices', 'dry_goods', 'beverages', 'packaging'].map((cat) => (
+                  <button
+                    key={cat}
+                    onClick={() => setCategoryFilter(cat)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                      categoryFilter === cat
+                        ? 'bg-[#C76B4A] text-white'
+                        : 'bg-[#F3F1EB] text-[#777872] hover:bg-[#EAE7E0] hover:text-[#292B28]'
+                    }`}
+                  >
+                    {cat.charAt(0).toUpperCase() + cat.slice(1).replace('_', ' ')}
+                  </button>
+                ))}
+              </div>
+
+              <div className="relative w-full md:w-64">
+                <Search className="w-4 h-4 absolute left-3 top-2.5 text-[#A2A29A]" />
+                <Input
+                  placeholder="Search ingredient or SKU..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-9 text-xs h-9 border-[#EAE7E0] bg-[#FAF8F4]"
+                />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Table */}
+          <Card className="border-[#EAE7E0] bg-white shadow-xs overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm text-[#292B28]">
+                <thead className="bg-[#FAF8F4] text-xs font-semibold text-[#777872] uppercase tracking-wider border-b border-[#EAE7E0]">
+                  <tr>
+                    <th className="px-6 py-3.5">Ingredient & SKU</th>
+                    <th className="px-6 py-3.5">Category</th>
+                    <th className="px-6 py-3.5">Current Stock</th>
+                    <th className="px-6 py-3.5">Min Safety Level</th>
+                    <th className="px-6 py-3.5">Unit Cost</th>
+                    <th className="px-6 py-3.5">Supplier & Storage</th>
+                    <th className="px-6 py-3.5">Status</th>
+                    <th className="px-6 py-3.5 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#EAE7E0]">
+                  {isInvLoading ? (
+                    <tr>
+                      <td colSpan={8} className="px-6 py-12 text-center text-[#777872]">
+                        <RefreshCw className="w-6 h-6 animate-spin mx-auto text-[#C76B4A] mb-2" />
+                        Loading inventory catalog...
+                      </td>
+                    </tr>
+                  ) : inventoryItems.length === 0 ? (
+                    <tr>
+                      <td colSpan={8} className="px-6 py-12 text-center text-[#777872]">
+                        <Boxes className="w-8 h-8 mx-auto text-[#A2A29A] mb-2" />
+                        No raw materials found matching filters.
+                      </td>
+                    </tr>
+                  ) : (
+                    inventoryItems.map((item) => {
+                      const stockNum = Number(item.current_stock);
+                      const minStockNum = Number(item.minimum_stock);
+
+                      return (
+                        <tr key={item.id} className="hover:bg-[#FAF8F4]/50 transition-colors">
+                          <td className="px-6 py-4">
+                            <div className="font-semibold text-[#292B28]">{item.name}</div>
+                            <div className="text-xs text-[#A2A29A] font-mono mt-0.5">{item.sku || 'NO-SKU'}</div>
+                          </td>
+
+                          <td className="px-6 py-4">
+                            <span className="capitalize text-xs font-medium text-[#777872] px-2 py-0.5 bg-[#F3F1EB] rounded">
+                              {item.category.replace('_', ' ')}
+                            </span>
+                          </td>
+
+                          <td className="px-6 py-4">
+                            <div className="font-bold text-sm text-[#292B28]">
+                              {stockNum.toFixed(2)} <span className="text-xs font-normal text-[#777872]">{item.unit}</span>
+                            </div>
+                          </td>
+
+                          <td className="px-6 py-4">
+                            <div className="text-xs text-[#777872]">
+                              {minStockNum.toFixed(2)} {item.unit}
+                            </div>
+                          </td>
+
+                          <td className="px-6 py-4">
+                            <div className="text-xs font-medium text-[#292B28]">
+                              ₹{Number(item.unit_cost).toFixed(2)} <span className="text-[10px] text-[#A2A29A]">/ {item.unit}</span>
+                            </div>
+                          </td>
+
+                          <td className="px-6 py-4">
+                            <div className="text-xs text-[#292B28] font-medium">{item.supplier?.name || 'Local Market'}</div>
+                            <div className="text-[11px] text-[#A2A29A]">{item.storage_location || 'General Store'}</div>
+                          </td>
+
+                          <td className="px-6 py-4">{getStatusBadge(item.status)}</td>
+
+                          <td className="px-6 py-4 text-right">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => {
+                                setSelectedItemForAdjust(item);
+                                setIsAdjustStockModalOpen(true);
+                              }}
+                              className="h-8 text-xs border-[#EAE7E0] hover:bg-[#F3F1EB] text-[#292B28]"
+                            >
+                              <SlidersHorizontal className="w-3 h-3 mr-1" /> Adjust Stock
+                            </Button>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+        </div>
+      )}
+
+      {/* Tab 2: Low Stock Alerts */}
+      {activeTab === 'alerts' && (
+        <div className="space-y-4">
+          <Card className="border-[#EAE7E0] bg-white shadow-xs">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg flex items-center gap-2 text-[#C84D4D]">
+                <AlertTriangle className="w-5 h-5" />
+                Critical Replenishment Alerts
+              </CardTitle>
+              <CardDescription className="text-xs text-[#777872]">
+                The following raw materials have dipped below their safety threshold and require replenishment.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {lowStockAlerts.length === 0 ? (
+                <div className="text-center py-12 text-[#39845C]">
+                  <CheckCircle2 className="w-8 h-8 mx-auto mb-2" />
+                  <p className="font-semibold text-sm">All inventory levels are currently above safety thresholds!</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {lowStockAlerts.map((item) => {
+                    const current = Number(item.current_stock);
+                    const min = Number(item.minimum_stock);
+                    const deficit = min - current;
+
+                    return (
+                      <div
+                        key={item.id}
+                        className="p-4 rounded-xl border border-[#F8D7DA] bg-[#FDF2F2]/40 flex flex-col justify-between space-y-3"
+                      >
+                        <div>
+                          <div className="flex items-center justify-between">
+                            <h4 className="font-bold text-[#292B28] text-sm">{item.name}</h4>
+                            {getStatusBadge(item.status)}
+                          </div>
+                          <p className="text-xs text-[#777872] mt-1 font-mono">SKU: {item.sku || 'N/A'}</p>
+
+                          <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
+                            <div className="bg-white p-2 rounded-lg border border-[#EAE7E0]">
+                              <p className="text-[#A2A29A]">Current Stock</p>
+                              <p className="font-bold text-sm text-[#C84D4D]">{current.toFixed(2)} {item.unit}</p>
+                            </div>
+                            <div className="bg-white p-2 rounded-lg border border-[#EAE7E0]">
+                              <p className="text-[#A2A29A]">Minimum Reorder</p>
+                              <p className="font-bold text-sm text-[#292B28]">{min.toFixed(2)} {item.unit}</p>
+                            </div>
+                          </div>
+
+                          <div className="mt-2 text-xs text-[#777872]">
+                            Supplier: <span className="font-semibold text-[#292B28]">{item.supplier?.name || 'Local Wholesale'}</span>
+                          </div>
+                        </div>
+
+                        <div className="pt-2 border-t border-[#F8D7DA] flex items-center justify-between">
+                          <span className="text-xs text-[#C84D4D] font-semibold">
+                            Deficit: +{Math.max(0, deficit).toFixed(2)} {item.unit}
+                          </span>
+
+                          <Button
+                            size="sm"
+                            onClick={() => {
+                              setPoItems([
+                                {
+                                  inventory_item_id: item.id,
+                                  quantity_ordered: Math.ceil(min * 2),
+                                  unit_cost: Number(item.unit_cost),
+                                },
+                              ]);
+                              if (item.supplier_id) {
+                                setPoSupplierId(String(item.supplier_id));
+                              }
+                              setIsCreatePoModalOpen(true);
+                            }}
+                            className="h-7 text-xs bg-[#C76B4A] hover:bg-[#AE593B] text-white"
+                          >
+                            Order Now
+                          </Button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Tab 3: Suppliers Directory */}
+      {activeTab === 'suppliers' && (
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {suppliers.map((sup) => (
+              <Card key={sup.id} className="border-[#EAE7E0] bg-white shadow-xs hover:border-[#C76B4A] transition-all">
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-base text-[#292B28] font-bold">{sup.name}</CardTitle>
+                    <Badge className="bg-[#EEF1E9] text-[#39845C] border-none text-[10px] capitalize">{sup.status}</Badge>
+                  </div>
+                  <CardDescription className="text-xs text-[#777872]">
+                    Contact: {sup.contact_person || 'Representative'}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-2 text-xs text-[#292B28]">
+                  {sup.phone && (
+                    <div className="flex items-center gap-2">
+                      <Phone className="w-3.5 h-3.5 text-[#A2A29A]" />
+                      <span>{sup.phone}</span>
+                    </div>
+                  )}
+                  {sup.email && (
+                    <div className="flex items-center gap-2">
+                      <Mail className="w-3.5 h-3.5 text-[#A2A29A]" />
+                      <span>{sup.email}</span>
+                    </div>
+                  )}
+                  {sup.address && (
+                    <div className="flex items-center gap-2 text-[#777872]">
+                      <Building2 className="w-3.5 h-3.5 text-[#A2A29A]" />
+                      <span className="truncate">{sup.address}</span>
+                    </div>
+                  )}
+
+                  <div className="pt-3 border-t border-[#EAE7E0] flex items-center justify-between text-xs text-[#777872]">
+                    <span>Terms: <strong className="text-[#292B28] uppercase">{sup.payment_terms.replace('_', ' ')}</strong></span>
+                    <span>GST: {sup.tax_number || 'N/A'}</span>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Tab 4: Purchase Orders */}
+      {activeTab === 'orders' && (
+        <Card className="border-[#EAE7E0] bg-white shadow-xs overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm text-[#292B28]">
+              <thead className="bg-[#FAF8F4] text-xs font-semibold text-[#777872] uppercase tracking-wider border-b border-[#EAE7E0]">
+                <tr>
+                  <th className="px-6 py-3.5">PO Number</th>
+                  <th className="px-6 py-3.5">Supplier</th>
+                  <th className="px-6 py-3.5">Order Date</th>
+                  <th className="px-6 py-3.5">Expected Delivery</th>
+                  <th className="px-6 py-3.5">Total Amount</th>
+                  <th className="px-6 py-3.5">Status</th>
+                  <th className="px-6 py-3.5 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#EAE7E0]">
+                {purchaseOrders.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} className="px-6 py-12 text-center text-[#777872]">
+                      <ClipboardList className="w-8 h-8 mx-auto text-[#A2A29A] mb-2" />
+                      No purchase orders recorded yet.
+                    </td>
+                  </tr>
+                ) : (
+                  purchaseOrders.map((po) => (
+                    <tr key={po.id} className="hover:bg-[#FAF8F4]/50 transition-colors">
+                      <td className="px-6 py-4 font-mono font-bold text-xs text-[#292B28]">{po.po_number}</td>
+                      <td className="px-6 py-4 text-xs font-medium text-[#292B28]">{po.supplier?.name}</td>
+                      <td className="px-6 py-4 text-xs text-[#777872]">{po.order_date}</td>
+                      <td className="px-6 py-4 text-xs text-[#777872]">{po.expected_delivery_date || '—'}</td>
+                      <td className="px-6 py-4 text-xs font-bold text-[#292B28]">₹{Number(po.total_amount).toFixed(2)}</td>
+                      <td className="px-6 py-4">
+                        <Badge
+                          className={`capitalize text-[10px] ${
+                            po.status === 'received'
+                              ? 'bg-[#EEF1E9] text-[#39845C] border-none'
+                              : 'bg-[#FEF7EC] text-[#D69A3A] border-none'
+                          }`}
+                        >
+                          {po.status.replace('_', ' ')}
+                        </Badge>
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        {po.status !== 'received' && (
+                          <Button
+                            size="sm"
+                            onClick={() => {
+                              setSelectedPoForReceive(po);
+                              const initialQtyMap: { [id: number]: number } = {};
+                              po.items?.forEach((item) => {
+                                initialQtyMap[item.id] = Number(item.quantity_ordered) - Number(item.quantity_received);
+                              });
+                              setReceivedQuantities(initialQtyMap);
+                              setIsReceivePoModalOpen(true);
+                            }}
+                            className="h-8 text-xs bg-[#39845C] hover:bg-[#2F6B4A] text-white"
+                          >
+                            <PackageCheck className="w-3.5 h-3.5 mr-1" /> Receive Shipment
+                          </Button>
+                        )}
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+      )}
+
+      {/* Modal 1: Add New Material */}
+      {isAddItemModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-lg w-full p-6 border border-[#EAE7E0] animate-in fade-in-0 zoom-in-95">
+            <div className="flex items-center justify-between pb-4 border-b border-[#EAE7E0]">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-[#F8EAE3] text-[#C76B4A] flex items-center justify-center">
+                  <Boxes className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-[#292B28]">Register Raw Material</h3>
+                  <p className="text-xs text-[#777872]">Add tracked ingredient or kitchen packaging material</p>
+                </div>
+              </div>
+              <button onClick={() => setIsAddItemModalOpen(false)} className="text-[#A2A29A] hover:text-[#292B28]">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                addItemMutation.mutate({
+                  branch_id: activeBranch?.id,
+                  supplier_id: itemSupplierId ? parseInt(itemSupplierId, 10) : null,
+                  name: itemName,
+                  sku: itemSku || null,
+                  category: itemCategory,
+                  unit: itemUnit,
+                  current_stock: parseFloat(itemStock),
+                  minimum_stock: parseFloat(itemMinStock),
+                  unit_cost: parseFloat(itemCost),
+                  storage_location: itemLocation,
+                });
+              }}
+              className="space-y-3 pt-4"
+            >
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-[#292B28]">Material Name *</label>
+                  <Input
+                    required
+                    placeholder="e.g. Basmati Rice Premium"
+                    value={itemName}
+                    onChange={(e) => setItemName(e.target.value)}
+                    className="h-9 text-xs"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-[#292B28]">SKU Code</label>
+                  <Input
+                    placeholder="e.g. ING-RICE-01"
+                    value={itemSku}
+                    onChange={(e) => setItemSku(e.target.value)}
+                    className="h-9 text-xs"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-[#292B28]">Category *</label>
+                  <select
+                    value={itemCategory}
+                    onChange={(e) => setItemCategory(e.target.value)}
+                    className="w-full h-9 px-3 rounded-md border border-[#EAE7E0] bg-white text-xs text-[#292B28]"
+                  >
+                    <option value="produce">Produce & Vegetables</option>
+                    <option value="meat">Red Meat</option>
+                    <option value="poultry">Poultry</option>
+                    <option value="seafood">Seafood</option>
+                    <option value="dairy">Dairy & Paneer</option>
+                    <option value="spices">Spices & Seasonings</option>
+                    <option value="dry_goods">Dry Goods & Grains</option>
+                    <option value="beverages">Beverage Concentrates</option>
+                    <option value="packaging">Packaging & Disposables</option>
+                  </select>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-[#292B28]">Measurement Unit *</label>
+                  <select
+                    value={itemUnit}
+                    onChange={(e) => setItemUnit(e.target.value)}
+                    className="w-full h-9 px-3 rounded-md border border-[#EAE7E0] bg-white text-xs text-[#292B28]"
+                  >
+                    <option value="kg">Kilograms (kg)</option>
+                    <option value="g">Grams (g)</option>
+                    <option value="l">Liters (L)</option>
+                    <option value="ml">Milliliters (ml)</option>
+                    <option value="pcs">Pieces (pcs)</option>
+                    <option value="pack">Packs</option>
+                    <option value="box">Boxes</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-3">
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-[#292B28]">Initial Stock *</label>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    required
+                    value={itemStock}
+                    onChange={(e) => setItemStock(e.target.value)}
+                    className="h-9 text-xs"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-[#292B28]">Min Alert Level *</label>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    required
+                    value={itemMinStock}
+                    onChange={(e) => setItemMinStock(e.target.value)}
+                    className="h-9 text-xs"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-[#292B28]">Cost per Unit (₹) *</label>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    required
+                    value={itemCost}
+                    onChange={(e) => setItemCost(e.target.value)}
+                    className="h-9 text-xs"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-[#292B28]">Preferred Supplier</label>
+                  <select
+                    value={itemSupplierId}
+                    onChange={(e) => setItemSupplierId(e.target.value)}
+                    className="w-full h-9 px-3 rounded-md border border-[#EAE7E0] bg-white text-xs text-[#292B28]"
+                  >
+                    <option value="">No Supplier Assigned</option>
+                    {suppliers.map((s) => (
+                      <option key={s.id} value={s.id}>{s.name}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-[#292B28]">Storage Location</label>
+                  <Input
+                    placeholder="e.g. Walk-in Chiller #2"
+                    value={itemLocation}
+                    onChange={(e) => setItemLocation(e.target.value)}
+                    className="h-9 text-xs"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-4 border-t border-[#EAE7E0]">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsAddItemModalOpen(false)}
+                  className="text-xs h-9"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={addItemMutation.isPending}
+                  className="text-xs h-9 bg-[#C76B4A] hover:bg-[#AE593B] text-white"
+                >
+                  {addItemMutation.isPending ? 'Registering...' : 'Register Material'}
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal 2: Adjust Stock / Wastage */}
+      {isAdjustStockModalOpen && selectedItemForAdjust && (
+        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 border border-[#EAE7E0] animate-in fade-in-0 zoom-in-95">
+            <div className="flex items-center justify-between pb-3 border-b border-[#EAE7E0]">
+              <div>
+                <h3 className="font-bold text-[#292B28]">Adjust Stock Level</h3>
+                <p className="text-xs text-[#777872]">
+                  {selectedItemForAdjust.name} (Current: {Number(selectedItemForAdjust.current_stock).toFixed(2)} {selectedItemForAdjust.unit})
+                </p>
+              </div>
+              <button onClick={() => setIsAdjustStockModalOpen(false)} className="text-[#A2A29A] hover:text-[#292B28]">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                adjustStockMutation.mutate({
+                  inventory_item_id: selectedItemForAdjust.id,
+                  movement_type: adjustType,
+                  quantity: parseFloat(adjustQty),
+                  reason: adjustReason,
+                  notes: adjustNotes || null,
+                });
+              }}
+              className="space-y-3 pt-4"
+            >
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-[#292B28]">Adjustment Type *</label>
+                <select
+                  value={adjustType}
+                  onChange={(e) => {
+                    const type = e.target.value;
+                    setAdjustType(type);
+                    if (type === 'wastage' || type === 'spoilage') {
+                      setAdjustQty('-1');
+                      setAdjustReason(type === 'wastage' ? 'Kitchen prep wastage' : 'Spoilage past expiry');
+                    } else {
+                      setAdjustQty('5');
+                      setAdjustReason('Physical audit stock correction');
+                    }
+                  }}
+                  className="w-full h-9 px-3 rounded-md border border-[#EAE7E0] bg-white text-xs text-[#292B28]"
+                >
+                  <option value="wastage">Wastage / Kitchen Prep Loss (Deduction)</option>
+                  <option value="spoilage">Spoilage / Expiry (Deduction)</option>
+                  <option value="audit_adjustment">Manual Audit Count Correction</option>
+                  <option value="purchase_in">Emergency Direct Purchase (Addition)</option>
+                  <option value="return">Supplier Return (Deduction)</option>
+                </select>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-[#292B28]">
+                  Quantity Delta ({selectedItemForAdjust.unit}) *
+                </label>
+                <Input
+                  type="number"
+                  step="0.01"
+                  required
+                  placeholder="-1.5 or +5.0"
+                  value={adjustQty}
+                  onChange={(e) => setAdjustQty(e.target.value)}
+                  className="h-9 text-xs"
+                />
+                <p className="text-[11px] text-[#A2A29A]">Use negative numbers for wastage/loss, positive for additions.</p>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-[#292B28]">Reason *</label>
+                <Input
+                  required
+                  placeholder="e.g. Spilled sauce pan, damaged delivery bag"
+                  value={adjustReason}
+                  onChange={(e) => setAdjustReason(e.target.value)}
+                  className="h-9 text-xs"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-[#292B28]">Auditor Notes</label>
+                <Input
+                  placeholder="Logged by Chef or Manager"
+                  value={adjustNotes}
+                  onChange={(e) => setAdjustNotes(e.target.value)}
+                  className="h-9 text-xs"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-4 border-t border-[#EAE7E0]">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsAdjustStockModalOpen(false)}
+                  className="text-xs h-9"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={adjustStockMutation.isPending}
+                  className="text-xs h-9 bg-[#C76B4A] hover:bg-[#AE593B] text-white"
+                >
+                  {adjustStockMutation.isPending ? 'Saving...' : 'Record Adjustment'}
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal 3: Add Supplier */}
+      {isAddSupplierModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-lg w-full p-6 border border-[#EAE7E0] animate-in fade-in-0 zoom-in-95">
+            <div className="flex items-center justify-between pb-4 border-b border-[#EAE7E0]">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-[#EBF3FC] text-[#5185B8] flex items-center justify-center">
+                  <Truck className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-[#292B28]">Register New Supplier</h3>
+                  <p className="text-xs text-[#777872]">Vendor profile for purchase orders and material supply</p>
+                </div>
+              </div>
+              <button onClick={() => setIsAddSupplierModalOpen(false)} className="text-[#A2A29A] hover:text-[#292B28]">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                addSupplierMutation.mutate({
+                  name: supName,
+                  contact_person: supContact || null,
+                  phone: supPhone || null,
+                  email: supEmail || null,
+                  address: supAddress || null,
+                  tax_number: supTax || null,
+                  payment_terms: supTerms,
+                });
+              }}
+              className="space-y-3 pt-4"
+            >
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-[#292B28]">Supplier Business Name *</label>
+                  <Input
+                    required
+                    placeholder="e.g. Apex Meat Farms"
+                    value={supName}
+                    onChange={(e) => setSupName(e.target.value)}
+                    className="h-9 text-xs"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-[#292B28]">Contact Representative</label>
+                  <Input
+                    placeholder="e.g. Rajesh Sharma"
+                    value={supContact}
+                    onChange={(e) => setSupContact(e.target.value)}
+                    className="h-9 text-xs"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-[#292B28]">Phone Number</label>
+                  <Input
+                    placeholder="+91 98765 43210"
+                    value={supPhone}
+                    onChange={(e) => setSupPhone(e.target.value)}
+                    className="h-9 text-xs"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-[#292B28]">Email Address</label>
+                  <Input
+                    type="email"
+                    placeholder="orders@vendor.example.com"
+                    value={supEmail}
+                    onChange={(e) => setSupEmail(e.target.value)}
+                    className="h-9 text-xs"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-[#292B28]">Warehouse / Office Address</label>
+                <Input
+                  placeholder="Street, City, Industrial Area"
+                  value={supAddress}
+                  onChange={(e) => setSupAddress(e.target.value)}
+                  className="h-9 text-xs"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-[#292B28]">GST / Tax Number</label>
+                  <Input
+                    placeholder="27AAAAA0000A1Z5"
+                    value={supTax}
+                    onChange={(e) => setSupTax(e.target.value)}
+                    className="h-9 text-xs"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-[#292B28]">Payment Terms</label>
+                  <select
+                    value={supTerms}
+                    onChange={(e) => setSupTerms(e.target.value)}
+                    className="w-full h-9 px-3 rounded-md border border-[#EAE7E0] bg-white text-xs text-[#292B28]"
+                  >
+                    <option value="net_15">Net 15 Days</option>
+                    <option value="net_30">Net 30 Days</option>
+                    <option value="cash_on_delivery">Cash On Delivery (COD)</option>
+                    <option value="advance">100% Advance</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-4 border-t border-[#EAE7E0]">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsAddSupplierModalOpen(false)}
+                  className="text-xs h-9"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={addSupplierMutation.isPending}
+                  className="text-xs h-9 bg-[#C76B4A] hover:bg-[#AE593B] text-white"
+                >
+                  {addSupplierMutation.isPending ? 'Saving...' : 'Register Supplier'}
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal 4: Create Purchase Order */}
+      {isCreatePoModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-lg w-full p-6 border border-[#EAE7E0] animate-in fade-in-0 zoom-in-95">
+            <div className="flex items-center justify-between pb-3 border-b border-[#EAE7E0]">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-[#FAF8F4] text-[#C76B4A] flex items-center justify-center">
+                  <ClipboardList className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-[#292B28]">Issue Purchase Order</h3>
+                  <p className="text-xs text-[#777872]">Order supplies from registered vendor</p>
+                </div>
+              </div>
+              <button onClick={() => setIsCreatePoModalOpen(false)} className="text-[#A2A29A] hover:text-[#292B28]">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (!poSupplierId) {
+                  toast.error('Please select a supplier');
+                  return;
+                }
+                createPoMutation.mutate({
+                  branch_id: activeBranch?.id,
+                  supplier_id: parseInt(poSupplierId, 10),
+                  order_date: new Date().toISOString().split('T')[0],
+                  expected_delivery_date: poExpectedDate || null,
+                  notes: poNotes || null,
+                  items: poItems,
+                });
+              }}
+              className="space-y-4 pt-4"
+            >
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-[#292B28]">Supplier *</label>
+                  <select
+                    required
+                    value={poSupplierId}
+                    onChange={(e) => setPoSupplierId(e.target.value)}
+                    className="w-full h-9 px-3 rounded-md border border-[#EAE7E0] bg-white text-xs text-[#292B28]"
+                  >
+                    <option value="">Select Vendor...</option>
+                    {suppliers.map((s) => (
+                      <option key={s.id} value={s.id}>{s.name}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-[#292B28]">Expected Delivery Date</label>
+                  <Input
+                    type="date"
+                    value={poExpectedDate}
+                    onChange={(e) => setPoExpectedDate(e.target.value)}
+                    className="h-9 text-xs"
+                  />
+                </div>
+              </div>
+
+              {/* Items Section */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-semibold text-[#292B28]">Ordered Materials</label>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      if (inventoryItems.length > 0) {
+                        setPoItems([
+                          ...poItems,
+                          {
+                            inventory_item_id: inventoryItems[0].id,
+                            quantity_ordered: 5,
+                            unit_cost: Number(inventoryItems[0].unit_cost),
+                          },
+                        ]);
+                      }
+                    }}
+                    className="h-7 text-xs text-[#C76B4A]"
+                  >
+                    + Add Item
+                  </Button>
+                </div>
+
+                <div className="space-y-2 max-h-48 overflow-y-auto">
+                  {poItems.map((item, idx) => {
+                    const inv = inventoryItems.find((i) => i.id === item.inventory_item_id);
+                    return (
+                      <div key={idx} className="flex items-center gap-2 p-2 rounded-lg bg-[#FAF8F4] border border-[#EAE7E0]">
+                        <select
+                          value={item.inventory_item_id}
+                          onChange={(e) => {
+                            const newId = parseInt(e.target.value, 10);
+                            const found = inventoryItems.find((i) => i.id === newId);
+                            const updated = [...poItems];
+                            updated[idx] = {
+                              ...updated[idx],
+                              inventory_item_id: newId,
+                              unit_cost: found ? Number(found.unit_cost) : updated[idx].unit_cost,
+                            };
+                            setPoItems(updated);
+                          }}
+                          className="w-1/2 h-8 px-2 rounded border border-[#EAE7E0] bg-white text-xs text-[#292B28]"
+                        >
+                          {inventoryItems.map((invItem) => (
+                            <option key={invItem.id} value={invItem.id}>
+                              {invItem.name} ({invItem.unit})
+                            </option>
+                          ))}
+                        </select>
+
+                        <div className="w-1/4">
+                          <Input
+                            type="number"
+                            min="0.1"
+                            step="0.1"
+                            placeholder="Qty"
+                            value={item.quantity_ordered}
+                            onChange={(e) => {
+                              const updated = [...poItems];
+                              updated[idx].quantity_ordered = parseFloat(e.target.value) || 0;
+                              setPoItems(updated);
+                            }}
+                            className="h-8 text-xs"
+                          />
+                        </div>
+
+                        <div className="w-1/4">
+                          <Input
+                            type="number"
+                            min="0"
+                            step="0.1"
+                            placeholder="Rate (₹)"
+                            value={item.unit_cost}
+                            onChange={(e) => {
+                              const updated = [...poItems];
+                              updated[idx].unit_cost = parseFloat(e.target.value) || 0;
+                              setPoItems(updated);
+                            }}
+                            className="h-8 text-xs"
+                          />
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => setPoItems(poItems.filter((_, i) => i !== idx))}
+                          className="text-[#A2A29A] hover:text-[#C84D4D]"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-[#292B28]">Order Notes</label>
+                <Input
+                  placeholder="Special instructions or delivery dock gate info"
+                  value={poNotes}
+                  onChange={(e) => setPoNotes(e.target.value)}
+                  className="h-9 text-xs"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-4 border-t border-[#EAE7E0]">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsCreatePoModalOpen(false)}
+                  className="text-xs h-9"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={createPoMutation.isPending || poItems.length === 0}
+                  className="text-xs h-9 bg-[#C76B4A] hover:bg-[#AE593B] text-white"
+                >
+                  {createPoMutation.isPending ? 'Issuing...' : 'Issue Purchase Order'}
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal 5: Receive PO Shipment */}
+      {isReceivePoModalOpen && selectedPoForReceive && (
+        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-lg w-full p-6 border border-[#EAE7E0] animate-in fade-in-0 zoom-in-95">
+            <div className="flex items-center justify-between pb-3 border-b border-[#EAE7E0]">
+              <div>
+                <h3 className="font-bold text-[#292B28]">Receive Shipment Intake</h3>
+                <p className="text-xs text-[#777872]">
+                  Intake delivery for <span className="font-mono font-bold text-[#292B28]">{selectedPoForReceive.po_number}</span>
+                </p>
+              </div>
+              <button onClick={() => setIsReceivePoModalOpen(false)} className="text-[#A2A29A] hover:text-[#292B28]">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-3 py-4 max-h-64 overflow-y-auto">
+              {selectedPoForReceive.items?.map((item) => (
+                <div key={item.id} className="p-3 rounded-lg border border-[#EAE7E0] bg-[#FAF8F4] flex items-center justify-between gap-3">
+                  <div>
+                    <p className="font-semibold text-xs text-[#292B28]">{item.inventory_item?.name || 'Raw Material'}</p>
+                    <p className="text-[11px] text-[#777872]">
+                      Ordered: {Number(item.quantity_ordered).toFixed(2)} | Already Recv: {Number(item.quantity_received).toFixed(2)}
+                    </p>
+                  </div>
+
+                  <div className="w-32">
+                    <label className="text-[10px] text-[#777872] block">Receive Now ({item.inventory_item?.unit || 'units'}):</label>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      value={receivedQuantities[item.id] ?? 0}
+                      onChange={(e) => {
+                        setReceivedQuantities({
+                          ...receivedQuantities,
+                          [item.id]: parseFloat(e.target.value) || 0,
+                        });
+                      }}
+                      className="h-8 text-xs bg-white"
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex items-center justify-end gap-2 pt-3 border-t border-[#EAE7E0]">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsReceivePoModalOpen(false)}
+                className="text-xs"
+              >
+                Cancel
+              </Button>
+              <Button
+                size="sm"
+                onClick={() => {
+                  const receiptArray = Object.entries(receivedQuantities).map(([itemId, qty]) => ({
+                    item_id: parseInt(itemId, 10),
+                    quantity_received: qty,
+                  }));
+                  receivePoMutation.mutate({
+                    poId: selectedPoForReceive.id,
+                    items: receiptArray,
+                  });
+                }}
+                disabled={receivePoMutation.isPending}
+                className="text-xs bg-[#39845C] hover:bg-[#2F6B4A] text-white"
+              >
+                {receivePoMutation.isPending ? 'Updating...' : 'Accept Goods & Increment Stock'}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
