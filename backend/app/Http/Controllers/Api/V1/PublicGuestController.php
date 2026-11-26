@@ -30,44 +30,31 @@ class PublicGuestController extends Controller
      */
     public function restaurantDetails(string $slug): JsonResponse
     {
-        try {
-            $restaurant = Restaurant::where('slug', $slug)
-                ->where('is_active', true)
-                ->first();
+        $restaurant = Restaurant::where('slug', $slug)
+            ->where('is_active', true)
+            ->first();
 
-            if (!$restaurant) {
-                $restaurant = Restaurant::where('is_active', true)->first();
-            }
-
-            if (!$restaurant) {
-                return $this->errorResponse('Restaurant not found.', 404);
-            }
-
-            $branches = Branch::where('restaurant_id', $restaurant->id)
-                ->where('is_active', true)
-                ->get();
-
-            $categories = Category::where('restaurant_id', $restaurant->id)
-                ->where('is_active', true)
-                ->with(['menuItems' => function ($q) {
-                    $q->where('is_available', true)->with(['variants', 'addons']);
-                }])
-                ->orderBy('sort_order')
-                ->get();
-
-            return $this->successResponse([
-                'restaurant' => $restaurant,
-                'branches' => $branches,
-                'menu_catalog' => $categories,
-            ], 'Public restaurant profile retrieved.');
-        } catch (\Throwable $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage(),
-                'file' => basename($e->getFile()),
-                'line' => $e->getLine(),
-            ], 500);
+        if (!$restaurant) {
+            return $this->errorResponse('Restaurant not found.', 404);
         }
+
+        $branches = Branch::where('restaurant_id', $restaurant->id)
+            ->where('is_active', true)
+            ->get();
+
+        $categories = Category::where('restaurant_id', $restaurant->id)
+            ->where('is_active', true)
+            ->with(['menuItems' => function ($q) {
+                $q->where('is_available', true)->with(['variants', 'addons']);
+            }])
+            ->orderBy('sort_order')
+            ->get();
+
+        return $this->successResponse([
+            'restaurant' => $restaurant,
+            'branches' => $branches,
+            'menu_catalog' => $categories,
+        ], 'Public restaurant profile retrieved.');
     }
 
     /**
@@ -335,12 +322,12 @@ class PublicGuestController extends Controller
             return $this->errorResponse('Order not found.', 404);
         }
 
-        // Compute overall stage
+        // Compute overall stage (avoid empty collection returning true for every())
         $statuses = $order->items->pluck('status');
-        $stage = 1; // Order Placed
-        $stageLabel = 'Order Received';
-
-        if ($statuses->every(fn($s) => $s === 'served')) {
+        if ($order->order_status === 'cancelled' || $statuses->isEmpty()) {
+            $stage = 0;
+            $stageLabel = 'Cancelled';
+        } elseif ($statuses->every(fn($s) => $s === 'served')) {
             $stage = 4;
             $stageLabel = 'Served';
         } elseif ($statuses->contains('ready')) {
@@ -349,6 +336,9 @@ class PublicGuestController extends Controller
         } elseif ($statuses->contains('preparing')) {
             $stage = 2;
             $stageLabel = 'Preparing in Kitchen';
+        } else {
+            $stage = 1;
+            $stageLabel = 'Order Received';
         }
 
         return $this->successResponse([
@@ -398,6 +388,25 @@ class PublicGuestController extends Controller
 
         $title = $typeLabels[$validated['request_type']];
 
+        // Create live Notification for floor staff & Topbar bell
+        Notification::create([
+            'restaurant_id' => $table->restaurant_id,
+            'branch_id' => $table->branch_id,
+            'user_id' => $table->waiter_id,
+            'type' => 'table_service_request',
+            'title' => "Table {$table->table_number}: {$title}",
+            'message' => $validated['note']
+                ? "Table {$table->table_number} ({$table->location}): {$validated['note']}"
+                : "Guest at Table {$table->table_number} ({$table->location}) requested {$title}.",
+            'data' => [
+                'table_id' => $table->id,
+                'table_number' => $table->table_number,
+                'location' => $table->location,
+                'request_type' => $validated['request_type'],
+                'note' => $validated['note'] ?? null,
+            ],
+        ]);
+
         // Audit Log
         AuditLog::log(
             'table.service_request',
@@ -432,13 +441,31 @@ class PublicGuestController extends Controller
             'customer_email' => 'nullable|email|max:100',
             'guest_count' => 'required|integer|min:1|max:50',
             'reservation_date' => 'required|date|after_or_equal:today',
-            'reservation_time' => 'required|string|max:20',
+            'reservation_time' => 'required|date_format:H:i',
             'special_requests' => 'nullable|string|max:500',
         ]);
 
+        $branch = Branch::where('id', $validated['branch_id'])
+            ->where('restaurant_id', $validated['restaurant_id'])
+            ->where('is_active', true)
+            ->first();
+
+        if (!$branch) {
+            return $this->errorResponse('Selected branch is unavailable or does not belong to this restaurant.', 422);
+        }
+
+        if ($branch->opening_time && $branch->closing_time) {
+            if ($validated['reservation_time'] < $branch->opening_time || $validated['reservation_time'] > $branch->closing_time) {
+                return $this->errorResponse(
+                    "Reservations for {$branch->name} are accepted between {$branch->opening_time} and {$branch->closing_time}.",
+                    422
+                );
+            }
+        }
+
         $reservation = Reservation::create([
             'restaurant_id' => $validated['restaurant_id'],
-            'branch_id' => $validated['branch_id'],
+            'branch_id' => $branch->id,
             'customer_name' => $validated['customer_name'],
             'customer_phone' => $validated['customer_phone'],
             'customer_email' => $validated['customer_email'] ?? null,
@@ -462,6 +489,9 @@ class PublicGuestController extends Controller
             $reservation->branch_id
         );
 
-        return $this->successResponse($reservation, 'Your table reservation has been confirmed!', 201);
+        $responseData = $reservation->toArray();
+        $responseData['booking_code'] = sprintf('RES-%05d', $reservation->id);
+
+        return $this->successResponse($responseData, 'Your table reservation has been confirmed!', 201);
     }
 }

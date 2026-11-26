@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\V1\CategoryController;
 use App\Http\Controllers\Api\V1\InventoryController;
 use App\Http\Controllers\Api\V1\KdsController;
 use App\Http\Controllers\Api\V1\MenuItemController;
+use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\OrderController;
 use App\Http\Controllers\Api\V1\PublicGuestController;
 use App\Http\Controllers\Api\V1\PurchaseOrderController;
@@ -158,8 +159,11 @@ Route::prefix('v1')->group(function () {
         Route::post('/subscription/upgrade', [SubscriptionController::class, 'upgrade']);
         Route::post('/super-admin/plans', [SubscriptionController::class, 'storePlan']);
 
-        // Audit Logs Explorer
+        // Audit Logs Explorer & Staff Notifications
         Route::get('/audit-logs', [SystemController::class, 'auditLogs']);
+        Route::get('/notifications', [NotificationController::class, 'index']);
+        Route::patch('/notifications/{id}/read', [NotificationController::class, 'markRead']);
+        Route::post('/notifications/read-all', [NotificationController::class, 'markAllRead']);
 
         // Tenant Scoped Verification Route
         Route::middleware('tenant')->group(function () {

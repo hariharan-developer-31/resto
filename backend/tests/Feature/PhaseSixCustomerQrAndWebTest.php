@@ -219,6 +219,25 @@ class PhaseSixCustomerQrAndWebTest extends TestCase
             'restaurant_id' => $table->restaurant_id,
             'branch_id' => $table->branch_id,
         ]);
+
+        // Verify live staff notification was created and is readable via API
+        $this->assertDatabaseHas('notifications', [
+            'type' => 'table_service_request',
+            'restaurant_id' => $table->restaurant_id,
+            'branch_id' => $table->branch_id,
+        ]);
+
+        $waiter = \App\Models\User::where('email', 'waiter@grandfeast.com')->firstOrFail();
+        $token = $waiter->createToken('waiter_token')->plainTextToken;
+
+        $notifRes = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+            'X-Restaurant-ID' => (string) $table->restaurant_id,
+            'X-Branch-ID' => (string) $table->branch_id,
+        ])->getJson('/api/v1/notifications');
+
+        $notifRes->assertStatus(200);
+        $this->assertGreaterThanOrEqual(1, $notifRes->json('data.unread_count'));
     }
 
     /**
@@ -258,5 +277,25 @@ class PhaseSixCustomerQrAndWebTest extends TestCase
             'guest_count' => 4,
             'status' => 'confirmed',
         ]);
+        $this->assertStringStartsWith('RES-', (string) $response->json('data.booking_code'));
+    }
+
+    /**
+     * Test cancelled order tracks as Cancelled (stage 0) rather than Served.
+     */
+    public function test_cancelled_order_tracks_as_cancelled_not_served(): void
+    {
+        $cancelledOrder = Order::where('order_status', 'cancelled')->firstOrFail();
+
+        $res = $this->getJson('/api/v1/public/orders/' . $cancelledOrder->order_number . '/track');
+
+        $res->assertStatus(200)
+            ->assertJson([
+                'success' => true,
+                'data' => [
+                    'stage' => 0,
+                    'stage_label' => 'Cancelled',
+                ],
+            ]);
     }
 }
