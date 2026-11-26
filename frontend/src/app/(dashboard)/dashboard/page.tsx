@@ -56,11 +56,12 @@ export default function DashboardPage() {
   const logout = useAuthStore((s) => s.logout);
   const isSuperAdmin = user?.is_super_admin ?? false;
 
-  // Fetch live Super Admin stats from backend API
+  // Fetch live dashboard stats (global for Super Admin, tenant-scoped for staff)
   const { data: statsData, isLoading, refetch, isFetching } = useQuery({
-    queryKey: ['super-admin-stats'],
+    queryKey: ['dashboard-stats', isSuperAdmin ? 'global' : activeRestaurant?.id, activeBranch?.id],
     queryFn: async () => {
-      const res = await apiRequest('super-admin/dashboard');
+      const endpoint = isSuperAdmin ? 'super-admin/dashboard' : 'dashboard';
+      const res = await apiRequest(endpoint);
       return res.data;
     },
     refetchInterval: 15000,

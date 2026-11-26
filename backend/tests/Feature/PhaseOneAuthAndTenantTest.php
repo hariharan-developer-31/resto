@@ -240,4 +240,104 @@ class PhaseOneAuthAndTenantTest extends TestCase
         $adminResponse->assertStatus(200)
             ->assertJson(['success' => true]);
     }
+
+    /**
+     * Test self-update privilege escalation is blocked for low-privilege users.
+     */
+    public function test_staff_cannot_escalate_privileges_via_self_update(): void
+    {
+        $waiter = User::where('email', 'waiter@grandfeast.com')->firstOrFail();
+        $token = $waiter->createToken('waiter_token')->plainTextToken;
+
+        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+            ->putJson("/api/v1/users/{$waiter->id}", [
+                'name' => 'Arun Escalated',
+                'permissions' => ['restaurants.delete', 'users.delete'],
+            ]);
+
+        $response->assertStatus(403)
+            ->assertJson(['success' => false]);
+    }
+
+    /**
+     * Test Restaurant Admin cannot reset Super Admin password.
+     */
+    public function test_restaurant_admin_cannot_reset_super_admin_password(): void
+    {
+        $restAdmin = User::where('email', 'admin@grandfeast.com')->firstOrFail();
+        $superAdmin = User::where('email', 'superadmin@resto.com')->firstOrFail();
+        $token = $restAdmin->createToken('rest_admin_token')->plainTextToken;
+
+        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+            ->postJson("/api/v1/users/{$superAdmin->id}/reset-password", [
+                'new_password' => 'hijacked1234',
+            ]);
+
+        $response->assertStatus(403)
+            ->assertJson(['success' => false]);
+    }
+
+    /**
+     * Test non-Super-Admin is blocked from /super-admin/* and gets scoped /dashboard.
+     */
+    public function test_non_super_admin_dashboard_and_plan_restrictions(): void
+    {
+        $cashier = User::where('email', 'cashier@grandfeast.com')->firstOrFail();
+        $token = $cashier->createToken('cashier_token')->plainTextToken;
+
+        $this->withHeader('Authorization', 'Bearer ' . $token)
+            ->getJson('/api/v1/super-admin/dashboard')
+            ->assertStatus(403);
+
+        $this->withHeader('Authorization', 'Bearer ' . $token)
+            ->postJson('/api/v1/super-admin/plans', [
+                'name' => 'Rogue Plan',
+                'slug' => 'rogue',
+                'monthly_price' => 0,
+                'annual_price' => 0,
+                'max_branches' => 99,
+                'max_tables_per_branch' => 99,
+                'max_staff_members' => 99,
+            ])
+            ->assertStatus(403);
+
+        $this->withHeader('Authorization', 'Bearer ' . $token)
+            ->getJson('/api/v1/dashboard')
+            ->assertStatus(200)
+            ->assertJson(['success' => true]);
+    }
+
+    /**
+     * Test global exception handler returns accurate 401/404/422 status codes.
+     */
+    public function test_api_exception_handler_returns_proper_http_status_codes(): void
+    {
+        // Unauthenticated -> 401
+        $this->getJson('/api/v1/dashboard')->assertStatus(401);
+
+        // Validation error -> 422
+        $this->postJson('/api/v1/auth/login', [])->assertStatus(422);
+
+        // Not found -> 404
+        $superAdmin = User::where('email', 'superadmin@resto.com')->firstOrFail();
+        $token = $superAdmin->createToken('admin_token')->plainTextToken;
+        $this->withHeader('Authorization', 'Bearer ' . $token)
+            ->getJson('/api/v1/restaurants/999999')
+            ->assertStatus(404);
+    }
+
+    /**
+     * Test deactivated user's existing token is immediately rejected by active middleware.
+     */
+    public function test_deactivated_user_existing_token_is_rejected(): void
+    {
+        $cashier = User::where('email', 'cashier@grandfeast.com')->firstOrFail();
+        $token = $cashier->createToken('cashier_token')->plainTextToken;
+
+        $cashier->update(['is_active' => false]);
+
+        $this->withHeader('Authorization', 'Bearer ' . $token)
+            ->getJson('/api/v1/auth/me')
+            ->assertStatus(403);
+    }
 }

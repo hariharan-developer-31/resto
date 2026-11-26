@@ -18,13 +18,17 @@ class RecipeController extends Controller
     /**
      * Get recipe ingredients (Bill of Materials) for a specific menu item.
      */
-    public function getRecipe(int $menuItemId): JsonResponse
+    public function getRecipe(Request $request, int $menuItemId): JsonResponse
     {
         $menuItem = MenuItem::with([
             'recipeIngredients.inventoryItem',
             'recipeIngredients.menuVariant',
             'variants',
         ])->findOrFail($menuItemId);
+
+        if (!$request->user()->hasRestaurantAccess($menuItem->restaurant_id)) {
+            return $this->errorResponse('Unauthorized access to this recipe.', 403);
+        }
 
         return $this->successResponse([
             'menu_item_id' => $menuItem->id,
@@ -40,6 +44,10 @@ class RecipeController extends Controller
     {
         $user = $request->user();
         $menuItem = MenuItem::findOrFail($menuItemId);
+
+        if (!$user->hasRestaurantAccess($menuItem->restaurant_id)) {
+            return $this->errorResponse('Unauthorized access to this recipe.', 403);
+        }
 
         $validated = $request->validate([
             'ingredients' => 'required|array',

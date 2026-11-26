@@ -58,6 +58,10 @@ class BranchController extends Controller
             return $this->errorResponse('Unauthorized to create branches.', 403);
         }
 
+        if (!$user->hasRestaurantAccess($restaurantId)) {
+            return $this->errorResponse('Unauthorized access to this restaurant.', 403);
+        }
+
         $restaurant = Restaurant::find($restaurantId);
         if (!$restaurant) {
             return $this->errorResponse('Restaurant not found.', 404);
@@ -160,6 +164,10 @@ class BranchController extends Controller
             return $this->errorResponse('Branch not found.', 404);
         }
 
+        if (!$user->hasRestaurantAccess($restaurantId)) {
+            return $this->errorResponse('Unauthorized access to this restaurant.', 403);
+        }
+
         $validated = $request->validate([
             'name' => 'sometimes|required|string|max:255',
             'code' => 'nullable|string|max:32',
@@ -223,6 +231,10 @@ class BranchController extends Controller
             return $this->errorResponse('Branch not found.', 404);
         }
 
+        if (!$user->hasRestaurantAccess($restaurantId)) {
+            return $this->errorResponse('Unauthorized access to this restaurant.', 403);
+        }
+
         // Safeguard: Check active orders
         $hasActiveOrders = Order::where('branch_id', $branchId)
             ->whereIn('order_status', ['pending', 'preparing', 'ready'])
@@ -258,6 +270,10 @@ class BranchController extends Controller
         $branch = Branch::where('restaurant_id', $restaurantId)->find($branchId);
         if (!$branch) {
             return $this->errorResponse('Branch not found.', 404);
+        }
+
+        if (!$user->hasRestaurantAccess($restaurantId)) {
+            return $this->errorResponse('Unauthorized access to this restaurant.', 403);
         }
 
         $branch->update(['is_active' => !$branch->is_active]);

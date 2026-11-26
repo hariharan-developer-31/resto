@@ -769,10 +769,10 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        $restaurant->update([
+        $restaurant->forceFill([
             'current_plan_id' => $planPro->id,
             'subscription_status' => 'active',
-        ]);
+        ])->save();
 
         \App\Models\RestaurantSubscription::firstOrCreate(
             ['restaurant_id' => $restaurant->id, 'plan_id' => $planPro->id],

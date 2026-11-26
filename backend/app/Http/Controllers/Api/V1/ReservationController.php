@@ -135,9 +135,12 @@ class ReservationController extends Controller
     /**
      * Display a specific reservation.
      */
-    public function show(int $id): JsonResponse
+    public function show(Request $request, int $id): JsonResponse
     {
         $reservation = Reservation::with(['table', 'branch', 'restaurant'])->findOrFail($id);
+        if (!$request->user()->hasRestaurantAccess($reservation->restaurant_id)) {
+            return $this->errorResponse('Unauthorized access to this reservation.', 403);
+        }
         return $this->successResponse($reservation, 'Reservation details retrieved.');
     }
 
@@ -148,6 +151,9 @@ class ReservationController extends Controller
     {
         $user = $request->user();
         $reservation = Reservation::findOrFail($id);
+        if (!$user->hasRestaurantAccess($reservation->restaurant_id)) {
+            return $this->errorResponse('Unauthorized access to this reservation.', 403);
+        }
 
         $validated = $request->validate([
             'table_id' => 'nullable|exists:dining_tables,id',
@@ -186,6 +192,9 @@ class ReservationController extends Controller
     {
         $user = $request->user();
         $reservation = Reservation::findOrFail($id);
+        if (!$user->hasRestaurantAccess($reservation->restaurant_id)) {
+            return $this->errorResponse('Unauthorized access to this reservation.', 403);
+        }
 
         $validated = $request->validate([
             'status' => ['required', Rule::in(['pending', 'confirmed', 'checked_in', 'seated', 'completed', 'cancelled', 'no_show'])],
@@ -240,6 +249,9 @@ class ReservationController extends Controller
     {
         $user = $request->user();
         $reservation = Reservation::findOrFail($id);
+        if (!$user->hasRestaurantAccess($reservation->restaurant_id)) {
+            return $this->errorResponse('Unauthorized access to this reservation.', 403);
+        }
 
         $validated = $request->validate([
             'table_id' => 'required|exists:dining_tables,id',
@@ -279,6 +291,9 @@ class ReservationController extends Controller
     {
         $user = $request->user();
         $reservation = Reservation::findOrFail($id);
+        if (!$user->hasRestaurantAccess($reservation->restaurant_id)) {
+            return $this->errorResponse('Unauthorized access to this reservation.', 403);
+        }
 
         AuditLog::log('reservation.deleted', $reservation, $reservation->toArray(), null, $user);
         $reservation->delete();

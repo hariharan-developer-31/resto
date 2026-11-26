@@ -309,13 +309,17 @@ class OrderController extends Controller
     /**
      * Show single order with items grouped by round and KOT tickets.
      */
-    public function show(int $id): JsonResponse
+    public function show(Request $request, int $id): JsonResponse
     {
         $order = Order::with(['table', 'waiter:id,name,email', 'items.addons', 'payments.receiver:id,name'])
             ->find($id);
 
         if (!$order) {
             return $this->errorResponse('Order not found.', 404);
+        }
+
+        if (!$request->user()->hasRestaurantAccess($order->restaurant_id)) {
+            return $this->errorResponse('Unauthorized access to this order.', 403);
         }
 
         // Group items by round for clarity
@@ -332,9 +336,13 @@ class OrderController extends Controller
      */
     public function updateItemStatus(Request $request, int $itemId): JsonResponse
     {
-        $item = OrderItem::find($itemId);
+        $item = OrderItem::with('order')->find($itemId);
         if (!$item) {
             return $this->errorResponse('Order item not found.', 404);
+        }
+
+        if (!$request->user()->hasRestaurantAccess($item->order->restaurant_id)) {
+            return $this->errorResponse('Unauthorized access to this order item.', 403);
         }
 
         $validated = $request->validate([
@@ -368,6 +376,10 @@ class OrderController extends Controller
         $order = Order::with(['items', 'table'])->find($orderId);
         if (!$order) {
             return $this->errorResponse('Order not found.', 404);
+        }
+
+        if (!$request->user()->hasRestaurantAccess($order->restaurant_id)) {
+            return $this->errorResponse('Unauthorized access to this order.', 403);
         }
 
         if ($order->payment_status === 'paid') {
@@ -501,6 +513,10 @@ class OrderController extends Controller
         $order = Order::with('table')->find($orderId);
         if (!$order) {
             return $this->errorResponse('Order not found.', 404);
+        }
+
+        if (!$request->user()->hasRestaurantAccess($order->restaurant_id)) {
+            return $this->errorResponse('Unauthorized access to this order.', 403);
         }
 
         if ($order->payment_status === 'paid') {

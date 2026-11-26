@@ -6,12 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Models\AuditLog;
 use App\Models\User;
 use App\Traits\ApiResponse;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
-use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
@@ -119,6 +119,10 @@ class AuthController extends Controller
             'password' => Hash::make($request->input('new_password')),
         ]);
 
+        // Revoke all other tokens so compromised sessions are terminated
+        $currentTokenId = $user->currentAccessToken()?->id;
+        $user->tokens()->when($currentTokenId, fn($q) => $q->where('id', '!=', $currentTokenId))->delete();
+
         AuditLog::log(
             action: 'auth.change_password',
             auditable: $user,
@@ -137,11 +141,11 @@ class AuthController extends Controller
             'email' => 'required|email',
         ]);
 
+        $genericMessage = 'If an account exists with that email, password reset instructions have been dispatched.';
         $user = User::where('email', $request->input('email'))->first();
 
         if (!$user) {
-            // Keep generic response for security
-            return $this->successResponse(null, 'If an account exists with that email, a reset token has been issued.');
+            return $this->successResponse(null, $genericMessage);
         }
 
         $token = Str::random(60);
@@ -160,10 +164,11 @@ class AuthController extends Controller
             userId: $user->id
         );
 
-        // For dev/demo return token or log it
-        return $this->successResponse([
-            'dev_reset_token' => config('app.debug') ? $token : null,
-        ], 'Password reset instructions dispatched.');
+        $payload = app()->environment(['local', 'testing']) && config('app.debug')
+            ? ['dev_reset_token' => $token]
+            : null;
+
+        return $this->successResponse($payload, $genericMessage);
     }
 
     /**
@@ -181,7 +186,13 @@ class AuthController extends Controller
             ->where('email', $request->input('email'))
             ->first();
 
-        if (!$record || !Hash::check($request->input('token'), $record->token)) {
+        $expireMinutes = (int) config('auth.passwords.users.expire', 60);
+        $isExpired = !$record || !$record->created_at || Carbon::parse($record->created_at)->addMinutes($expireMinutes)->isPast();
+
+        if ($isExpired || !Hash::check($request->input('token'), $record->token)) {
+            if ($record && $isExpired) {
+                DB::table('password_reset_tokens')->where('email', $request->input('email'))->delete();
+            }
             return $this->errorResponse('Invalid or expired password reset token.', 422);
         }
 
@@ -193,6 +204,9 @@ class AuthController extends Controller
         $user->update([
             'password' => Hash::make($request->input('password')),
         ]);
+
+        // Revoke all active API tokens on password reset
+        $user->tokens()->delete();
 
         DB::table('password_reset_tokens')->where('email', $user->email)->delete();
 

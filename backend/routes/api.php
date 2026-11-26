@@ -39,20 +39,25 @@ Route::prefix('v1')->group(function () {
     Route::prefix('public')->group(function () {
         Route::get('/restaurants/{slug}', [PublicGuestController::class, 'restaurantDetails']);
         Route::get('/table/{qrToken}', [PublicGuestController::class, 'resolveTable']);
-        Route::post('/table/{qrToken}/order', [PublicGuestController::class, 'placeTableOrder']);
         Route::get('/orders/{orderNumber}/track', [PublicGuestController::class, 'trackOrder']);
-        Route::post('/table/{qrToken}/service-request', [PublicGuestController::class, 'serviceRequest']);
-        Route::post('/reservations', [PublicGuestController::class, 'createReservation']);
+
+        Route::middleware(['throttle:30,1'])->group(function () {
+            Route::post('/table/{qrToken}/order', [PublicGuestController::class, 'placeTableOrder']);
+            Route::post('/table/{qrToken}/service-request', [PublicGuestController::class, 'serviceRequest']);
+            Route::post('/reservations', [PublicGuestController::class, 'createReservation']);
+        });
     });
 
     // Authentication Routes (Rate limited)
-    Route::prefix('auth')->middleware(['throttle:60,1'])->group(function () {
-        Route::post('/login', [AuthController::class, 'login']);
-        Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
-        Route::post('/reset-password', [AuthController::class, 'resetPassword']);
+    Route::prefix('auth')->group(function () {
+        Route::middleware(['throttle:10,1'])->group(function () {
+            Route::post('/login', [AuthController::class, 'login']);
+            Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
+            Route::post('/reset-password', [AuthController::class, 'resetPassword']);
+        });
 
         // Authenticated Auth Endpoints
-        Route::middleware('auth:sanctum')->group(function () {
+        Route::middleware(['auth:sanctum', 'active'])->group(function () {
             Route::get('/me', [AuthController::class, 'me']);
             Route::post('/logout', [AuthController::class, 'logout']);
             Route::post('/change-password', [AuthController::class, 'changePassword']);
@@ -60,9 +65,10 @@ Route::prefix('v1')->group(function () {
     });
 
     // Protected Authenticated System Routes
-    Route::middleware('auth:sanctum')->group(function () {
-        // Super Admin Global Analytics
+    Route::middleware(['auth:sanctum', 'active', 'tenant'])->group(function () {
+        // Super Admin Global Analytics & Tenant Scoped Dashboard
         Route::get('/super-admin/dashboard', [SuperAdminController::class, 'dashboardStats']);
+        Route::get('/dashboard', [SuperAdminController::class, 'tenantDashboardStats']);
 
         // Restaurant Management
         Route::apiResource('restaurants', RestaurantController::class);

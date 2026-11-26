@@ -168,11 +168,15 @@ class TableController extends Controller
     /**
      * Display the specified table.
      */
-    public function show(int $id): JsonResponse
+    public function show(Request $request, int $id): JsonResponse
     {
         $table = DiningTable::with(['waiter:id,name,phone', 'branch', 'restaurant'])->find($id);
         if (!$table) {
             return $this->errorResponse('Table not found.', 404);
+        }
+
+        if (!$request->user()->hasRestaurantAccess($table->restaurant_id)) {
+            return $this->errorResponse('Unauthorized access to this table.', 403);
         }
 
         $frontendUrl = env('FRONTEND_URL', 'http://localhost:3000');
@@ -195,6 +199,10 @@ class TableController extends Controller
         $table = DiningTable::find($id);
         if (!$table) {
             return $this->errorResponse('Table not found.', 404);
+        }
+
+        if (!$user->hasRestaurantAccess($table->restaurant_id)) {
+            return $this->errorResponse('Unauthorized access to this table.', 403);
         }
 
         $validated = $request->validate([
@@ -247,6 +255,10 @@ class TableController extends Controller
             return $this->errorResponse('Table not found.', 404);
         }
 
+        if (!$user->hasRestaurantAccess($table->restaurant_id)) {
+            return $this->errorResponse('Unauthorized access to this table.', 403);
+        }
+
         if (in_array($table->status, ['occupied', 'billing'])) {
             return $this->errorResponse("Cannot delete Table [{$table->table_number}] while it is currently occupied or billing.", 422);
         }
@@ -277,6 +289,10 @@ class TableController extends Controller
         $table = DiningTable::find($id);
         if (!$table) {
             return $this->errorResponse('Table not found.', 404);
+        }
+
+        if (!$user->hasRestaurantAccess($table->restaurant_id)) {
+            return $this->errorResponse('Unauthorized access to this table.', 403);
         }
 
         $newToken = $table->generateQrToken();
@@ -319,6 +335,10 @@ class TableController extends Controller
             return $this->errorResponse('Table not found.', 404);
         }
 
+        if (!$user->hasRestaurantAccess($table->restaurant_id)) {
+            return $this->errorResponse('Unauthorized access to this table.', 403);
+        }
+
         $table->update(['waiter_id' => $request->input('waiter_id')]);
 
         return $this->successResponse($table->fresh(['waiter:id,name']), 'Waiter assigned successfully.');
@@ -329,6 +349,11 @@ class TableController extends Controller
      */
     public function updateStatus(Request $request, int $id): JsonResponse
     {
+        $user = $request->user();
+        if (!$user->isSuperAdmin() && !$user->can('tables.manage') && !$user->can('orders.edit')) {
+            return $this->errorResponse('Unauthorized to update table status.', 403);
+        }
+
         $request->validate([
             'status' => 'required|in:available,occupied,reserved,billing,cleaning,out_of_service',
         ]);
@@ -336,6 +361,10 @@ class TableController extends Controller
         $table = DiningTable::find($id);
         if (!$table) {
             return $this->errorResponse('Table not found.', 404);
+        }
+
+        if (!$user->hasRestaurantAccess($table->restaurant_id)) {
+            return $this->errorResponse('Unauthorized access to this table.', 403);
         }
 
         $table->update(['status' => $request->input('status')]);

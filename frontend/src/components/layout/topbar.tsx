@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useAuthStore } from '@/lib/auth-store';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -14,6 +15,7 @@ interface TopbarProps {
 }
 
 export function Topbar({ onMenuClick }: TopbarProps) {
+  const queryClient = useQueryClient();
   const user = useAuthStore((s) => s.user);
   const activeRestaurant = useAuthStore((s) => s.activeRestaurant);
   const activeBranch = useAuthStore((s) => s.activeBranch);
@@ -48,6 +50,7 @@ export function Topbar({ onMenuClick }: TopbarProps) {
                     (r) => r.id === Number(e.target.value)
                   );
                   setActiveRestaurant(selected || null);
+                  queryClient.invalidateQueries();
                 }}
                 className="bg-transparent font-semibold text-[#252525] outline-none cursor-pointer pr-1"
               >
@@ -64,7 +67,7 @@ export function Topbar({ onMenuClick }: TopbarProps) {
 
           {/* Branch Switcher */}
           {activeRestaurant && availableBranches.length > 0 && (
-            <div className="hidden sm:flex items-center gap-2 px-4 py-2 bg-[#F3DA8A]/25 rounded-2xl text-xs font-semibold text-[#252525]">
+            <div className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-[#F3DA8A]/25 rounded-2xl text-xs font-semibold text-[#252525]">
               <GitBranch className="h-4 w-4 text-[#252525]" />
               {availableBranches.length > 1 ? (
                 <select
@@ -74,6 +77,7 @@ export function Topbar({ onMenuClick }: TopbarProps) {
                       (b) => b.id === Number(e.target.value)
                     );
                     setActiveBranch(selected || null);
+                    queryClient.invalidateQueries();
                   }}
                   className="bg-transparent font-semibold text-[#252525] outline-none cursor-pointer pr-1"
                 >

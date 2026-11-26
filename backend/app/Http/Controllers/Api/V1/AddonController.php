@@ -92,6 +92,10 @@ class AddonController extends Controller
             return $this->errorResponse('Addon not found.', 404);
         }
 
+        if (!$user->hasRestaurantAccess($addon->restaurant_id)) {
+            return $this->errorResponse('Unauthorized access to this addon.', 403);
+        }
+
         $validated = $request->validate([
             'name' => 'sometimes|required|string|max:255',
             'price' => 'sometimes|required|numeric|min:0',
@@ -123,6 +127,10 @@ class AddonController extends Controller
         $addon = Addon::find($id);
         if (!$addon) {
             return $this->errorResponse('Addon not found.', 404);
+        }
+
+        if (!$user->hasRestaurantAccess($addon->restaurant_id)) {
+            return $this->errorResponse('Unauthorized access to this addon.', 403);
         }
 
         $addon->delete();

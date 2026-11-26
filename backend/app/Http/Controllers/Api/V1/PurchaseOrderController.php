@@ -142,7 +142,7 @@ class PurchaseOrderController extends Controller
     /**
      * Display a specific purchase order with items.
      */
-    public function show(int $id): JsonResponse
+    public function show(Request $request, int $id): JsonResponse
     {
         $po = PurchaseOrder::with([
             'items.inventoryItem',
@@ -151,6 +151,10 @@ class PurchaseOrderController extends Controller
             'creator:id,name',
             'receiver:id,name',
         ])->findOrFail($id);
+
+        if (!$request->user()->hasRestaurantAccess($po->restaurant_id)) {
+            return $this->errorResponse('Unauthorized access to this purchase order.', 403);
+        }
 
         return $this->successResponse($po, 'Purchase order retrieved.');
     }
@@ -163,6 +167,10 @@ class PurchaseOrderController extends Controller
     {
         $user = $request->user();
         $po = PurchaseOrder::with('items.inventoryItem')->findOrFail($id);
+
+        if (!$user->hasRestaurantAccess($po->restaurant_id)) {
+            return $this->errorResponse('Unauthorized access to this purchase order.', 403);
+        }
 
         if ($po->status === 'received') {
             return $this->errorResponse('This purchase order has already been completely received.', 400);

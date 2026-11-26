@@ -6,6 +6,12 @@
 export const API_BASE_URL = 
   process.env.NEXT_PUBLIC_API_URL || 'https://resto-production-eaf02fa7.up.railway.app/api/v1';
 
+let unauthorizedHandler: (() => void) | null = null;
+
+export function registerUnauthorizedHandler(handler: (() => void) | null) {
+  unauthorizedHandler = handler;
+}
+
 export interface ApiResponse<T = any> {
   success: boolean;
   message?: string;
@@ -79,10 +85,14 @@ export async function apiRequest<T = any>(
     }));
 
     if (!res.ok) {
-      // Automatic session expiry handling
-      if (res.status === 401 && typeof window !== 'undefined') {
+      // Automatic session expiry handling (skip on login attempts)
+      const isLoginRequest = endpoint.replace(/^\//, '').startsWith('auth/login');
+      if (res.status === 401 && !isLoginRequest && typeof window !== 'undefined') {
         localStorage.removeItem('resto_token');
         localStorage.removeItem('resto_user');
+        localStorage.removeItem('resto_restaurant_id');
+        localStorage.removeItem('resto_branch_id');
+        unauthorizedHandler?.();
       }
 
       throw new ApiError(
