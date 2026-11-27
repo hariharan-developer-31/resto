@@ -7,6 +7,7 @@ import { useAuthStore } from '@/lib/auth-store';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { ModalPortal } from '@/components/ui/modal-portal';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { TenantGuard } from '@/components/layout/tenant-guard';
@@ -478,22 +479,61 @@ export default function WaiterPage() {
                     </div>
                   </div>
                 ) : (
-                  <div className="bg-[#FAF9F6] rounded-xl p-3 text-center text-xs text-[#5A5D58]">
-                    Table is currently available for guest seating.
+                  <div className="bg-[#FAF9F6] rounded-xl p-3 text-center text-xs text-[#5A5D58] space-y-1">
+                    {tbl.status === 'cleaning' ? (
+                      <>
+                        <span className="block font-medium text-[#D97706]">🧹 Table needs cleaning</span>
+                        <span className="block text-[11px] text-[#8E928B]">Tap Ready once sanitized.</span>
+                      </>
+                    ) : tbl.status === 'billing' ? (
+                      <>
+                        <span className="block font-medium text-[#8E44AD]">💳 Bill settlement in progress</span>
+                        <span className="block text-[11px] text-[#8E928B]">Cashier is finalizing payment.</span>
+                      </>
+                    ) : (
+                      <>
+                        <span className="block font-medium text-[#2E7D32]">✨ Ready for guests</span>
+                        <span className="block text-[11px] text-[#8E928B]">Table is ready to seat guests.</span>
+                      </>
+                    )}
                   </div>
                 )}
 
-                {/* Table Bottom Action: Take Order / Add Round */}
-                <Button
-                  onClick={() => {
-                    setSelectedTable(tbl);
-                    setOrderPadOpen(true);
-                  }}
-                  className="w-full bg-[#B4D58A] hover:bg-[#9EC271] text-white text-xs font-semibold h-9 flex items-center justify-center gap-1.5 shadow-xs"
-                >
-                  <UtensilsCrossed className="h-3.5 w-3.5" />
-                  {isOccupied ? 'Add Items (New Round)' : 'Seat Guests & Take Order'}
-                </Button>
+                {/* Table Bottom Action: Take Order / Add Round / Mark Clean */}
+                {tbl.status === 'cleaning' ? (
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      onClick={() => updateStatusMutation.mutate({ tableId: tbl.id, status: 'available' })}
+                      disabled={updateStatusMutation.isPending}
+                      className="flex-1 bg-[#B4D58A] hover:bg-[#9EC271] text-white text-xs font-semibold h-9 shadow-xs"
+                    >
+                      <Check className="h-3.5 w-3.5 mr-1" /> Ready
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        setSelectedTable(tbl);
+                        setOrderPadOpen(true);
+                      }}
+                      className="flex-1 text-xs font-semibold h-9"
+                    >
+                      <UtensilsCrossed className="h-3.5 w-3.5 mr-1" /> Seat
+                    </Button>
+                  </div>
+                ) : (
+                  <Button
+                    onClick={() => {
+                      setSelectedTable(tbl);
+                      setOrderPadOpen(true);
+                    }}
+                    className="w-full bg-[#B4D58A] hover:bg-[#9EC271] text-white text-xs font-semibold h-9 flex items-center justify-center gap-1.5 shadow-xs"
+                  >
+                    <UtensilsCrossed className="h-3.5 w-3.5" />
+                    <span>{isOccupied ? 'Add Items' : 'Take Order'}</span>
+                  </Button>
+                )}
               </CardContent>
             </Card>
           );
@@ -502,8 +542,10 @@ export default function WaiterPage() {
 
       {/* MODAL: Rapid Order Pad Drawer */}
       {orderPadOpen && selectedTable && (
-        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
-          <div className="bg-white rounded-2xl max-w-lg w-full border border-black/[0.06] shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
+        <ModalPortal>
+          <div className="fixed inset-0 z-[100] overflow-y-auto bg-black/60 backdrop-blur-sm p-3 sm:p-4">
+            <div className="flex min-h-full items-center justify-center py-2 sm:py-6" onClick={(e) => { if (e.target === e.currentTarget) setOrderPadOpen(false); }}>
+              <div className="bg-white rounded-2xl max-w-lg w-full border border-black/[0.06] shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
             {/* Header */}
             <div className="p-4 border-b border-black/[0.06] bg-[#FAF9F6] flex items-center justify-between shrink-0">
               <div>
@@ -703,12 +745,16 @@ export default function WaiterPage() {
             </div>
           </div>
         </div>
+      </div>
+      </ModalPortal>
       )}
 
       {/* MODAL: Waiter Item Customization (Variants & Addons) */}
       {customizingItem && (
-        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-sm w-full border border-black/[0.06] shadow-xl p-4 space-y-3">
+        <ModalPortal>
+          <div className="fixed inset-0 z-[100] overflow-y-auto bg-black/60 backdrop-blur-sm p-4">
+            <div className="flex min-h-full items-center justify-center py-2 sm:py-6" onClick={(e) => { if (e.target === e.currentTarget) setCustomizingItem(null); }}>
+              <div className="bg-white rounded-2xl max-w-sm w-full border border-black/[0.06] shadow-xl p-4 space-y-3">
             <div className="flex items-center justify-between">
               <h3 className="font-bold text-sm text-[#252525]">{customizingItem.name}</h3>
               <button onClick={() => setCustomizingItem(null)} className="text-[#5A5D58]">
@@ -773,12 +819,16 @@ export default function WaiterPage() {
             </Button>
           </div>
         </div>
+      </div>
+      </ModalPortal>
       )}
 
       {/* MODAL: Quick Table Status Change */}
       {statusDialogTable && (
-        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-xs w-full border border-black/[0.06] shadow-xl p-4 space-y-3">
+        <ModalPortal>
+          <div className="fixed inset-0 z-[100] overflow-y-auto bg-black/60 backdrop-blur-sm p-4">
+            <div className="flex min-h-full items-center justify-center py-2 sm:py-6" onClick={(e) => { if (e.target === e.currentTarget) setStatusDialogTable(null); }}>
+              <div className="bg-white rounded-2xl max-w-xs w-full border border-black/[0.06] shadow-xl p-4 space-y-3">
             <h3 className="font-bold text-sm text-[#252525] text-center">
               Update Status · Table {statusDialogTable.table_number}
             </h3>
@@ -819,6 +869,8 @@ export default function WaiterPage() {
             </Button>
           </div>
         </div>
+      </div>
+      </ModalPortal>
       )}
     </div>
     </TenantGuard>
