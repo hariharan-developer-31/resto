@@ -480,179 +480,191 @@ export default function TablesManagementPage() {
 
       {/* Modal: Create / Edit Table */}
       {isTableModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#252525]/40 backdrop-blur-xs p-3 sm:p-4">
-          <div className="w-full max-w-sm rounded-2xl bg-white border border-black/[0.06] shadow-xl p-4 sm:p-6 space-y-4 max-h-[92vh] overflow-y-auto">
-            <div className="flex items-center justify-between pb-2 border-b border-black/[0.06]">
-              <h2 className="font-bold text-lg font-semibold text-[#252525]">
-                {selectedTable ? 'Edit Table' : 'Add Dining Table'}
-              </h2>
-              <button onClick={() => setIsTableModalOpen(false)}>
-                <X className="h-5 w-5 text-[#5A5D58]" />
-              </button>
-            </div>
-
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                saveTableMutation.mutate();
-              }}
-              className="space-y-4"
-            >
-              <Input
-                label="Table Number *"
-                type="text"
-                placeholder="e.g. T-07, B-01"
-                value={tableNumber}
-                onChange={(e) => setTableNumber(e.target.value)}
-                required
-              />
-
-              <Input
-                label="Seating Capacity (Guests)"
-                type="number"
-                min="1"
-                max="50"
-                value={seatingCapacity}
-                onChange={(e) => setSeatingCapacity(e.target.value)}
-                required
-              />
-
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold uppercase tracking-wider text-[#5A5D58]">
-                  Dining Section / Location
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g. AC Dining Hall, Rooftop, Patio"
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  className="w-full h-10 px-3 rounded-[10px] border border-black/[0.06] bg-white text-sm text-[#252525] outline-none focus:border-[#B4D58A]"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold uppercase tracking-wider text-[#5A5D58]">
-                  Assigned Waiter
-                </label>
-                <select
-                  value={waiterId}
-                  onChange={(e) => setWaiterId(e.target.value ? Number(e.target.value) : '')}
-                  className="w-full h-10 px-3 rounded-[10px] border border-black/[0.06] bg-white text-sm text-[#252525] outline-none focus:border-[#B4D58A]"
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-[#252525]/40 backdrop-blur-xs p-3 sm:p-4">
+          <div className="flex min-h-full items-center justify-center py-2 sm:py-6">
+            <div className="w-full max-w-sm rounded-2xl bg-white border border-black/[0.06] shadow-xl p-4 sm:p-6 space-y-4">
+              <div className="flex items-center justify-between pb-2 border-b border-black/[0.06]">
+                <h2 className="font-bold text-lg font-semibold text-[#252525]">
+                  {selectedTable ? 'Edit Table' : 'Add Dining Table'}
+                </h2>
+                <button
+                  type="button"
+                  onClick={() => setIsTableModalOpen(false)}
+                  className="p-1 rounded-lg text-[#5A5D58] hover:text-[#252525] hover:bg-[#FAF9F6]"
                 >
-                  <option value="">None (Unassigned)</option>
-                  {waiters.map((w: any) => (
-                    <option key={w.id} value={w.id}>{w.name}</option>
-                  ))}
-                </select>
+                  <X className="h-5 w-5" />
+                </button>
               </div>
 
-              <div className="flex justify-end gap-2 pt-2 border-t border-black/[0.06]">
-                <Button variant="outline" size="sm" type="button" onClick={() => setIsTableModalOpen(false)}>
-                  Cancel
-                </Button>
-                <Button size="sm" type="submit" isLoading={saveTableMutation.isPending}>
-                  {selectedTable ? 'Update Table' : 'Create Table'}
-                </Button>
-              </div>
-            </form>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  saveTableMutation.mutate();
+                }}
+                className="space-y-4"
+              >
+                <Input
+                  label="Table Number *"
+                  type="text"
+                  placeholder="e.g. T-07, B-01"
+                  value={tableNumber}
+                  onChange={(e) => setTableNumber(e.target.value)}
+                  required
+                />
+
+                <Input
+                  label="Seating Capacity (Guests)"
+                  type="number"
+                  min="1"
+                  max="50"
+                  value={seatingCapacity}
+                  onChange={(e) => setSeatingCapacity(e.target.value)}
+                  required
+                />
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold uppercase tracking-wider text-[#5A5D58]">
+                    Dining Section / Location
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. AC Dining Hall, Rooftop, Patio"
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                    className="w-full h-10 px-3 rounded-[10px] border border-black/[0.06] bg-white text-sm text-[#252525] outline-none focus:border-[#B4D58A]"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold uppercase tracking-wider text-[#5A5D58]">
+                    Assigned Waiter
+                  </label>
+                  <select
+                    value={waiterId}
+                    onChange={(e) => setWaiterId(e.target.value ? Number(e.target.value) : '')}
+                    className="w-full h-10 px-3 rounded-[10px] border border-black/[0.06] bg-white text-sm text-[#252525] outline-none focus:border-[#B4D58A]"
+                  >
+                    <option value="">None (Unassigned)</option>
+                    {waiters.map((w: any) => (
+                      <option key={w.id} value={w.id}>{w.name}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="flex justify-end gap-2 pt-2 border-t border-black/[0.06]">
+                  <Button variant="outline" size="sm" type="button" onClick={() => setIsTableModalOpen(false)}>
+                    Cancel
+                  </Button>
+                  <Button size="sm" type="submit" isLoading={saveTableMutation.isPending}>
+                    {selectedTable ? 'Update Table' : 'Create Table'}
+                  </Button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       )}
 
       {/* Modal: QR Code Standee & Generator */}
       {isQrModalOpen && selectedTable && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#252525]/50 backdrop-blur-xs p-3 sm:p-4">
-          <div className="w-full max-w-md rounded-2xl bg-white border border-black/[0.06] shadow-2xl p-4 sm:p-6 space-y-4 sm:space-y-5 max-h-[92vh] overflow-y-auto">
-            <div className="flex items-center justify-between pb-3 border-b border-black/[0.06]">
-              <div className="flex items-center gap-2">
-                <QrCode className="h-5 w-5 text-[#B4D58A]" />
-                <h2 className="font-bold text-lg font-semibold text-[#252525]">
-                  Table {selectedTable.table_number} — QR Standee
-                </h2>
-              </div>
-              <button onClick={() => setIsQrModalOpen(false)}>
-                <X className="h-5 w-5 text-[#5A5D58]" />
-              </button>
-            </div>
-
-            {/* Printable Standee Card */}
-            <div
-              ref={printRef}
-              className="print-area p-6 rounded-2xl border-2 border-dashed border-[#B4D58A]/30 bg-[#FAF9F6] flex flex-col items-center text-center space-y-4"
-            >
-              <div className="space-y-1">
-                <span className="font-bold text-lg text-[#252525] block">
-                  {activeRestaurant?.name || 'Restaurant'}
-                </span>
-                <span className="text-xs text-[#5A5D58] block">
-                  {activeBranch?.name} • Section: {selectedTable.location}
-                </span>
-              </div>
-
-              {/* QR Image Canvas / SVG */}
-              <div className="p-4 bg-white rounded-2xl shadow-sm border border-black/[0.06]">
-                <QRCodeSVG
-                  value={
-                    selectedTable.qr_ordering_url ||
-                    `${typeof window !== 'undefined' ? window.location.origin : ''}/order/${selectedTable.qr_token}`
-                  }
-                  size={180}
-                  level="H"
-                  includeMargin={true}
-                />
-              </div>
-
-              <div className="space-y-1">
-                <span className="font-bold text-3xl font-extrabold text-[#B4D58A] block">
-                  TABLE {selectedTable.table_number}
-                </span>
-                <p className="text-xs font-medium text-[#252525]">
-                  Scan with your smartphone camera to browse menu & place orders
-                </p>
-                <p className="font-mono text-[9px] text-[#8E928B] truncate max-w-xs mx-auto">
-                  Token: {selectedTable.qr_token}
-                </p>
-              </div>
-            </div>
-
-            {/* Controls */}
-            <div className="no-print space-y-3 pt-2">
-              <div className="flex items-center justify-between gap-2">
-                <Button
-                  onClick={handlePrintQr}
-                  variant="outline"
-                  size="sm"
-                  className="w-full gap-1.5 text-xs"
-                >
-                  <Printer className="h-4 w-4" /> Print Standee
-                </Button>
-                <Button
-                  onClick={() => {
-                    navigator.clipboard.writeText(selectedTable.qr_ordering_url || '');
-                    toast.success('Ordering URL copied to clipboard!');
-                  }}
-                  variant="outline"
-                  size="sm"
-                  className="w-full gap-1.5 text-xs"
-                >
-                  Copy Order URL
-                </Button>
-              </div>
-
-              <div className="pt-2 border-t border-black/[0.04] text-center">
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-[#252525]/50 backdrop-blur-xs p-3 sm:p-4">
+          <div className="flex min-h-full items-center justify-center py-2 sm:py-6">
+            <div className="w-full max-w-md rounded-2xl bg-white border border-black/[0.06] shadow-2xl p-4 sm:p-5 space-y-3 sm:space-y-4">
+              <div className="flex items-center justify-between pb-2.5 border-b border-black/[0.06]">
+                <div className="flex items-center gap-2">
+                  <QrCode className="h-5 w-5 text-[#B4D58A]" />
+                  <h2 className="font-bold text-base sm:text-lg font-semibold text-[#252525]">
+                    Table {selectedTable.table_number} — QR Standee
+                  </h2>
+                </div>
                 <button
                   type="button"
-                  onClick={() => {
-                    if (confirm('Regenerate QR Code? The existing printed QR code will stop working immediately.')) {
-                      regenerateQrMutation.mutate(selectedTable.id);
-                    }
-                  }}
-                  disabled={regenerateQrMutation.isPending}
-                  className="text-xs font-medium text-[#F2AFC0] hover:underline cursor-pointer inline-flex items-center gap-1"
+                  onClick={() => setIsQrModalOpen(false)}
+                  className="p-1 rounded-lg text-[#5A5D58] hover:text-[#252525] hover:bg-[#FAF9F6] transition-colors"
                 >
-                  <RefreshCw className={`h-3 w-3 ${regenerateQrMutation.isPending ? 'animate-spin' : ''}`} />
-                  Regenerate Secure Token (Revoke Previous)
+                  <X className="h-5 w-5" />
                 </button>
+              </div>
+
+              {/* Printable Standee Card */}
+              <div
+                ref={printRef}
+                className="print-area p-4 sm:p-5 rounded-2xl border-2 border-dashed border-[#B4D58A]/30 bg-[#FAF9F6] flex flex-col items-center text-center space-y-3"
+              >
+                <div className="space-y-0.5">
+                  <span className="font-bold text-base sm:text-lg text-[#252525] block">
+                    {activeRestaurant?.name || 'Restaurant'}
+                  </span>
+                  <span className="text-xs text-[#5A5D58] block">
+                    {activeBranch?.name} • Section: {selectedTable.location}
+                  </span>
+                </div>
+
+                {/* QR Image Canvas / SVG */}
+                <div className="p-3 bg-white rounded-2xl shadow-sm border border-black/[0.06]">
+                  <QRCodeSVG
+                    value={
+                      selectedTable.qr_ordering_url ||
+                      `${typeof window !== 'undefined' ? window.location.origin : ''}/order/${selectedTable.qr_token}`
+                    }
+                    size={145}
+                    level="H"
+                    includeMargin={true}
+                  />
+                </div>
+
+                <div className="space-y-0.5">
+                  <span className="font-bold text-2xl font-extrabold text-[#B4D58A] block">
+                    TABLE {selectedTable.table_number}
+                  </span>
+                  <p className="text-xs font-medium text-[#252525]">
+                    Scan with your smartphone camera to browse menu & place orders
+                  </p>
+                  <p className="font-mono text-[9px] text-[#8E928B] truncate max-w-xs mx-auto">
+                    Token: {selectedTable.qr_token}
+                  </p>
+                </div>
+              </div>
+
+              {/* Controls */}
+              <div className="no-print space-y-2.5 pt-1">
+                <div className="flex items-center justify-between gap-2">
+                  <Button
+                    onClick={handlePrintQr}
+                    variant="outline"
+                    size="sm"
+                    className="w-full gap-1.5 text-xs"
+                  >
+                    <Printer className="h-4 w-4" /> Print Standee
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      navigator.clipboard.writeText(selectedTable.qr_ordering_url || '');
+                      toast.success('Ordering URL copied to clipboard!');
+                    }}
+                    variant="outline"
+                    size="sm"
+                    className="w-full gap-1.5 text-xs"
+                  >
+                    Copy Order URL
+                  </Button>
+                </div>
+
+                <div className="pt-1.5 border-t border-black/[0.04] text-center">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (confirm('Regenerate QR Code? The existing printed QR code will stop working immediately.')) {
+                        regenerateQrMutation.mutate(selectedTable.id);
+                      }
+                    }}
+                    disabled={regenerateQrMutation.isPending}
+                    className="text-xs font-medium text-[#F2AFC0] hover:underline cursor-pointer inline-flex items-center gap-1"
+                  >
+                    <RefreshCw className={`h-3 w-3 ${regenerateQrMutation.isPending ? 'animate-spin' : ''}`} />
+                    Regenerate Secure Token (Revoke Previous)
+                  </button>
+                </div>
               </div>
             </div>
           </div>

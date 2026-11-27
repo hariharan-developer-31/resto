@@ -584,19 +584,21 @@ export default function MenuCatalogPage() {
 
       {/* Modal: Add / Edit Food Item */}
       {isItemModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#252525]/40 backdrop-blur-xs p-3 sm:p-4">
-          <div className="w-full max-w-xl max-h-[92vh] overflow-y-auto rounded-2xl bg-white border border-black/[0.06] shadow-xl p-4 sm:p-6 space-y-4 sm:space-y-5">
-            <div className="flex items-center justify-between pb-3 border-b border-black/[0.06]">
-              <h2 className="font-bold text-lg sm:text-xl font-semibold text-[#252525]">
-                {editingItem ? 'Edit Food Item' : 'New Culinary Item'}
-              </h2>
-              <button
-                onClick={() => setIsItemModalOpen(false)}
-                className="p-1.5 text-[#5A5D58] hover:text-[#252525] rounded-lg hover:bg-[#FAF9F6]"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-[#252525]/40 backdrop-blur-xs p-3 sm:p-4">
+          <div className="flex min-h-full items-center justify-center py-2 sm:py-6">
+            <div className="w-full max-w-xl rounded-2xl bg-white border border-black/[0.06] shadow-xl p-4 sm:p-6 space-y-4 sm:space-y-5">
+              <div className="flex items-center justify-between pb-3 border-b border-black/[0.06]">
+                <h2 className="font-bold text-lg sm:text-xl font-semibold text-[#252525]">
+                  {editingItem ? 'Edit Food Item' : 'New Culinary Item'}
+                </h2>
+                <button
+                  type="button"
+                  onClick={() => setIsItemModalOpen(false)}
+                  className="p-1.5 text-[#5A5D58] hover:text-[#252525] rounded-lg hover:bg-[#FAF9F6]"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
 
             <form
               onSubmit={(e) => {
@@ -819,96 +821,109 @@ export default function MenuCatalogPage() {
             </form>
           </div>
         </div>
+      </div>
       )}
 
       {/* Modal: Create Category */}
       {isCategoryModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#252525]/40 backdrop-blur-xs p-3 sm:p-4">
-          <div className="w-full max-w-sm rounded-2xl bg-white border border-black/[0.06] shadow-xl p-4 sm:p-6 space-y-4 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between pb-2 border-b border-black/[0.06]">
-              <h2 className="font-bold text-lg font-semibold text-[#252525]">Add Menu Category</h2>
-              <button onClick={() => setIsCategoryModalOpen(false)}>
-                <X className="h-5 w-5 text-[#5A5D58]" />
-              </button>
-            </div>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                createCategoryMutation.mutate();
-              }}
-              className="space-y-4"
-            >
-              <Input
-                label="Category Name *"
-                type="text"
-                placeholder="e.g. Starters, Tandoor"
-                value={catName}
-                onChange={(e) => setCatName(e.target.value)}
-                required
-              />
-              <Input
-                label="Description"
-                type="text"
-                placeholder="Short descriptive subtitle..."
-                value={catDesc}
-                onChange={(e) => setCatDesc(e.target.value)}
-              />
-              <div className="flex justify-end gap-2 pt-2">
-                <Button variant="outline" size="sm" type="button" onClick={() => setIsCategoryModalOpen(false)}>
-                  Cancel
-                </Button>
-                <Button size="sm" type="submit" isLoading={createCategoryMutation.isPending}>
-                  Create Category
-                </Button>
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-[#252525]/40 backdrop-blur-xs p-3 sm:p-4">
+          <div className="flex min-h-full items-center justify-center py-2 sm:py-6">
+            <div className="w-full max-w-sm rounded-2xl bg-white border border-black/[0.06] shadow-xl p-4 sm:p-6 space-y-4">
+              <div className="flex items-center justify-between pb-2 border-b border-black/[0.06]">
+                <h2 className="font-bold text-lg font-semibold text-[#252525]">Add Menu Category</h2>
+                <button
+                  type="button"
+                  onClick={() => setIsCategoryModalOpen(false)}
+                  className="p-1 rounded-lg text-[#5A5D58] hover:text-[#252525] hover:bg-[#FAF9F6]"
+                >
+                  <X className="h-5 w-5" />
+                </button>
               </div>
-            </form>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  createCategoryMutation.mutate();
+                }}
+                className="space-y-4"
+              >
+                <Input
+                  label="Category Name *"
+                  type="text"
+                  placeholder="e.g. Starters, Tandoor"
+                  value={catName}
+                  onChange={(e) => setCatName(e.target.value)}
+                  required
+                />
+                <Input
+                  label="Description"
+                  type="text"
+                  placeholder="Short descriptive subtitle..."
+                  value={catDesc}
+                  onChange={(e) => setCatDesc(e.target.value)}
+                />
+                <div className="flex justify-end gap-2 pt-2">
+                  <Button variant="outline" size="sm" type="button" onClick={() => setIsCategoryModalOpen(false)}>
+                    Cancel
+                  </Button>
+                  <Button size="sm" type="submit" isLoading={createCategoryMutation.isPending}>
+                    Create Category
+                  </Button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       )}
 
       {/* Modal: Create Add-on */}
       {isAddonModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#252525]/40 backdrop-blur-xs p-3 sm:p-4">
-          <div className="w-full max-w-sm rounded-2xl bg-white border border-black/[0.06] shadow-xl p-4 sm:p-6 space-y-4 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between pb-2 border-b border-black/[0.06]">
-              <h2 className="font-bold text-lg font-semibold text-[#252525]">New Add-on Option</h2>
-              <button onClick={() => setIsAddonModalOpen(false)}>
-                <X className="h-5 w-5 text-[#5A5D58]" />
-              </button>
-            </div>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                createAddonMutation.mutate();
-              }}
-              className="space-y-4"
-            >
-              <Input
-                label="Add-on Name *"
-                type="text"
-                placeholder="e.g. Extra Cheese, Extra Sauce"
-                value={addonName}
-                onChange={(e) => setAddonName(e.target.value)}
-                required
-              />
-              <Input
-                label="Price (₹) *"
-                type="number"
-                step="0.01"
-                placeholder="30.00"
-                value={addonPrice}
-                onChange={(e) => setAddonPrice(e.target.value)}
-                required
-              />
-              <div className="flex justify-end gap-2 pt-2">
-                <Button variant="outline" size="sm" type="button" onClick={() => setIsAddonModalOpen(false)}>
-                  Cancel
-                </Button>
-                <Button size="sm" type="submit" isLoading={createAddonMutation.isPending}>
-                  Create Add-on
-                </Button>
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-[#252525]/40 backdrop-blur-xs p-3 sm:p-4">
+          <div className="flex min-h-full items-center justify-center py-2 sm:py-6">
+            <div className="w-full max-w-sm rounded-2xl bg-white border border-black/[0.06] shadow-xl p-4 sm:p-6 space-y-4">
+              <div className="flex items-center justify-between pb-2 border-b border-black/[0.06]">
+                <h2 className="font-bold text-lg font-semibold text-[#252525]">New Add-on Option</h2>
+                <button
+                  type="button"
+                  onClick={() => setIsAddonModalOpen(false)}
+                  className="p-1 rounded-lg text-[#5A5D58] hover:text-[#252525] hover:bg-[#FAF9F6]"
+                >
+                  <X className="h-5 w-5" />
+                </button>
               </div>
-            </form>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  createAddonMutation.mutate();
+                }}
+                className="space-y-4"
+              >
+                <Input
+                  label="Add-on Name *"
+                  type="text"
+                  placeholder="e.g. Extra Cheese, Extra Sauce"
+                  value={addonName}
+                  onChange={(e) => setAddonName(e.target.value)}
+                  required
+                />
+                <Input
+                  label="Price (₹) *"
+                  type="number"
+                  step="0.01"
+                  placeholder="30.00"
+                  value={addonPrice}
+                  onChange={(e) => setAddonPrice(e.target.value)}
+                  required
+                />
+                <div className="flex justify-end gap-2 pt-2">
+                  <Button variant="outline" size="sm" type="button" onClick={() => setIsAddonModalOpen(false)}>
+                    Cancel
+                  </Button>
+                  <Button size="sm" type="submit" isLoading={createAddonMutation.isPending}>
+                    Create Add-on
+                  </Button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       )}

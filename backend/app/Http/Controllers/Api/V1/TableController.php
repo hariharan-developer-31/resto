@@ -26,7 +26,11 @@ class TableController extends Controller
             ?? $request->input('branch_id')
             ?? $user->branches()->first()?->id;
 
-        $restaurantId = $request->header('X-Restaurant-ID') ?? $request->input('restaurant_id');
+        $currentRest = $request->attributes->get('current_restaurant');
+        $restaurantId = $currentRest?->id ?? $request->header('X-Restaurant-ID') ?? $request->input('restaurant_id');
+        if ($restaurantId && !is_numeric($restaurantId)) {
+            $restaurantId = Restaurant::where('slug', $restaurantId)->value('id');
+        }
         if (!$branchId && $restaurantId) {
             $branchId = Branch::where('restaurant_id', $restaurantId)->first()?->id;
         }
@@ -132,7 +136,11 @@ class TableController extends Controller
             ?? $request->input('branch_id')
             ?? $user->branches()->first()?->id;
 
-        $restaurantId = $request->header('X-Restaurant-ID') ?? $request->input('restaurant_id');
+        $currentRest = $request->attributes->get('current_restaurant');
+        $restaurantId = $currentRest?->id ?? $request->header('X-Restaurant-ID') ?? $request->input('restaurant_id');
+        if ($restaurantId && !is_numeric($restaurantId)) {
+            $restaurantId = Restaurant::where('slug', $restaurantId)->value('id');
+        }
         if (!$branchId && $restaurantId) {
             $branchId = Branch::where('restaurant_id', $restaurantId)->first()?->id;
         }

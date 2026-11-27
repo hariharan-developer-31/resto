@@ -21,9 +21,15 @@ class MenuItemController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $restaurantId = $request->header('X-Restaurant-ID') 
+        $restaurant = $request->attributes->get('current_restaurant');
+        $restaurantId = $restaurant?->id 
+            ?? $request->header('X-Restaurant-ID') 
             ?? $request->input('restaurant_id')
             ?? $request->user()->restaurants()->first()?->id;
+
+        if ($restaurantId && !is_numeric($restaurantId)) {
+            $restaurantId = Restaurant::where('slug', $restaurantId)->value('id');
+        }
 
         if (!$restaurantId && $request->user()->isSuperAdmin()) {
             $restaurantId = Restaurant::first()?->id;
@@ -81,9 +87,15 @@ class MenuItemController extends Controller
             return $this->errorResponse('Unauthorized to create menu items.', 403);
         }
 
-        $restaurantId = $request->header('X-Restaurant-ID') 
+        $restaurant = $request->attributes->get('current_restaurant');
+        $restaurantId = $restaurant?->id 
+            ?? $request->header('X-Restaurant-ID') 
             ?? $request->input('restaurant_id')
             ?? $user->restaurants()->first()?->id;
+
+        if ($restaurantId && !is_numeric($restaurantId)) {
+            $restaurantId = Restaurant::where('slug', $restaurantId)->value('id');
+        }
 
         if (!$restaurantId && $user->isSuperAdmin()) {
             $restaurantId = Restaurant::first()?->id;
