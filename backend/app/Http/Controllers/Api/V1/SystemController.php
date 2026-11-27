@@ -99,4 +99,35 @@ class SystemController extends Controller
 
         return $this->successResponse($logs, 'Audit logs retrieved');
     }
+
+    /**
+     * Super Admin schema & migration diagnostics.
+     */
+    public function diagnostics(Request $request): JsonResponse
+    {
+        if (!$request->user() || !$request->user()->isSuperAdmin()) {
+            return $this->errorResponse('Unauthorized.', 403);
+        }
+
+        $probe = function (callable $fn) {
+            try {
+                return ['ok' => true, 'result' => $fn()];
+            } catch (\Throwable $e) {
+                return ['ok' => false, 'error' => $e->getMessage()];
+            }
+        };
+
+        return $this->successResponse([
+            'driver' => DB::getDriverName(),
+            'migrations' => $probe(fn() => DB::table('migrations')->orderBy('id')->pluck('migration')),
+            'categories' => $probe(fn() => DB::table('categories')->count()),
+            'dining_tables_ext' => $probe(fn() => DB::table('dining_tables')->select('id', 'location', 'waiter_id')->first()),
+            'orders_ext' => $probe(fn() => DB::table('orders')->select('id', 'guest_count', 'settled_at')->first()),
+            'subscription_plans' => $probe(fn() => DB::table('subscription_plans')->count()),
+            'migrate_status' => $probe(function () {
+                \Illuminate\Support\Facades\Artisan::call('migrate:status');
+                return \Illuminate\Support\Facades\Artisan::output();
+            }),
+        ], 'Diagnostics retrieved.');
+    }
 }

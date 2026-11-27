@@ -69,6 +69,7 @@ Route::prefix('v1')->group(function () {
     Route::middleware(['auth:sanctum', 'active', 'tenant'])->group(function () {
         // Super Admin Global Analytics & Tenant Scoped Dashboard
         Route::get('/super-admin/dashboard', [SuperAdminController::class, 'dashboardStats']);
+        Route::get('/super-admin/diagnostics', [SystemController::class, 'diagnostics']);
         Route::get('/dashboard', [SuperAdminController::class, 'tenantDashboardStats']);
 
         // Restaurant Management
