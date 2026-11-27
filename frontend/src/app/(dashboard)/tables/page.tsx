@@ -276,7 +276,24 @@ export default function TablesManagementPage() {
       </div>
 
       {/* Status Counters Strip */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 sm:gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 sm:gap-3">
+        <div
+          onClick={() => setStatusFilter('All')}
+          className={`p-3 rounded-xl border text-xs cursor-pointer transition-all ${
+            statusFilter === 'All' ? 'border-[#252525] bg-[#252525] text-white shadow-xs' : 'border-black/[0.06] bg-white hover:bg-[#FAF9F6]'
+          }`}
+        >
+          <div className="flex items-center justify-between">
+            <span className={`uppercase font-semibold text-[10px] ${statusFilter === 'All' ? 'text-white/80' : 'text-[#5A5D58]'}`}>
+              All Tables
+            </span>
+            <span className={`h-2 w-2 rounded-full ${statusFilter === 'All' ? 'bg-[#B4D58A]' : 'bg-[#252525]'}`} />
+          </div>
+          <span className={`font-bold text-xl block mt-1 ${statusFilter === 'All' ? 'text-white' : 'text-[#252525]'}`}>
+            {tables.length}
+          </span>
+        </div>
+
         <div
           onClick={() => setStatusFilter(statusFilter === 'available' ? 'All' : 'available')}
           className={`p-3 rounded-xl border text-xs cursor-pointer transition-all ${
@@ -378,15 +395,36 @@ export default function TablesManagementPage() {
       {isLoading ? (
         <div className="py-16 text-center text-sm text-[#5A5D58]">Loading tables...</div>
       ) : filteredTables.length === 0 ? (
-        <Card className="border-black/[0.06] p-12 text-center">
-          <Grid className="h-12 w-12 text-[#8E928B] mx-auto mb-3" />
-          <h3 className="font-bold text-lg font-semibold text-[#252525]">No Tables Found</h3>
-          <p className="text-xs text-[#5A5D58] mt-1">
-            Add tables for this branch to generate contactless QR codes and manage dining sessions.
+        <Card className="border-black/[0.06] p-10 text-center bg-white rounded-2xl shadow-xs">
+          <Grid className="h-10 w-10 text-[#8E928B] mx-auto mb-2 opacity-60" />
+          <h3 className="font-bold text-base font-semibold text-[#252525]">
+            {tables.length === 0
+              ? 'No Tables Found'
+              : `No ${statusFilter !== 'All' ? `"${statusFilter.toUpperCase()}"` : ''} Tables Found`}
+          </h3>
+          <p className="text-xs text-[#5A5D58] mt-1 max-w-sm mx-auto">
+            {tables.length === 0
+              ? 'Add tables for this branch to generate contactless QR codes and manage dining sessions.'
+              : `There are currently 0 tables matching status "${statusFilter}" in ${selectedLocation === 'All' ? 'this branch' : selectedLocation}.`}
           </p>
-          <Button onClick={openCreateTableModal} size="sm" className="mt-4 gap-2">
-            <Plus className="h-4 w-4" /> Add Table
-          </Button>
+          <div className="flex items-center justify-center gap-2 mt-4">
+            {(statusFilter !== 'All' || selectedLocation !== 'All') && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setStatusFilter('All');
+                  setSelectedLocation('All');
+                }}
+                className="text-xs"
+              >
+                Clear Filter & Show All Tables ({tables.length})
+              </Button>
+            )}
+            <Button onClick={openCreateTableModal} size="sm" className="gap-1.5 text-xs">
+              <Plus className="h-3.5 w-3.5" /> Add Table
+            </Button>
+          </div>
         </Card>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
