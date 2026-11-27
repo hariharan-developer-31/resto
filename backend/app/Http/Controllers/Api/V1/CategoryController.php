@@ -71,6 +71,10 @@ class CategoryController extends Controller
             $restaurantId = Restaurant::first()?->id;
         }
 
+        if (!$restaurantId) {
+            return $this->errorResponse('Please specify a valid restaurant context.', 400);
+        }
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'slug' => 'nullable|string|max:255',

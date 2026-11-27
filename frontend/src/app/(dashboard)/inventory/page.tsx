@@ -6,6 +6,7 @@ import { apiRequest } from '@/lib/api-client';
 import { useAuthStore } from '@/lib/auth-store';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { TenantGuard } from '@/components/layout/tenant-guard';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
@@ -422,7 +423,8 @@ export default function InventoryManagementPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <TenantGuard requireBranch stationName="Inventory & Supply Chain">
+      <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -468,7 +470,13 @@ export default function InventoryManagementPage() {
 
           {activeTab === 'suppliers' && (
             <Button
-              onClick={() => setIsAddSupplierModalOpen(true)}
+              onClick={() => {
+                if (!activeRestaurant?.id) {
+                  toast.error('Please select an active restaurant first.');
+                  return;
+                }
+                setIsAddSupplierModalOpen(true);
+              }}
               className="bg-[#B4D58A] hover:bg-[#9EC271] text-white shadow-sm"
             >
               <Plus className="w-4 h-4 mr-2" /> New Supplier
@@ -1924,5 +1932,6 @@ export default function InventoryManagementPage() {
         </div>
       )}
     </div>
+    </TenantGuard>
   );
 }

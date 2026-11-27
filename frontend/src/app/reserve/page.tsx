@@ -22,7 +22,7 @@ import {
 
 function ReservePageContent() {
   const searchParams = useSearchParams();
-  const restaurantSlug = searchParams.get('restaurant') || 'the-grand-feast';
+  const restaurantSlug = searchParams.get('restaurant') || 'featured';
 
   const [resBranchId, setResBranchId] = useState<number>(1);
   const [resName, setResName] = useState('');

@@ -6,6 +6,7 @@ import { apiRequest } from '@/lib/api-client';
 import { useAuthStore } from '@/lib/auth-store';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { TenantGuard } from '@/components/layout/tenant-guard';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { formatCurrency } from '@/lib/utils';
@@ -275,17 +276,18 @@ export default function MenuCatalogPage() {
   });
 
   return (
-    <div className="space-y-6">
-      {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="font-bold text-2xl sm:text-3xl font-semibold text-[#252525]">
-            Menu Catalog & Kitchen Stations
-          </h1>
-          <p className="text-xs text-[#5A5D58]">
-            Organize food categories, preparation times, variants, and add-ons for {activeRestaurant?.name}
-          </p>
-        </div>
+    <TenantGuard requireBranch={false} stationName="Menu Catalog">
+      <div className="space-y-6">
+        {/* Page Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="font-bold text-2xl sm:text-3xl font-semibold text-[#252525]">
+              Menu Catalog & Kitchen Stations
+            </h1>
+            <p className="text-xs text-[#5A5D58]">
+              Organize food categories, preparation times, variants, and add-ons for {activeRestaurant?.name || 'Active Restaurant'}
+            </p>
+          </div>
 
         {canCreate && (
           <div className="flex items-center gap-2">
@@ -869,5 +871,6 @@ export default function MenuCatalogPage() {
         </div>
       )}
     </div>
+    </TenantGuard>
   );
 }

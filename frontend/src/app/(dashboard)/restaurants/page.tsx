@@ -47,7 +47,7 @@ export default function RestaurantsPage() {
     try {
       const me = await apiRequest('auth/me');
       if (me?.data) {
-        useAuthStore.getState().updateUser(me.data);
+        useAuthStore.getState().updateUser((me.data as any).user || me.data);
       }
     } catch {
       // non-fatal
@@ -142,10 +142,14 @@ export default function RestaurantsPage() {
         });
       }
     },
-    onSuccess: () => {
+    onSuccess: (res: any) => {
       queryClient.invalidateQueries({ queryKey: ['restaurants'] });
-      queryClient.invalidateQueries({ queryKey: ['system-bootstrap'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard-stats'] });
+      queryClient.invalidateQueries({ queryKey: ['staff-notifications'] });
       refreshAuthContext();
+      if (!editingRestaurant && res?.data) {
+        useAuthStore.getState().setActiveRestaurant(res.data);
+      }
       toast.success(editingRestaurant ? 'Restaurant updated!' : 'Restaurant created successfully!');
       setIsModalOpen(false);
     },

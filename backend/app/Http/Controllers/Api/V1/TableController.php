@@ -26,6 +26,11 @@ class TableController extends Controller
             ?? $request->input('branch_id')
             ?? $user->branches()->first()?->id;
 
+        $restaurantId = $request->header('X-Restaurant-ID') ?? $request->input('restaurant_id');
+        if (!$branchId && $restaurantId) {
+            $branchId = Branch::where('restaurant_id', $restaurantId)->first()?->id;
+        }
+
         if (!$branchId && $user->isSuperAdmin()) {
             $branchId = Branch::first()?->id;
         }
@@ -113,6 +118,11 @@ class TableController extends Controller
         $branchId = $request->header('X-Branch-ID') 
             ?? $request->input('branch_id')
             ?? $user->branches()->first()?->id;
+
+        $restaurantId = $request->header('X-Restaurant-ID') ?? $request->input('restaurant_id');
+        if (!$branchId && $restaurantId) {
+            $branchId = Branch::where('restaurant_id', $restaurantId)->first()?->id;
+        }
 
         if (!$branchId && $user->isSuperAdmin()) {
             $branchId = Branch::first()?->id;

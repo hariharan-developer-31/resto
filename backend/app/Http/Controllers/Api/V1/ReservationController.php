@@ -7,6 +7,7 @@ use App\Models\AuditLog;
 use App\Models\Branch;
 use App\Models\DiningTable;
 use App\Models\Reservation;
+use App\Models\Restaurant;
 use App\Traits\ApiResponse;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -29,7 +30,7 @@ class ReservationController extends Controller
             ?? $user->restaurants()->first()?->id;
 
         if (!$restaurantId && $user->isSuperAdmin()) {
-            $restaurantId = Branch::first()?->restaurant_id;
+            $restaurantId = Restaurant::first()?->id;
         }
 
         if (!$restaurantId) {

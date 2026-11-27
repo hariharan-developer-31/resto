@@ -43,7 +43,7 @@ class SubscriptionController extends Controller
             ?? $user->restaurants()->first()?->id;
 
         if (!$restaurantId && $user->isSuperAdmin()) {
-            $restaurantId = Branch::first()?->restaurant_id;
+            $restaurantId = Restaurant::first()?->id;
         }
 
         if (!$restaurantId) {
@@ -129,7 +129,7 @@ class SubscriptionController extends Controller
             ?? $user->restaurants()->first()?->id;
 
         if (!$restaurantId && $user->isSuperAdmin()) {
-            $restaurantId = Branch::first()?->restaurant_id;
+            $restaurantId = Restaurant::first()?->id;
         }
 
         if (!$restaurantId || (!$user->isSuperAdmin() && (!$user->can('settings.edit') || !$user->hasRestaurantAccess((int) $restaurantId)))) {

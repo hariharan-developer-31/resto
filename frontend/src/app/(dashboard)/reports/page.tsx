@@ -6,6 +6,7 @@ import { apiRequest } from '@/lib/api-client';
 import { useAuthStore } from '@/lib/auth-store';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { TenantGuard } from '@/components/layout/tenant-guard';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -114,7 +115,7 @@ export default function ReportsAndAnalyticsPage() {
       });
       return res.data;
     },
-    enabled: !!activeRestaurant?.id && activeTab === 'eod',
+    enabled: !!activeRestaurant?.id && !!activeBranch?.id && activeTab === 'eod',
   });
 
   // 5. Fetch Tax Report
@@ -152,7 +153,8 @@ export default function ReportsAndAnalyticsPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <TenantGuard requireBranch={false} stationName="Executive Reports & Analytics">
+      <div className="space-y-6">
       {/* Header */}
       <div className="no-print flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -775,5 +777,6 @@ export default function ReportsAndAnalyticsPage() {
         </div>
       )}
     </div>
+    </TenantGuard>
   );
 }

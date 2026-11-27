@@ -34,7 +34,7 @@ class AnalyticsController extends Controller
             ?? $user->restaurants()->first()?->id;
 
         if (!$restaurantId && $user->isSuperAdmin()) {
-            $restaurantId = Branch::first()?->restaurant_id;
+            $restaurantId = Restaurant::first()?->id;
         }
 
         if (!$restaurantId) {
@@ -164,7 +164,7 @@ class AnalyticsController extends Controller
             ?? $user->restaurants()->first()?->id;
 
         if (!$restaurantId && $user->isSuperAdmin()) {
-            $restaurantId = Branch::first()?->restaurant_id;
+            $restaurantId = Restaurant::first()?->id;
         }
 
         if (!$restaurantId || !$user->hasRestaurantAccess((int) $restaurantId)) {
@@ -238,7 +238,7 @@ class AnalyticsController extends Controller
             ?? $user->restaurants()->first()?->id;
 
         if (!$restaurantId && $user->isSuperAdmin()) {
-            $restaurantId = Branch::first()?->restaurant_id;
+            $restaurantId = Restaurant::first()?->id;
         }
 
         if (!$restaurantId || !$user->hasRestaurantAccess((int) $restaurantId)) {
@@ -306,7 +306,7 @@ class AnalyticsController extends Controller
             ?? $user->restaurants()->first()?->id;
 
         if (!$restaurantId && $user->isSuperAdmin()) {
-            $restaurantId = Branch::first()?->restaurant_id;
+            $restaurantId = Restaurant::first()?->id;
         }
 
         if (!$restaurantId || !$user->hasRestaurantAccess((int) $restaurantId)) {
@@ -410,7 +410,7 @@ class AnalyticsController extends Controller
             ?? $user->restaurants()->first()?->id;
 
         if (!$restaurantId && $user->isSuperAdmin()) {
-            $restaurantId = Branch::first()?->restaurant_id;
+            $restaurantId = Restaurant::first()?->id;
         }
 
         if (!$restaurantId || !$user->hasRestaurantAccess((int) $restaurantId)) {

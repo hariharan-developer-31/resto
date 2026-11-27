@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Models\AuditLog;
 use App\Models\Branch;
+use App\Models\Restaurant;
 use App\Models\Supplier;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
@@ -26,7 +27,7 @@ class SupplierController extends Controller
             ?? $user->restaurants()->first()?->id;
 
         if (!$restaurantId && $user->isSuperAdmin()) {
-            $restaurantId = Branch::first()?->restaurant_id;
+            $restaurantId = Restaurant::first()?->id;
         }
 
         if (!$restaurantId) {
@@ -68,7 +69,7 @@ class SupplierController extends Controller
             ?? $user->restaurants()->first()?->id;
 
         if (!$restaurantId && $user->isSuperAdmin()) {
-            $restaurantId = Branch::first()?->restaurant_id;
+            $restaurantId = Restaurant::first()?->id;
         }
 
         $validated = $request->validate([

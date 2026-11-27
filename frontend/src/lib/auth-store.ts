@@ -90,10 +90,39 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   updateUser: (user) => {
+    // Normalization in case an API response wrapper was passed
+    const normalizedUser = (user as any)?.user ? (user as any).user : user;
     if (typeof window !== 'undefined') {
-      localStorage.setItem('resto_user', JSON.stringify(user));
+      localStorage.setItem('resto_user', JSON.stringify(normalizedUser));
     }
-    set({ user });
+
+    // Auto-reconcile activeRestaurant & activeBranch if not set or invalid
+    let activeRestaurant = get().activeRestaurant;
+    let activeBranch = get().activeBranch;
+
+    if (!activeRestaurant && normalizedUser?.restaurants?.length > 0) {
+      activeRestaurant = normalizedUser.restaurants[0];
+    } else if (activeRestaurant && !normalizedUser?.restaurants?.some((r: any) => r.id === activeRestaurant?.id)) {
+      activeRestaurant = normalizedUser?.restaurants?.[0] || null;
+    }
+
+    if (activeRestaurant) {
+      const branchesForRest = normalizedUser?.branches?.filter((b: any) => b.restaurant_id === activeRestaurant?.id) || [];
+      if (!activeBranch || activeBranch.restaurant_id !== activeRestaurant.id) {
+        activeBranch = branchesForRest.find((b: any) => b.is_main_branch) || branchesForRest[0] || null;
+      }
+    } else {
+      activeBranch = null;
+    }
+
+    if (typeof window !== 'undefined') {
+      if (activeRestaurant) localStorage.setItem('resto_restaurant_id', String(activeRestaurant.id));
+      else localStorage.removeItem('resto_restaurant_id');
+      if (activeBranch) localStorage.setItem('resto_branch_id', String(activeBranch.id));
+      else localStorage.removeItem('resto_branch_id');
+    }
+
+    set({ user: normalizedUser, activeRestaurant, activeBranch });
   },
 
   setActiveRestaurant: (restaurant) => {
@@ -216,13 +245,13 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     const user = get().user;
     if (!user) return false;
     if (user.is_super_admin) return true;
-    return user.roles.includes(roleName);
+    return Boolean(user.roles?.includes(roleName));
   },
 
   hasPermission: (permissionName: string) => {
     const user = get().user;
     if (!user) return false;
     if (user.is_super_admin) return true;
-    return user.permissions.includes(permissionName);
+    return Boolean(user.permissions?.includes(permissionName));
   },
 }));

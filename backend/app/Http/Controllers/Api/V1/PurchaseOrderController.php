@@ -8,6 +8,7 @@ use App\Models\Branch;
 use App\Models\InventoryItem;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderItem;
+use App\Models\Restaurant;
 use App\Models\Supplier;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
@@ -31,7 +32,7 @@ class PurchaseOrderController extends Controller
             ?? $user->restaurants()->first()?->id;
 
         if (!$restaurantId && $user->isSuperAdmin()) {
-            $restaurantId = Branch::first()?->restaurant_id;
+            $restaurantId = Restaurant::first()?->id;
         }
 
         if (!$restaurantId) {

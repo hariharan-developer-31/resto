@@ -32,7 +32,7 @@ export function Topbar({ onMenuClick }: TopbarProps) {
       const res = await apiClient.get<{ unread_count: number; notifications: any[] }>('/notifications');
       return res.data;
     },
-    enabled: !!user,
+    enabled: !!user && !!activeRestaurant?.id,
     refetchInterval: 8000,
   });
 
@@ -96,7 +96,7 @@ export function Topbar({ onMenuClick }: TopbarProps) {
                 ))}
               </select>
             ) : (
-              <span>{activeRestaurant?.name || 'All Restaurants'}</span>
+              <span>{activeRestaurant?.name || 'No Active Restaurant'}</span>
             )}
           </div>
 

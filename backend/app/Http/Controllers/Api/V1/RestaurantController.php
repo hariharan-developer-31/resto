@@ -4,12 +4,14 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\AuditLog;
+use App\Models\Branch;
 use App\Models\Order;
 use App\Models\Restaurant;
 use App\Models\RestaurantSetting;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class RestaurantController extends Controller
@@ -86,36 +88,55 @@ class RestaurantController extends Controller
             $validated['slug'] = Str::slug($validated['name']) . '-' . Str::random(4);
         }
 
-        $restaurant = Restaurant::create([
-            'name' => $validated['name'],
-            'slug' => $validated['slug'],
-            'logo' => $validated['logo'] ?? null,
-            'description' => $validated['description'] ?? null,
-            'phone' => $validated['phone'] ?? null,
-            'email' => $validated['email'] ?? null,
-            'website' => $validated['website'] ?? null,
-            'gst_number' => $validated['gst_number'] ?? null,
-            'currency' => $validated['currency'] ?? 'INR',
-            'currency_symbol' => $validated['currency_symbol'] ?? '₹',
-            'timezone' => $validated['timezone'] ?? 'Asia/Kolkata',
-            'primary_color' => $validated['primary_color'] ?? '#C76B4A',
-            'is_active' => $validated['is_active'] ?? true,
-        ]);
+        $restaurant = DB::transaction(function () use ($validated, $user) {
+            $restaurant = Restaurant::create([
+                'name' => $validated['name'],
+                'slug' => $validated['slug'],
+                'logo' => $validated['logo'] ?? null,
+                'description' => $validated['description'] ?? null,
+                'phone' => $validated['phone'] ?? null,
+                'email' => $validated['email'] ?? null,
+                'website' => $validated['website'] ?? null,
+                'gst_number' => $validated['gst_number'] ?? null,
+                'currency' => $validated['currency'] ?? 'INR',
+                'currency_symbol' => $validated['currency_symbol'] ?? '₹',
+                'timezone' => $validated['timezone'] ?? 'Asia/Kolkata',
+                'primary_color' => $validated['primary_color'] ?? '#C76B4A',
+                'is_active' => $validated['is_active'] ?? true,
+            ]);
 
-        // Save settings if provided
-        if (!empty($validated['settings'])) {
-            foreach ($validated['settings'] as $key => $val) {
-                RestaurantSetting::updateOrCreate(
-                    ['restaurant_id' => $restaurant->id, 'key' => $key],
-                    ['value' => is_array($val) ? json_encode($val) : $val]
-                );
+            // Save settings if provided
+            if (!empty($validated['settings'])) {
+                foreach ($validated['settings'] as $key => $val) {
+                    RestaurantSetting::updateOrCreate(
+                        ['restaurant_id' => $restaurant->id, 'key' => $key],
+                        ['value' => is_array($val) ? json_encode($val) : $val]
+                    );
+                }
             }
-        }
 
-        // Attach creator to user_restaurants if not superadmin
-        if (!$user->isSuperAdmin()) {
-            $user->restaurants()->syncWithoutDetaching([$restaurant->id]);
-        }
+            // Auto-provision default Main Branch
+            $mainBranch = Branch::create([
+                'restaurant_id' => $restaurant->id,
+                'name' => 'Main Branch',
+                'code' => 'MAIN',
+                'phone' => $restaurant->phone,
+                'email' => $restaurant->email,
+                'is_main_branch' => true,
+                'is_active' => true,
+                'opening_time' => '09:00:00',
+                'closing_time' => '23:00:00',
+                'tax_rate' => 5.00,
+            ]);
+
+            // Attach creator to user_restaurants if not superadmin
+            if (!$user->isSuperAdmin()) {
+                $user->restaurants()->syncWithoutDetaching([$restaurant->id]);
+                $user->branches()->syncWithoutDetaching([$mainBranch->id]);
+            }
+
+            return $restaurant;
+        });
 
         AuditLog::log(
             action: 'restaurant.created',

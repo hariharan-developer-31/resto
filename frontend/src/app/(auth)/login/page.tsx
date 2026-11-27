@@ -24,11 +24,6 @@ export default function LoginPage() {
 
   const demoAccounts = [
     { role: 'Super Admin', email: 'superadmin@resto.com', desc: 'Universal multi-tenant control', color: 'bg-[#B4D58A]/30 text-[#252525] border-[#B4D58A]' },
-    { role: 'Restaurant Admin', email: 'admin@grandfeast.com', desc: 'The Grand Feast owner', color: 'bg-[#F3DA8A]/30 text-[#252525] border-[#F3DA8A]' },
-    { role: 'Branch Manager', email: 'manager@grandfeast.com', desc: 'Downtown Flagship manager', color: 'bg-[#F2AFC0]/30 text-[#252525] border-[#F2AFC0]' },
-    { role: 'Cashier / POS', email: 'cashier@grandfeast.com', desc: 'Billing & Table checkout', color: 'bg-[#B4D58A]/20 text-[#252525] border-[#B4D58A]' },
-    { role: 'Waiter', email: 'waiter@grandfeast.com', desc: 'Table orders & status', color: 'bg-[#F3DA8A]/20 text-[#252525] border-[#F3DA8A]' },
-    { role: 'Kitchen Chef', email: 'kitchen@grandfeast.com', desc: 'Kitchen KDS preparation', color: 'bg-[#F2AFC0]/20 text-[#252525] border-[#F2AFC0]' },
   ];
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -147,35 +142,32 @@ export default function LoginPage() {
             <div className="pt-4 border-t border-black/[0.06] space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-[11px] font-bold uppercase tracking-wider text-[#8E928B]">
-                  Quick Demo Access
+                  Administrator Station Access
                 </span>
-                <span className="text-[10px] text-[#5A5D58] font-medium">Click to test</span>
+                <span className="text-[10px] text-[#5A5D58] font-medium">Click to fill</span>
               </div>
 
-              <div className="grid grid-cols-2 gap-2.5">
-                {demoAccounts.map((account) => {
-                  const isSelected = login === account.email;
-                  return (
-                    <button
-                      key={account.role}
-                      type="button"
-                      onClick={() => selectDemoAccount(account.email)}
-                      className={`text-left p-3 rounded-2xl border transition-all text-xs cursor-pointer ${
-                        isSelected
-                          ? 'border-[#B4D58A] bg-[#B4D58A]/25 shadow-xs font-bold'
-                          : 'border-black/[0.06] bg-black/[0.02] hover:bg-black/[0.04]'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="font-bold text-[#252525]">{account.role}</span>
-                        {isSelected && <Check className="h-3.5 w-3.5 text-[#252525]" />}
-                      </div>
-                      <span className="text-[10px] text-[#5A5D58] line-clamp-1 mt-0.5 font-medium">
-                        {account.desc}
-                      </span>
-                    </button>
-                  );
-                })}
+              <div>
+                <button
+                  type="button"
+                  onClick={() => selectDemoAccount('superadmin@resto.com')}
+                  className={`w-full text-left p-3.5 rounded-2xl border transition-all text-xs cursor-pointer ${
+                    login === 'superadmin@resto.com'
+                      ? 'border-[#B4D58A] bg-[#B4D58A]/25 shadow-xs font-bold'
+                      : 'border-black/[0.06] bg-black/[0.02] hover:bg-black/[0.04]'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-[#252525]">Super Administrator</span>
+                    {login === 'superadmin@resto.com' && <Check className="h-4 w-4 text-[#252525]" />}
+                  </div>
+                  <span className="text-[11px] text-[#5A5D58] block mt-0.5 font-medium">
+                    superadmin@resto.com • Universal multi-tenant control
+                  </span>
+                </button>
+                <p className="text-[11px] text-[#8E928B] mt-2 px-1 text-center">
+                  Tenant and station staff accounts are provisioned via Staff Management once you create your restaurant.
+                </p>
               </div>
             </div>
 

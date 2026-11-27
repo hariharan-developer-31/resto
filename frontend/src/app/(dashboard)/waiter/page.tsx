@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { TenantGuard } from '@/components/layout/tenant-guard';
 import {
   UserCheck,
   Grid,
@@ -108,6 +109,7 @@ export default function WaiterPage() {
       const res = await apiClient.get<any>('/tables');
       return Array.isArray(res.data) ? res.data : res.data?.tables || [];
     },
+    enabled: !!activeRestaurant?.id && !!activeBranch?.id,
     refetchInterval: 5000, // Poll every 5s for real-time kitchen updates
   });
 
@@ -117,6 +119,7 @@ export default function WaiterPage() {
       const res = await apiClient.get<any>('/orders?active_only=true');
       return res.data?.data || [];
     },
+    enabled: !!activeRestaurant?.id && !!activeBranch?.id,
     refetchInterval: 5000,
   });
 
@@ -126,6 +129,7 @@ export default function WaiterPage() {
       const res = await apiClient.get<any>('/menu-items?per_page=100');
       return res.data?.data || res.data || [];
     },
+    enabled: !!activeRestaurant?.id,
   });
 
   const { data: categories = [] } = useQuery({
@@ -134,6 +138,7 @@ export default function WaiterPage() {
       const res = await apiClient.get<any[]>('/categories');
       return res.data || [];
     },
+    enabled: !!activeRestaurant?.id,
   });
 
   // Map Active Orders to Tables
@@ -262,7 +267,8 @@ export default function WaiterPage() {
   });
 
   return (
-    <div className="space-y-4 max-w-5xl mx-auto pb-12">
+    <TenantGuard requireBranch stationName="Waiter Station">
+      <div className="space-y-4 max-w-5xl mx-auto pb-12">
       {/* Top Header Card */}
       <div className="bg-white rounded-2xl border border-black/[0.06] p-4 sm:p-5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
@@ -815,5 +821,6 @@ export default function WaiterPage() {
         </div>
       )}
     </div>
+    </TenantGuard>
   );
 }

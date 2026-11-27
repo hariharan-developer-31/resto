@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { TenantGuard } from '@/components/layout/tenant-guard';
 import {
   UtensilsCrossed,
   Search,
@@ -139,6 +140,7 @@ export default function PosPage() {
       const res = await apiClient.get<any[]>('/categories');
       return res.data || [];
     },
+    enabled: !!activeRestaurant?.id,
   });
 
   // Fetch Menu Items (up to 100 items)
@@ -148,6 +150,7 @@ export default function PosPage() {
       const res = await apiClient.get<any>('/menu-items?per_page=100');
       return res.data?.data || res.data || [];
     },
+    enabled: !!activeRestaurant?.id,
   });
 
   // Fetch Tables (unwrap { tables, branch, locations })
@@ -157,6 +160,7 @@ export default function PosPage() {
       const res = await apiClient.get<any>('/tables');
       return Array.isArray(res.data) ? res.data : res.data?.tables || [];
     },
+    enabled: !!activeRestaurant?.id && !!activeBranch?.id,
   });
 
   // Fetch Active Order for Selected Table
@@ -368,7 +372,8 @@ export default function PosPage() {
   });
 
   return (
-    <div className="flex flex-col lg:flex-row gap-4 h-[calc(100vh-5.5rem)] -m-4 sm:-m-6 p-4 overflow-hidden bg-[#FAF9F6]">
+    <TenantGuard requireBranch stationName="POS Station">
+      <div className="flex flex-col lg:flex-row gap-4 h-[calc(100vh-5.5rem)] -m-4 sm:-m-6 p-4 overflow-hidden bg-[#FAF9F6]">
       {/* LEFT PANE: Tables, Categories & Item Catalog */}
       <div className="flex-1 flex flex-col min-w-0 bg-white rounded-xl border border-black/[0.06] shadow-xs overflow-hidden">
         {/* TOP BAR: Mode Selector & Table Strip */}
@@ -1380,5 +1385,6 @@ export default function PosPage() {
         </div>
       )}
     </div>
+    </TenantGuard>
   );
 }

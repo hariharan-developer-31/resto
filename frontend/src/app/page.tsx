@@ -49,7 +49,7 @@ export default function RestaurantWebsite() {
   const { data: publicData } = useQuery({
     queryKey: ['public-restaurant-profile'],
     queryFn: async () => {
-      const res = await apiClient.get<any>('/public/restaurants/the-grand-feast');
+      const res = await apiClient.get<any>('/public/restaurants/featured');
       return res.data;
     },
   });

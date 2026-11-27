@@ -43,7 +43,7 @@ export default function RestaurantBranchesPage() {
     try {
       const me = await apiRequest('auth/me');
       if (me?.data) {
-        useAuthStore.getState().updateUser(me.data);
+        useAuthStore.getState().updateUser((me.data as any).user || me.data);
       }
     } catch {
       // non-fatal
@@ -151,10 +151,14 @@ export default function RestaurantBranchesPage() {
         });
       }
     },
-    onSuccess: () => {
+    onSuccess: (res: any) => {
       queryClient.invalidateQueries({ queryKey: ['branches', restaurantId] });
       queryClient.invalidateQueries({ queryKey: ['restaurants'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard-stats'] });
       refreshAuthContext();
+      if (!editingBranch && res?.data) {
+        useAuthStore.getState().setActiveBranch(res.data);
+      }
       toast.success(editingBranch ? 'Branch updated!' : 'Branch created successfully!');
       setIsModalOpen(false);
     },

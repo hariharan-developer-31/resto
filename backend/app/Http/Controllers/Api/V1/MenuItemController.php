@@ -89,6 +89,10 @@ class MenuItemController extends Controller
             $restaurantId = Restaurant::first()?->id;
         }
 
+        if (!$restaurantId) {
+            return $this->errorResponse('Please specify a valid restaurant context.', 400);
+        }
+
         $validated = $request->validate([
             'category_id' => 'required|exists:categories,id',
             'name' => 'required|string|max:255',

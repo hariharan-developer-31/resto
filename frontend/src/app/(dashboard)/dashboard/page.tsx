@@ -31,6 +31,7 @@ import {
   AlertCircle,
   ChefHat,
   Receipt,
+  Sparkles,
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -191,7 +192,7 @@ export default function DashboardPage() {
           <p className="text-xs text-[#5A5D58]">
             {isSuperAdmin
               ? 'Multi-restaurant platform performance, financial telemetry and branch operations'
-              : `Managing operations for ${activeRestaurant?.name} • Branch: ${activeBranch?.name || 'Main'}`}
+              : `Managing operations for ${activeRestaurant?.name || 'Active Tenant'} • Branch: ${activeBranch?.name || 'Main'}`}
           </p>
         </div>
 
@@ -214,6 +215,49 @@ export default function DashboardPage() {
           </Link>
         </div>
       </div>
+
+      {/* Onboarding Zero State Banner for Fresh Installation */}
+      {overview.total_restaurants === 0 && (
+        <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-[#B4D58A]/30 via-[#F3DA8A]/25 to-white border border-[#B4D58A] shadow-xs">
+          <div className="max-w-2xl space-y-3">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#B4D58A] text-[#252525] text-xs font-bold">
+              <Sparkles className="h-3.5 w-3.5" />
+              Quick Setup Guide
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-[#252525] font-baloo">
+              Welcome to Restaurant OS!
+            </h2>
+            <p className="text-sm text-[#5A5D58] font-medium leading-relaxed">
+              Your system is freshly provisioned with zero demo data. Follow these 3 easy steps to launch your first digital restaurant station:
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+              <div className="p-3 bg-white/90 rounded-2xl border border-black/[0.06]">
+                <span className="text-xs font-bold text-[#B4D58A] block">Step 1</span>
+                <span className="text-xs font-bold text-[#252525]">Create Restaurant</span>
+                <p className="text-[11px] text-[#5A5D58] mt-0.5">Name, currency & branding</p>
+              </div>
+              <div className="p-3 bg-white/90 rounded-2xl border border-black/[0.06]">
+                <span className="text-xs font-bold text-[#F3DA8A] block">Step 2</span>
+                <span className="text-xs font-bold text-[#252525]">Add Dining Branch</span>
+                <p className="text-[11px] text-[#5A5D58] mt-0.5">Physical location & tables</p>
+              </div>
+              <div className="p-3 bg-white/90 rounded-2xl border border-black/[0.06]">
+                <span className="text-xs font-bold text-[#F2AFC0] block">Step 3</span>
+                <span className="text-xs font-bold text-[#252525]">Set Up Menu</span>
+                <p className="text-[11px] text-[#5A5D58] mt-0.5">Dishes, prices & stations</p>
+              </div>
+            </div>
+            <div className="pt-2">
+              <Link href="/restaurants">
+                <Button variant="mint" size="lg" className="gap-2 font-bold shadow-xs">
+                  <Store className="h-4 w-4" />
+                  Create Your First Restaurant Now
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* 12 Metric Cards (Section 7 Requirements) */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">

@@ -6,6 +6,7 @@ import { apiRequest } from '@/lib/api-client';
 import { useAuthStore } from '@/lib/auth-store';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { TenantGuard } from '@/components/layout/tenant-guard';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
@@ -250,7 +251,8 @@ export default function ReservationsPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <TenantGuard requireBranch stationName="Reservations & Seating">
+      <div className="space-y-6">
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -864,5 +866,6 @@ export default function ReservationsPage() {
         </div>
       )}
     </div>
+    </TenantGuard>
   );
 }

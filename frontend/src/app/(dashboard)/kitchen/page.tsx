@@ -7,6 +7,7 @@ import { useAuthStore } from '@/lib/auth-store';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { TenantGuard } from '@/components/layout/tenant-guard';
 import {
   ChefHat,
   Clock,
@@ -56,6 +57,7 @@ interface KdsTicket {
 
 export default function KitchenPage() {
   const queryClient = useQueryClient();
+  const activeRestaurant = useAuthStore((s) => s.activeRestaurant);
   const activeBranch = useAuthStore((s) => s.activeBranch);
 
   const [selectedStation, setSelectedStation] = useState<string>('all');
@@ -125,6 +127,7 @@ export default function KitchenPage() {
       );
       return res.data;
     },
+    enabled: !!activeRestaurant?.id && !!activeBranch?.id,
     refetchInterval: 5000,
   });
 
@@ -135,6 +138,7 @@ export default function KitchenPage() {
       const res = await apiClient.get<any>('/kds/summary');
       return res.data;
     },
+    enabled: !!activeRestaurant?.id && !!activeBranch?.id,
     refetchInterval: 5000,
   });
 
@@ -192,7 +196,8 @@ export default function KitchenPage() {
   });
 
   return (
-    <div className="flex flex-col h-[calc(100vh-5.5rem)] -m-4 sm:-m-6 p-4 overflow-hidden bg-[#FAF9F6] space-y-3">
+    <TenantGuard requireBranch stationName="Kitchen KDS">
+      <div className="flex flex-col h-[calc(100vh-5.5rem)] -m-4 sm:-m-6 p-4 overflow-hidden bg-[#FAF9F6] space-y-3">
       {/* TOP CONTROL BAR */}
       <div className="bg-white rounded-2xl border border-black/[0.06] p-3.5 shadow-xs flex flex-wrap items-center justify-between gap-3 shrink-0">
         {/* Left: Brand & Mode Toggle */}
@@ -519,5 +524,6 @@ export default function KitchenPage() {
         )}
       </div>
     </div>
+    </TenantGuard>
   );
 }

@@ -159,15 +159,15 @@ class UserController extends Controller
         $restaurantIds = $validated['restaurant_ids'] ?? [];
         $branchIds = $validated['branch_ids'] ?? [];
 
-        if ($error = $this->validateTenantAssignments($currentUser, $restaurantIds, $branchIds)) {
-            return $this->errorResponse($error, 403);
-        }
-
         if (!$currentUser->isSuperAdmin() && empty($restaurantIds)) {
             $defaultRestaurantId = $currentUser->restaurants()->first()?->id;
             if ($defaultRestaurantId) {
                 $restaurantIds = [$defaultRestaurantId];
             }
+        }
+
+        if ($error = $this->validateTenantAssignments($currentUser, $restaurantIds, $branchIds)) {
+            return $this->errorResponse($error, 403);
         }
 
         // Enforce SaaS staff quota for each assigned restaurant (excluding Super Admin accounts)
@@ -352,7 +352,10 @@ class UserController extends Controller
         }
 
         // Update role if permitted
-        if ($hasAdminEdit && !empty($validated['role']) && ($currentUser->isSuperAdmin() || $currentUser->can('roles.manage'))) {
+        if ($hasAdminEdit && !empty($validated['role']) && ($currentUser->isSuperAdmin() || $currentUser->can('users.edit') || $currentUser->can('roles.manage'))) {
+            if ($validated['role'] === 'Super Admin' && !$currentUser->isSuperAdmin()) {
+                return $this->errorResponse('Only a Super Admin can grant Super Admin privileges.', 403);
+            }
             $user->syncRoles([$validated['role']]);
         }
 

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\AuditLog;
 use App\Models\Branch;
 use App\Models\InventoryItem;
+use App\Models\Restaurant;
 use App\Models\StockMovement;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
@@ -28,7 +29,7 @@ class InventoryController extends Controller
             ?? $user->restaurants()->first()?->id;
 
         if (!$restaurantId && $user->isSuperAdmin()) {
-            $restaurantId = Branch::first()?->restaurant_id;
+            $restaurantId = Restaurant::first()?->id;
         }
 
         if (!$restaurantId) {
@@ -273,7 +274,7 @@ class InventoryController extends Controller
             ?? $user->restaurants()->first()?->id;
 
         if (!$restaurantId && $user->isSuperAdmin()) {
-            $restaurantId = Branch::first()?->restaurant_id;
+            $restaurantId = Restaurant::first()?->id;
         }
 
         $query = InventoryItem::where('restaurant_id', $restaurantId)
