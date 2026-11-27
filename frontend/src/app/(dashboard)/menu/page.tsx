@@ -115,6 +115,11 @@ export default function MenuCatalogPage() {
   const menuItems = itemsData?.data || [];
 
   const openCreateItemModal = () => {
+    if (categories.length === 0) {
+      toast.info('Please create at least one category (e.g. Main Course, Rice, Beverages) before adding food items.');
+      setIsCategoryModalOpen(true);
+      return;
+    }
     setEditingItem(null);
     setItemName('');
     setItemCategoryId(selectedCategoryId || categories[0]?.id || '');
@@ -383,14 +388,28 @@ export default function MenuCatalogPage() {
       ) : menuItems.length === 0 ? (
         <Card className="border-black/[0.06] p-12 text-center">
           <Utensils className="h-12 w-12 text-[#8E928B] mx-auto mb-3" />
-          <h3 className="font-bold text-lg font-semibold text-[#252525]">No Menu Items</h3>
-          <p className="text-xs text-[#5A5D58] mt-1">
-            {search ? 'No items match your search.' : 'Add your first culinary item to begin service.'}
+          <h3 className="font-bold text-lg font-semibold text-[#252525]">
+            {categories.length === 0 ? 'No Categories or Items Yet' : 'No Menu Items'}
+          </h3>
+          <p className="text-xs text-[#5A5D58] mt-1 max-w-md mx-auto">
+            {categories.length === 0
+              ? 'To build your menu catalog, start by adding your first category (e.g. Main Course, Rice Dishes, Beverages).'
+              : search
+              ? 'No items match your search.'
+              : 'Add your first culinary item to begin floor service.'}
           </p>
           {canCreate && (
-            <Button onClick={openCreateItemModal} size="sm" className="mt-4 gap-2">
-              <Plus className="h-4 w-4" /> Add Food Item
-            </Button>
+            <div className="flex items-center justify-center gap-3 mt-4">
+              {categories.length === 0 ? (
+                <Button onClick={() => setIsCategoryModalOpen(true)} size="sm" className="gap-2">
+                  <FolderPlus className="h-4 w-4" /> Create First Category
+                </Button>
+              ) : (
+                <Button onClick={openCreateItemModal} size="sm" className="gap-2">
+                  <Plus className="h-4 w-4" /> Add Food Item
+                </Button>
+              )}
+            </div>
           )}
         </Card>
       ) : (
@@ -597,20 +616,43 @@ export default function MenuCatalogPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-semibold uppercase tracking-wider text-[#5A5D58]">
-                    Category *
-                  </label>
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-semibold uppercase tracking-wider text-[#5A5D58]">
+                      Category *
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsItemModalOpen(false);
+                        setIsCategoryModalOpen(true);
+                      }}
+                      className="text-[11px] font-bold text-[#B4D58A] hover:underline flex items-center gap-0.5"
+                    >
+                      <Plus className="h-3 w-3" /> New Category
+                    </button>
+                  </div>
                   <select
                     value={itemCategoryId}
                     onChange={(e) => setItemCategoryId(Number(e.target.value))}
-                    className="w-full h-10 px-3 rounded-[10px] border border-black/[0.06] bg-white text-sm text-[#252525] outline-none focus:border-[#B4D58A]"
+                    className={`w-full h-10 px-3 rounded-[10px] border text-sm text-[#252525] outline-none ${
+                      categories.length === 0
+                        ? 'border-[#F2AFC0] bg-[#FAF9F6]'
+                        : 'border-black/[0.06] bg-white focus:border-[#B4D58A]'
+                    }`}
                     required
                   >
-                    <option value="">Select Category</option>
+                    <option value="">
+                      {categories.length === 0 ? 'No categories yet — create one first' : 'Select Category'}
+                    </option>
                     {categories.map((c: any) => (
                       <option key={c.id} value={c.id}>{c.name}</option>
                     ))}
                   </select>
+                  {categories.length === 0 && (
+                    <p className="text-[11px] text-[#A83D3D] mt-1 font-medium">
+                      ⚠️ Every menu item must belong to a category. Click &quot;+ New Category&quot; above to create one.
+                    </p>
+                  )}
                 </div>
 
                 <div className="space-y-1.5">
