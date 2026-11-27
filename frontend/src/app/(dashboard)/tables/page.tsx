@@ -46,6 +46,17 @@ export default function TablesManagementPage() {
   const [isQrModalOpen, setIsQrModalOpen] = useState(false);
   const [selectedTable, setSelectedTable] = useState<any | null>(null);
 
+  const getOrderingUrl = (table: any) => {
+    if (!table?.qr_token) return '';
+    if (typeof window !== 'undefined' && window.location.origin && !window.location.hostname.includes('localhost')) {
+      return `${window.location.origin}/order/${table.qr_token}`;
+    }
+    if (table.qr_ordering_url && !table.qr_ordering_url.includes('localhost')) {
+      return table.qr_ordering_url;
+    }
+    return `https://resto-lemon-six.vercel.app/order/${table.qr_token}`;
+  };
+
   // Form state
   const [tableNumber, setTableNumber] = useState('');
   const [seatingCapacity, setSeatingCapacity] = useState('4');
@@ -591,44 +602,57 @@ export default function TablesManagementPage() {
               </div>
 
               {/* Printable Standee Card */}
-              <div
-                ref={printRef}
-                className="print-area p-4 sm:p-5 rounded-2xl border-2 border-dashed border-[#B4D58A]/30 bg-[#FAF9F6] flex flex-col items-center text-center space-y-3"
-              >
-                <div className="space-y-0.5">
-                  <span className="font-bold text-base sm:text-lg text-[#252525] block">
-                    {activeRestaurant?.name || 'Restaurant'}
-                  </span>
-                  <span className="text-xs text-[#5A5D58] block">
-                    {activeBranch?.name} • Section: {selectedTable.location}
-                  </span>
-                </div>
+              {(() => {
+                const orderingUrl = getOrderingUrl(selectedTable);
+                return (
+                  <div
+                    ref={printRef}
+                    className="print-area p-4 sm:p-5 rounded-2xl border-2 border-dashed border-[#B4D58A]/30 bg-[#FAF9F6] flex flex-col items-center text-center space-y-3"
+                  >
+                    <div className="space-y-0.5">
+                      <span className="font-bold text-base sm:text-lg text-[#252525] block">
+                        {activeRestaurant?.name || 'Restaurant'}
+                      </span>
+                      <span className="text-xs text-[#5A5D58] block">
+                        {activeBranch?.name} • Section: {selectedTable.location}
+                      </span>
+                    </div>
 
-                {/* QR Image Canvas / SVG */}
-                <div className="p-3 bg-white rounded-2xl shadow-sm border border-black/[0.06]">
-                  <QRCodeSVG
-                    value={
-                      selectedTable.qr_ordering_url ||
-                      `${typeof window !== 'undefined' ? window.location.origin : ''}/order/${selectedTable.qr_token}`
-                    }
-                    size={145}
-                    level="H"
-                    includeMargin={true}
-                  />
-                </div>
+                    {/* QR Image Canvas / SVG */}
+                    <div className="p-3 bg-white rounded-2xl shadow-sm border border-black/[0.06]">
+                      <QRCodeSVG
+                        value={orderingUrl}
+                        size={150}
+                        level="H"
+                        includeMargin={true}
+                      />
+                    </div>
 
-                <div className="space-y-0.5">
-                  <span className="font-bold text-2xl font-extrabold text-[#B4D58A] block">
-                    TABLE {selectedTable.table_number}
-                  </span>
-                  <p className="text-xs font-medium text-[#252525]">
-                    Scan with your smartphone camera to browse menu & place orders
-                  </p>
-                  <p className="font-mono text-[9px] text-[#8E928B] truncate max-w-xs mx-auto">
-                    Token: {selectedTable.qr_token}
-                  </p>
-                </div>
-              </div>
+                    <div className="space-y-1">
+                      <span className="font-bold text-2xl font-extrabold text-[#B4D58A] block">
+                        TABLE {selectedTable.table_number}
+                      </span>
+                      <p className="text-xs font-medium text-[#252525]">
+                        Scan with your smartphone camera to browse menu & place orders
+                      </p>
+                      <p className="font-mono text-[9px] text-[#8E928B] truncate max-w-xs mx-auto">
+                        Token: {selectedTable.qr_token}
+                      </p>
+                      {orderingUrl && (
+                        <a
+                          href={orderingUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 font-mono text-[10px] text-[#557627] hover:underline bg-[#B4D58A]/20 px-2.5 py-1 rounded-md truncate max-w-[280px] mx-auto transition-colors"
+                          title={orderingUrl}
+                        >
+                          🔗 {orderingUrl}
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                );
+              })()}
 
               {/* Controls */}
               <div className="no-print space-y-2.5 pt-1">
@@ -643,8 +667,11 @@ export default function TablesManagementPage() {
                   </Button>
                   <Button
                     onClick={() => {
-                      navigator.clipboard.writeText(selectedTable.qr_ordering_url || '');
-                      toast.success('Ordering URL copied to clipboard!');
+                      const orderingUrl = getOrderingUrl(selectedTable);
+                      if (orderingUrl) {
+                        navigator.clipboard.writeText(orderingUrl);
+                        toast.success('Live Ordering URL copied to clipboard!');
+                      }
                     }}
                     variant="outline"
                     size="sm"

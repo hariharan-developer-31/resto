@@ -79,7 +79,7 @@ class TableController extends Controller
             $query->where('waiter_id', $waiterId);
         }
 
-        $frontendUrl = rtrim((string) config('app.frontend_url', 'http://localhost:3000'), '/');
+        $frontendUrl = $this->resolveFrontendUrl($request);
 
         $tables = $query->get()
             ->sortBy('table_number', SORT_NATURAL | SORT_FLAG_CASE)
@@ -237,7 +237,7 @@ class TableController extends Controller
             return $this->errorResponse('Unauthorized access to this table.', 403);
         }
 
-        $frontendUrl = rtrim((string) config('app.frontend_url', 'http://localhost:3000'), '/');
+        $frontendUrl = $this->resolveFrontendUrl($request);
         $data = $table->toArray();
         $data['qr_ordering_url'] = $table->qr_token ? "{$frontendUrl}/order/{$table->qr_token}" : null;
 
@@ -363,7 +363,7 @@ class TableController extends Controller
             userId: $user->id
         );
 
-        $frontendUrl = rtrim((string) config('app.frontend_url', 'http://localhost:3000'), '/');
+        $frontendUrl = $this->resolveFrontendUrl($request);
 
         return $this->successResponse([
             'table_id' => $table->id,
@@ -428,5 +428,26 @@ class TableController extends Controller
         $table->update(['status' => $request->input('status')]);
 
         return $this->successResponse($table, 'Table status updated.');
+    }
+
+    /**
+     * Resolve the frontend base URL for customer QR ordering.
+     */
+    private function resolveFrontendUrl(Request $request): string
+    {
+        $origin = $request->header('Origin') ?: $request->header('Referer');
+        if ($origin && preg_match('#^(https?://[^/]+)#i', (string) $origin, $matches)) {
+            $originHost = rtrim($matches[1], '/');
+            if (!str_contains($originHost, 'localhost') || app()->isLocal()) {
+                return $originHost;
+            }
+        }
+
+        $configUrl = config('app.frontend_url');
+        if ($configUrl && !str_contains($configUrl, 'localhost')) {
+            return rtrim((string) $configUrl, '/');
+        }
+
+        return 'https://resto-lemon-six.vercel.app';
     }
 }

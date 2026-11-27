@@ -300,23 +300,23 @@ export default function DashboardPage() {
           return (
             <Card
               key={m.title}
-              className={`border-black/[0.06] hover:border-[#D8D4CA] transition-all p-4 ${
+              className={`border-black/[0.06] hover:border-[#D8D4CA] transition-all p-3 sm:p-4 ${
                 m.highlight ? 'bg-gradient-to-br from-white to-[#B4D58A]/20/30' : ''
               }`}
             >
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-[11px] font-semibold uppercase tracking-wider text-[#5A5D58] truncate">
+              <div className="flex items-center justify-between mb-2 gap-1">
+                <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-tight sm:tracking-wider text-[#5A5D58] leading-tight line-clamp-1">
                   {m.title}
                 </span>
-                <div className={`p-2 rounded-xl ${m.color} shrink-0`}>
-                  <Icon className="h-4 w-4" />
+                <div className={`p-1.5 sm:p-2 rounded-xl ${m.color} shrink-0`}>
+                  <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 </div>
               </div>
               <div className="space-y-0.5">
-                <p className="font-bold text-2xl font-bold tracking-tight text-[#252525]">
+                <p className="font-bold text-xl sm:text-2xl tracking-tight text-[#252525]">
                   {m.value}
                 </p>
-                <p className="text-[11px] text-[#8E928B] truncate">{m.sub}</p>
+                <p className="text-[10px] sm:text-[11px] text-[#8E928B] truncate">{m.sub}</p>
               </div>
             </Card>
           );
