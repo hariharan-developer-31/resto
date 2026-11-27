@@ -749,11 +749,56 @@ export default function PosPage() {
           )}
         </div>
 
+        {/* Dine-In Quick Table Selector Banner inside Cart */}
+        {orderType === 'dine_in' && !selectedTable && (
+          <div className="bg-[#B4D58A]/10 border-b border-[#B4D58A]/20 p-2.5 space-y-1.5 animate-in fade-in duration-150">
+            <div className="flex items-center justify-between text-xs">
+              <span className="font-semibold text-[#252525] flex items-center gap-1">
+                <span>🍽️ Assign Table:</span>
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  setOrderType('takeaway');
+                  setPackagingCharge(25);
+                  setErrorMsg(null);
+                }}
+                className="text-[11px] text-[#B4D58A] hover:underline font-semibold"
+              >
+                Switch to Takeaway
+              </button>
+            </div>
+            <div className="flex items-center gap-1.5 overflow-x-auto py-0.5">
+              {tables.length === 0 ? (
+                <span className="text-xs text-[#5A5D58]">No tables found in this branch.</span>
+              ) : (
+                tables.map((t: DiningTable) => (
+                  <button
+                    key={t.id}
+                    type="button"
+                    onClick={() => {
+                      setSelectedTable(t);
+                      setErrorMsg(null);
+                    }}
+                    className="px-2.5 py-1 text-xs font-bold rounded-lg border border-[#B4D58A] bg-white text-[#252525] hover:bg-[#B4D58A] hover:text-white transition-all shadow-2xs shrink-0 flex items-center gap-1"
+                  >
+                    <span>{t.table_number}</span>
+                    <span className="h-1.5 w-1.5 rounded-full bg-[#B4D58A]" />
+                  </button>
+                ))
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Error message if any */}
         {errorMsg && (
           <div className="bg-[#FDF2F2] border-b border-[#F9D6D6] px-3 py-2 text-xs text-[#F2AFC0] flex items-center justify-between">
-            <span>{errorMsg}</span>
-            <button onClick={() => setErrorMsg(null)}>
+            <div className="flex items-center gap-1.5">
+              <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+              <span>{errorMsg}</span>
+            </div>
+            <button onClick={() => setErrorMsg(null)} className="p-0.5 hover:bg-black/5 rounded">
               <X className="h-3.5 w-3.5" />
             </button>
           </div>
