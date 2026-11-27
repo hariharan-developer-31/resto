@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { TenantGuard } from '@/components/layout/tenant-guard';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { ModalPortal } from '@/components/ui/modal-portal';
 import { formatCurrency } from '@/lib/utils';
 import { toast } from 'sonner';
 import {
@@ -584,9 +585,10 @@ export default function MenuCatalogPage() {
 
       {/* Modal: Add / Edit Food Item */}
       {isItemModalOpen && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-[#252525]/40 backdrop-blur-xs p-3 sm:p-4">
-          <div className="flex min-h-full items-center justify-center py-2 sm:py-6">
-            <div className="w-full max-w-xl rounded-2xl bg-white border border-black/[0.06] shadow-xl p-4 sm:p-6 space-y-4 sm:space-y-5">
+        <ModalPortal>
+          <div className="fixed inset-0 z-[100] overflow-y-auto bg-[#252525]/60 backdrop-blur-sm p-3 sm:p-4">
+            <div className="flex min-h-full items-center justify-center py-2 sm:py-6" onClick={(e) => { if (e.target === e.currentTarget) setIsItemModalOpen(false); }}>
+              <div className="w-full max-w-xl rounded-2xl bg-white border border-black/[0.06] shadow-xl p-4 sm:p-6 space-y-4 sm:space-y-5">
               <div className="flex items-center justify-between pb-3 border-b border-black/[0.06]">
                 <h2 className="font-bold text-lg sm:text-xl font-semibold text-[#252525]">
                   {editingItem ? 'Edit Food Item' : 'New Culinary Item'}
@@ -822,13 +824,15 @@ export default function MenuCatalogPage() {
           </div>
         </div>
       </div>
+      </ModalPortal>
       )}
 
       {/* Modal: Create Category */}
       {isCategoryModalOpen && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-[#252525]/40 backdrop-blur-xs p-3 sm:p-4">
-          <div className="flex min-h-full items-center justify-center py-2 sm:py-6">
-            <div className="w-full max-w-sm rounded-2xl bg-white border border-black/[0.06] shadow-xl p-4 sm:p-6 space-y-4">
+        <ModalPortal>
+          <div className="fixed inset-0 z-[100] overflow-y-auto bg-[#252525]/60 backdrop-blur-sm p-3 sm:p-4">
+            <div className="flex min-h-full items-center justify-center py-2 sm:py-6" onClick={(e) => { if (e.target === e.currentTarget) setIsCategoryModalOpen(false); }}>
+              <div className="w-full max-w-sm rounded-2xl bg-white border border-black/[0.06] shadow-xl p-4 sm:p-6 space-y-4">
               <div className="flex items-center justify-between pb-2 border-b border-black/[0.06]">
                 <h2 className="font-bold text-lg font-semibold text-[#252525]">Add Menu Category</h2>
                 <button
@@ -873,13 +877,15 @@ export default function MenuCatalogPage() {
             </div>
           </div>
         </div>
+        </ModalPortal>
       )}
 
       {/* Modal: Create Add-on */}
       {isAddonModalOpen && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-[#252525]/40 backdrop-blur-xs p-3 sm:p-4">
-          <div className="flex min-h-full items-center justify-center py-2 sm:py-6">
-            <div className="w-full max-w-sm rounded-2xl bg-white border border-black/[0.06] shadow-xl p-4 sm:p-6 space-y-4">
+        <ModalPortal>
+          <div className="fixed inset-0 z-[100] overflow-y-auto bg-[#252525]/60 backdrop-blur-sm p-3 sm:p-4">
+            <div className="flex min-h-full items-center justify-center py-2 sm:py-6" onClick={(e) => { if (e.target === e.currentTarget) setIsAddonModalOpen(false); }}>
+              <div className="w-full max-w-sm rounded-2xl bg-white border border-black/[0.06] shadow-xl p-4 sm:p-6 space-y-4">
               <div className="flex items-center justify-between pb-2 border-b border-black/[0.06]">
                 <h2 className="font-bold text-lg font-semibold text-[#252525]">New Add-on Option</h2>
                 <button
@@ -926,6 +932,7 @@ export default function MenuCatalogPage() {
             </div>
           </div>
         </div>
+        </ModalPortal>
       )}
     </div>
     </TenantGuard>

@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { ModalPortal } from '@/components/ui/modal-portal';
 import { toast } from 'sonner';
 import Link from 'next/link';
 import {
@@ -367,8 +368,10 @@ export default function RestaurantBranchesPage() {
 
       {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#252525]/40 backdrop-blur-xs p-4">
-          <div className="w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl bg-white border border-black/[0.06] shadow-xl p-6 space-y-5">
+        <ModalPortal>
+          <div className="fixed inset-0 z-[100] overflow-y-auto bg-[#252525]/60 backdrop-blur-sm p-4">
+            <div className="flex min-h-full items-center justify-center py-2 sm:py-6" onClick={(e) => { if (e.target === e.currentTarget) setIsModalOpen(false); }}>
+              <div className="w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl bg-white border border-black/[0.06] shadow-xl p-6 space-y-5">
             <div className="flex items-center justify-between pb-3 border-b border-black/[0.06]">
               <h2 className="font-bold text-xl font-semibold text-[#252525]">
                 {editingBranch ? 'Edit Branch' : 'Create Branch'}
@@ -509,6 +512,8 @@ export default function RestaurantBranchesPage() {
             </form>
           </div>
         </div>
+      </div>
+      </ModalPortal>
       )}
     </div>
   );

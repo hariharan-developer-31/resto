@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { ModalPortal } from '@/components/ui/modal-portal';
 import { toast } from 'sonner';
 import {
   ShieldCheck,
@@ -301,8 +302,10 @@ export default function RolesPermissionsPage() {
 
       {/* Create Custom Role Modal */}
       {isCreateRoleModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#252525]/40 backdrop-blur-xs p-4">
-          <div className="w-full max-w-sm rounded-2xl bg-white border border-black/[0.06] shadow-xl p-6 space-y-4">
+        <ModalPortal>
+          <div className="fixed inset-0 z-[100] overflow-y-auto bg-[#252525]/60 backdrop-blur-sm p-4">
+            <div className="flex min-h-full items-center justify-center py-2 sm:py-6" onClick={(e) => { if (e.target === e.currentTarget) setIsCreateRoleModalOpen(false); }}>
+              <div className="w-full max-w-sm rounded-2xl bg-white border border-black/[0.06] shadow-xl p-6 space-y-4">
             <div className="flex items-center justify-between pb-2 border-b border-black/[0.06]">
               <h2 className="font-bold text-lg font-semibold text-[#252525]">Add Custom Role</h2>
               <button onClick={() => setIsCreateRoleModalOpen(false)}>
@@ -335,6 +338,8 @@ export default function RolesPermissionsPage() {
             </form>
           </div>
         </div>
+      </div>
+      </ModalPortal>
       )}
     </div>
   );

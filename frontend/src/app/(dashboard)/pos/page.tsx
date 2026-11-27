@@ -7,6 +7,7 @@ import { useAuthStore } from '@/lib/auth-store';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { ModalPortal } from '@/components/ui/modal-portal';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { TenantGuard } from '@/components/layout/tenant-guard';
@@ -961,9 +962,10 @@ export default function PosPage() {
 
       {/* MODAL 1: Item Customization (Variants & Addons) */}
       {customizingItem && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/40 backdrop-blur-xs p-3 sm:p-4">
-          <div className="flex min-h-full items-center justify-center py-2 sm:py-6">
-            <div className="bg-white rounded-2xl max-w-md w-full border border-black/[0.06] shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+        <ModalPortal>
+          <div className="fixed inset-0 z-[100] overflow-y-auto bg-black/60 backdrop-blur-sm p-3 sm:p-4">
+            <div className="flex min-h-full items-center justify-center py-2 sm:py-6" onClick={(e) => { if (e.target === e.currentTarget) setCustomizingItem(null); }}>
+              <div className="bg-white rounded-2xl max-w-md w-full border border-black/[0.06] shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
             <div className="p-4 border-b border-black/[0.06] flex items-center justify-between bg-[#FAF9F6]">
               <div>
                 <h3 className="font-bold text-base text-[#252525]">{customizingItem.name}</h3>
@@ -1091,13 +1093,15 @@ export default function PosPage() {
           </div>
         </div>
       </div>
+      </ModalPortal>
       )}
 
       {/* MODAL 2: Kitchen Order Ticket (KOT) Generated */}
       {kotData && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/40 backdrop-blur-xs p-3 sm:p-4">
-          <div className="flex min-h-full items-center justify-center py-2 sm:py-6">
-            <div className="print-area bg-white rounded-2xl max-w-sm w-full border border-black/[0.06] shadow-2xl p-4 sm:p-5 space-y-4">
+        <ModalPortal>
+          <div className="fixed inset-0 z-[100] overflow-y-auto bg-black/60 backdrop-blur-sm p-3 sm:p-4">
+            <div className="flex min-h-full items-center justify-center py-2 sm:py-6" onClick={(e) => { if (e.target === e.currentTarget) setKotData(null); }}>
+              <div className="print-area bg-white rounded-2xl max-w-sm w-full border border-black/[0.06] shadow-2xl p-4 sm:p-5 space-y-4">
             <div className="text-center pb-3 border-b border-dashed border-black/[0.06]">
               <div className="h-10 w-10 bg-[#B4D58A]/10 text-[#B4D58A] rounded-full flex items-center justify-center mx-auto mb-2">
                 <CheckCircle2 className="h-6 w-6" />
@@ -1154,13 +1158,15 @@ export default function PosPage() {
           </div>
         </div>
       </div>
+      </ModalPortal>
       )}
 
       {/* MODAL 3: Bill Settlement & Payment Collection */}
       {settlementOrder && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/40 backdrop-blur-xs p-3 sm:p-4">
-          <div className="flex min-h-full items-center justify-center py-2 sm:py-6">
-            <div className="bg-white rounded-2xl max-w-md w-full border border-black/[0.06] shadow-2xl p-4 sm:p-5 space-y-4">
+        <ModalPortal>
+          <div className="fixed inset-0 z-[100] overflow-y-auto bg-black/60 backdrop-blur-sm p-3 sm:p-4">
+            <div className="flex min-h-full items-center justify-center py-2 sm:py-6" onClick={(e) => { if (e.target === e.currentTarget) setSettlementOrder(null); }}>
+              <div className="bg-white rounded-2xl max-w-md w-full border border-black/[0.06] shadow-2xl p-4 sm:p-5 space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-black/[0.06]">
               <div>
                 <h3 className="font-bold text-base text-[#252525]">Settle Table Bill</h3>
@@ -1345,13 +1351,15 @@ export default function PosPage() {
           </div>
         </div>
       </div>
+      </ModalPortal>
       )}
 
       {/* MODAL 4: Final Tax Invoice Receipt */}
       {invoiceData && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/40 backdrop-blur-xs p-3 sm:p-4">
-          <div className="flex min-h-full items-center justify-center py-2 sm:py-6">
-            <div className="print-area bg-white rounded-2xl max-w-sm w-full border border-black/[0.06] shadow-2xl p-4 sm:p-6 space-y-4">
+        <ModalPortal>
+          <div className="fixed inset-0 z-[100] overflow-y-auto bg-black/60 backdrop-blur-sm p-3 sm:p-4">
+            <div className="flex min-h-full items-center justify-center py-2 sm:py-6" onClick={(e) => { if (e.target === e.currentTarget) setInvoiceData(null); }}>
+              <div className="print-area bg-white rounded-2xl max-w-sm w-full border border-black/[0.06] shadow-2xl p-4 sm:p-6 space-y-4">
               <div className="text-center pb-3 border-b border-dashed border-black/[0.06]">
               <h3 className="font-bold text-lg text-[#252525] uppercase">
                 {activeRestaurant?.name || 'Restaurant OS'}
@@ -1460,6 +1468,7 @@ export default function PosPage() {
           </div>
         </div>
       </div>
+      </ModalPortal>
       )}
     </div>
     </TenantGuard>
