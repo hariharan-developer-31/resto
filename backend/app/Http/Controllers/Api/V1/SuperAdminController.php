@@ -33,9 +33,9 @@ class SuperAdminController extends Controller
         $today = $now->toDateString();
         $startOfMonth = $now->copy()->startOfMonth();
 
-        // 1. Core Counts
+        // 1. Core Counts (scoped only to existing restaurants)
         $totalRestaurants = Restaurant::count();
-        $totalBranches = Branch::count();
+        $totalBranches = Branch::whereHas('restaurant')->count();
         $totalUsers = User::count();
         $totalStaff = User::whereHas('roles', function ($q) {
             $q->whereIn('name', ['Restaurant Admin', 'Branch Manager', 'Cashier', 'Kitchen Staff']);
@@ -44,33 +44,37 @@ class SuperAdminController extends Controller
             $q->where('name', 'Waiter');
         })->count();
 
-        // 2. Orders & Financial Aggregates
-        $totalOrders = Order::count();
-        $todayRevenue = (float) Order::whereDate('created_at', $today)
+        // 2. Orders & Financial Aggregates (scoped strictly to existing active restaurants)
+        $totalOrders = Order::whereHas('restaurant')->count();
+        $todayRevenue = (float) Order::whereHas('restaurant')
+            ->whereDate('created_at', $today)
             ->where('payment_status', 'paid')
             ->sum('total_amount');
 
-        $monthlyRevenue = (float) Order::where('created_at', '>=', $startOfMonth)
+        $monthlyRevenue = (float) Order::whereHas('restaurant')
+            ->where('created_at', '>=', $startOfMonth)
             ->where('payment_status', 'paid')
             ->sum('total_amount');
 
-        $pendingPayments = (float) Order::where('payment_status', 'unpaid')
+        $pendingPayments = (float) Order::whereHas('restaurant')
+            ->where('payment_status', 'unpaid')
             ->where('order_status', '!=', 'cancelled')
             ->sum('total_amount');
 
-        $activeTables = DiningTable::where('status', 'occupied')->count();
-        $totalReservations = Reservation::count();
-        $cancelledOrders = Order::where('order_status', 'cancelled')->count();
+        $activeTables = DiningTable::whereHas('restaurant')->where('status', 'occupied')->count();
+        $totalReservations = Reservation::whereHas('restaurant')->count();
+        $cancelledOrders = Order::whereHas('restaurant')->where('order_status', 'cancelled')->count();
 
         // 3. 7-Day Revenue Trend
         $revenueTrends = [];
         for ($i = 6; $i >= 0; $i--) {
             $date = $now->copy()->subDays($i)->toDateString();
             $label = $now->copy()->subDays($i)->format('D, M j');
-            $dailyRevenue = (float) Order::whereDate('created_at', $date)
+            $dailyRevenue = (float) Order::whereHas('restaurant')
+                ->whereDate('created_at', $date)
                 ->where('payment_status', 'paid')
                 ->sum('total_amount');
-            $dailyOrders = Order::whereDate('created_at', $date)->count();
+            $dailyOrders = Order::whereHas('restaurant')->whereDate('created_at', $date)->count();
 
             $revenueTrends[] = [
                 'date' => $date,
@@ -108,8 +112,9 @@ class SuperAdminController extends Controller
                 ];
             });
 
-        // 5. Recent Orders
-        $recentOrders = Order::with(['restaurant:id,name,currency_symbol', 'branch:id,name', 'table:id,table_number', 'waiter:id,name'])
+        // 5. Recent Orders (scoped only to existing restaurants)
+        $recentOrders = Order::whereHas('restaurant')
+            ->with(['restaurant:id,name,currency_symbol', 'branch:id,name', 'table:id,table_number', 'waiter:id,name'])
             ->latest()
             ->take(6)
             ->get()

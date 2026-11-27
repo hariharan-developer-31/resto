@@ -56,13 +56,19 @@ export default function DashboardPage() {
   const activeBranch = useAuthStore((s) => s.activeBranch);
   const logout = useAuthStore((s) => s.logout);
   const isSuperAdmin = user?.is_super_admin ?? false;
+  const [adminScope, setAdminScope] = useState<'restaurant' | 'platform'>('restaurant');
 
-  // Fetch live dashboard stats (global for Super Admin, tenant-scoped for staff)
+  const isViewingPlatform = isSuperAdmin && adminScope === 'platform';
+
+  // Fetch live dashboard stats (global for Super Admin on platform view, tenant-scoped otherwise)
   const { data: statsData, isLoading, refetch, isFetching } = useQuery({
-    queryKey: ['dashboard-stats', isSuperAdmin ? 'global' : activeRestaurant?.id, activeBranch?.id],
+    queryKey: ['dashboard-stats', isViewingPlatform ? 'global' : activeRestaurant?.id, activeBranch?.id, adminScope],
     queryFn: async () => {
-      const endpoint = isSuperAdmin ? 'super-admin/dashboard' : 'dashboard';
-      const res = await apiRequest(endpoint);
+      const endpoint = isViewingPlatform ? 'super-admin/dashboard' : 'dashboard';
+      const res = await apiRequest(endpoint, {
+        restaurantId: activeRestaurant?.id,
+        branchId: activeBranch?.id,
+      });
       return res.data;
     },
     refetchInterval: 15000,
@@ -179,24 +185,52 @@ export default function DashboardPage() {
   return (
     <div className="space-y-8">
       {/* Top Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-6 rounded-2xl bg-white border border-black/[0.06] shadow-xs">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-5 sm:p-6 rounded-2xl bg-white border border-black/[0.06] shadow-xs">
         <div className="space-y-1">
           <div className="flex items-center gap-2.5">
             <h1 className="font-bold text-2xl sm:text-3xl font-semibold tracking-tight text-[#252525]">
-              {isSuperAdmin ? 'Super Admin Control Center' : `${activeRestaurant?.name || 'Restaurant'} Dashboard`}
+              {isViewingPlatform ? 'Super Admin Control Center' : `${activeRestaurant?.name || 'Restaurant'} Dashboard`}
             </h1>
             <Badge variant="default" className="text-xs">
-              {user?.roles?.[0] || 'Staff'}
+              {isViewingPlatform ? 'Platform Overview' : user?.roles?.[0] || 'Staff'}
             </Badge>
           </div>
           <p className="text-xs text-[#5A5D58]">
-            {isSuperAdmin
+            {isViewingPlatform
               ? 'Multi-restaurant platform performance, financial telemetry and branch operations'
               : `Managing operations for ${activeRestaurant?.name || 'Active Tenant'} • Branch: ${activeBranch?.name || 'Main'}`}
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Admin Scope Switcher: Tenant vs Platform-wide */}
+          {isSuperAdmin && activeRestaurant && (
+            <div className="flex bg-[#F3DA8A]/25 p-1 rounded-xl text-xs font-semibold">
+              <button
+                type="button"
+                onClick={() => setAdminScope('restaurant')}
+                className={`px-3 py-1.5 rounded-lg transition-all ${
+                  adminScope === 'restaurant'
+                    ? 'bg-white text-[#252525] shadow-xs font-bold'
+                    : 'text-[#5A5D58] hover:text-[#252525]'
+                }`}
+              >
+                🏢 {activeRestaurant.name}
+              </button>
+              <button
+                type="button"
+                onClick={() => setAdminScope('platform')}
+                className={`px-3 py-1.5 rounded-lg transition-all ${
+                  adminScope === 'platform'
+                    ? 'bg-white text-[#252525] shadow-xs font-bold'
+                    : 'text-[#5A5D58] hover:text-[#252525]'
+                }`}
+              >
+                🌐 All Platform
+              </button>
+            </div>
+          )}
+
           <Button
             variant="outline"
             size="sm"
