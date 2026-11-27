@@ -12,83 +12,97 @@ return new class extends Migration
     public function up(): void
     {
         // 1. Categories & Subcategories
-        Schema::create('categories', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('restaurant_id')->constrained('restaurants')->cascadeOnDelete();
-            $table->foreignId('parent_id')->nullable()->constrained('categories')->nullOnDelete();
-            $table->string('name');
-            $table->string('slug');
-            $table->text('description')->nullable();
-            $table->string('image')->nullable();
-            $table->integer('sort_order')->default(0);
-            $table->boolean('is_active')->default(true)->index();
-            $table->timestamps();
-            $table->softDeletes();
+        if (!Schema::hasTable('categories')) {
+            Schema::create('categories', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('restaurant_id')->constrained('restaurants')->cascadeOnDelete();
+                $table->unsignedBigInteger('parent_id')->nullable()->index();
+                $table->string('name');
+                $table->string('slug');
+                $table->text('description')->nullable();
+                $table->string('image')->nullable();
+                $table->integer('sort_order')->default(0);
+                $table->boolean('is_active')->default(true)->index();
+                $table->timestamps();
+                $table->softDeletes();
 
-            $table->unique(['restaurant_id', 'slug']);
-            $table->index(['restaurant_id', 'is_active', 'sort_order']);
-        });
+                $table->unique(['restaurant_id', 'slug']);
+                $table->index(['restaurant_id', 'is_active', 'sort_order']);
+            });
+
+            Schema::table('categories', function (Blueprint $table) {
+                $table->foreign('parent_id')->references('id')->on('categories')->nullOnDelete();
+            });
+        }
 
         // 2. Menu Items Catalog
-        Schema::create('menu_items', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('restaurant_id')->constrained('restaurants')->cascadeOnDelete();
-            $table->foreignId('category_id')->constrained('categories')->cascadeOnDelete();
-            $table->string('name');
-            $table->string('slug');
-            $table->text('description')->nullable();
-            $table->string('image')->nullable();
-            $table->decimal('base_price', 10, 2);
-            $table->string('type', 20)->default('veg')->index(); // veg, non_veg, egg, vegan
-            $table->integer('preparation_time')->default(15); // in minutes
-            $table->boolean('is_available')->default(true)->index();
-            $table->boolean('is_featured')->default(false)->index();
-            $table->boolean('is_combo')->default(false);
-            $table->decimal('tax_rate', 5, 2)->nullable();
-            $table->string('kitchen_station', 50)->default('main')->index(); // main, grill, beverage, dessert
-            $table->integer('sort_order')->default(0);
-            $table->timestamps();
-            $table->softDeletes();
+        if (!Schema::hasTable('menu_items')) {
+            Schema::create('menu_items', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('restaurant_id')->constrained('restaurants')->cascadeOnDelete();
+                $table->foreignId('category_id')->constrained('categories')->cascadeOnDelete();
+                $table->string('name');
+                $table->string('slug');
+                $table->text('description')->nullable();
+                $table->string('image')->nullable();
+                $table->decimal('base_price', 10, 2);
+                $table->string('type', 20)->default('veg')->index(); // veg, non_veg, egg, vegan
+                $table->integer('preparation_time')->default(15); // in minutes
+                $table->boolean('is_available')->default(true)->index();
+                $table->boolean('is_featured')->default(false)->index();
+                $table->boolean('is_combo')->default(false);
+                $table->decimal('tax_rate', 5, 2)->nullable();
+                $table->string('kitchen_station', 50)->default('main')->index(); // main, grill, beverage, dessert
+                $table->integer('sort_order')->default(0);
+                $table->timestamps();
+                $table->softDeletes();
 
-            $table->unique(['restaurant_id', 'slug']);
-            $table->index(['restaurant_id', 'category_id', 'is_available']);
-        });
+                $table->unique(['restaurant_id', 'slug']);
+                $table->index(['restaurant_id', 'category_id', 'is_available']);
+            });
+        }
 
         // 3. Menu Variants
-        Schema::create('menu_variants', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('menu_item_id')->constrained('menu_items')->cascadeOnDelete();
-            $table->string('name'); // Regular, Large, Half, Full, Family Pack
-            $table->decimal('price', 10, 2);
-            $table->boolean('is_default')->default(false);
-            $table->timestamps();
-            $table->softDeletes();
+        if (!Schema::hasTable('menu_variants')) {
+            Schema::create('menu_variants', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('menu_item_id')->constrained('menu_items')->cascadeOnDelete();
+                $table->string('name'); // Regular, Large, Half, Full, Family Pack
+                $table->decimal('price', 10, 2);
+                $table->boolean('is_default')->default(false);
+                $table->timestamps();
+                $table->softDeletes();
 
-            $table->index(['menu_item_id', 'is_default']);
-        });
+                $table->index(['menu_item_id', 'is_default']);
+            });
+        }
 
         // 4. Addons Catalog
-        Schema::create('addons', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('restaurant_id')->constrained('restaurants')->cascadeOnDelete();
-            $table->string('name');
-            $table->decimal('price', 10, 2);
-            $table->boolean('is_active')->default(true)->index();
-            $table->timestamps();
-            $table->softDeletes();
+        if (!Schema::hasTable('addons')) {
+            Schema::create('addons', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('restaurant_id')->constrained('restaurants')->cascadeOnDelete();
+                $table->string('name');
+                $table->decimal('price', 10, 2);
+                $table->boolean('is_active')->default(true)->index();
+                $table->timestamps();
+                $table->softDeletes();
 
-            $table->index(['restaurant_id', 'is_active']);
-        });
+                $table->index(['restaurant_id', 'is_active']);
+            });
+        }
 
         // 5. Pivot: Menu Items <-> Addons
-        Schema::create('menu_item_addons', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('menu_item_id')->constrained('menu_items')->cascadeOnDelete();
-            $table->foreignId('addon_id')->constrained('addons')->cascadeOnDelete();
-            $table->timestamps();
+        if (!Schema::hasTable('menu_item_addons')) {
+            Schema::create('menu_item_addons', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('menu_item_id')->constrained('menu_items')->cascadeOnDelete();
+                $table->foreignId('addon_id')->constrained('addons')->cascadeOnDelete();
+                $table->timestamps();
 
-            $table->unique(['menu_item_id', 'addon_id']);
-        });
+                $table->unique(['menu_item_id', 'addon_id']);
+            });
+        }
 
         // 6. Extend dining_tables with location, waiter assignment and qr generation telemetry
         Schema::table('dining_tables', function (Blueprint $table) {
