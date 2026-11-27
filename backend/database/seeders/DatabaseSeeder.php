@@ -173,7 +173,13 @@ class DatabaseSeeder extends Seeder
         );
         $superAdmin->assignRole('Super Admin');
 
-        // 4. Create Sample Restaurant & Branches
+        // Stop here in non-test environments so production stays clean without demo data.
+        // Automated PHPUnit suites still seed full fixtures below.
+        if (!app()->runningUnitTests()) {
+            return;
+        }
+
+        // 4. Create Sample Restaurant & Branches (testing only)
         $restaurant = Restaurant::firstOrCreate(
             ['slug' => 'the-grand-feast'],
             [
