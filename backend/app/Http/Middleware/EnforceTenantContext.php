@@ -121,10 +121,11 @@ class EnforceTenantContext
             // Ensure X-Branch-ID header matches X-Restaurant-ID header when both are sent
             if ($idx === 0 && $headerBranchId !== null && $headerBranchId !== '' && $resolvedHeaderRestaurant) {
                 if ((int) $branch->restaurant_id !== (int) $resolvedHeaderRestaurant->id) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Branch does not belong to the active restaurant.',
-                    ], 422);
+                    // Gracefully auto-resolve to active restaurant's primary branch instead of 422 error
+                    $fallbackBranch = Branch::where('restaurant_id', $resolvedHeaderRestaurant->id)->first();
+                    if ($fallbackBranch) {
+                        $branch = $fallbackBranch;
+                    }
                 }
             }
 

@@ -387,8 +387,8 @@ export default function RestaurantsPage() {
 
       {/* Create / Edit Restaurant Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#252525]/40 backdrop-blur-xs p-4">
-          <div className="w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-2xl bg-white border border-black/[0.06] shadow-xl p-6 space-y-5">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#252525]/40 backdrop-blur-xs p-3 sm:p-4">
+          <div className="w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-2xl bg-white border border-black/[0.06] shadow-xl p-4 sm:p-6 space-y-4 sm:space-y-5">
             <div className="flex items-center justify-between pb-3 border-b border-black/[0.06]">
               <h2 className="font-bold text-xl font-semibold text-[#252525]">
                 {editingRestaurant ? 'Edit Restaurant Profile' : 'Create New Restaurant'}

@@ -584,10 +584,10 @@ export default function MenuCatalogPage() {
 
       {/* Modal: Add / Edit Food Item */}
       {isItemModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#252525]/40 backdrop-blur-xs p-4">
-          <div className="w-full max-w-xl max-h-[92vh] overflow-y-auto rounded-2xl bg-white border border-black/[0.06] shadow-xl p-6 space-y-5">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#252525]/40 backdrop-blur-xs p-3 sm:p-4">
+          <div className="w-full max-w-xl max-h-[92vh] overflow-y-auto rounded-2xl bg-white border border-black/[0.06] shadow-xl p-4 sm:p-6 space-y-4 sm:space-y-5">
             <div className="flex items-center justify-between pb-3 border-b border-black/[0.06]">
-              <h2 className="font-bold text-xl font-semibold text-[#252525]">
+              <h2 className="font-bold text-lg sm:text-xl font-semibold text-[#252525]">
                 {editingItem ? 'Edit Food Item' : 'New Culinary Item'}
               </h2>
               <button
@@ -614,7 +614,7 @@ export default function MenuCatalogPage() {
                 required
               />
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between">
                     <label className="text-xs font-semibold uppercase tracking-wider text-[#5A5D58]">
@@ -672,7 +672,7 @@ export default function MenuCatalogPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <Input
                   label="Base Price (₹) *"
                   type="number"
@@ -823,8 +823,8 @@ export default function MenuCatalogPage() {
 
       {/* Modal: Create Category */}
       {isCategoryModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#252525]/40 backdrop-blur-xs p-4">
-          <div className="w-full max-w-sm rounded-2xl bg-white border border-black/[0.06] shadow-xl p-6 space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#252525]/40 backdrop-blur-xs p-3 sm:p-4">
+          <div className="w-full max-w-sm rounded-2xl bg-white border border-black/[0.06] shadow-xl p-4 sm:p-6 space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between pb-2 border-b border-black/[0.06]">
               <h2 className="font-bold text-lg font-semibold text-[#252525]">Add Menu Category</h2>
               <button onClick={() => setIsCategoryModalOpen(false)}>
@@ -868,8 +868,8 @@ export default function MenuCatalogPage() {
 
       {/* Modal: Create Add-on */}
       {isAddonModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#252525]/40 backdrop-blur-xs p-4">
-          <div className="w-full max-w-sm rounded-2xl bg-white border border-black/[0.06] shadow-xl p-6 space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#252525]/40 backdrop-blur-xs p-3 sm:p-4">
+          <div className="w-full max-w-sm rounded-2xl bg-white border border-black/[0.06] shadow-xl p-4 sm:p-6 space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between pb-2 border-b border-black/[0.06]">
               <h2 className="font-bold text-lg font-semibold text-[#252525]">New Add-on Option</h2>
               <button onClick={() => setIsAddonModalOpen(false)}>

@@ -63,20 +63,21 @@ export function Topbar({ onMenuClick }: TopbarProps) {
   );
 
   return (
-    <header className="sticky top-0 z-30 flex h-20 w-full items-center justify-between bg-white/80 backdrop-blur-xl px-6 sm:px-8 border-b border-black/[0.04]">
+    <header className="sticky top-0 z-30 flex h-16 sm:h-20 w-full items-center justify-between bg-white/80 backdrop-blur-xl px-3 sm:px-6 lg:px-8 border-b border-black/[0.04]">
       {/* Left: Mobile hamburger + Tenant Selectors */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-2 sm:gap-3 min-w-0">
         <button
           onClick={onMenuClick}
-          className="p-2.5 text-[#252525] hover:bg-[#B4D58A]/20 rounded-2xl md:hidden transition-colors"
+          aria-label="Toggle navigation menu"
+          className="p-2 sm:p-2.5 text-[#252525] hover:bg-[#B4D58A]/20 rounded-xl sm:rounded-2xl md:hidden transition-colors shrink-0"
         >
           <Menu className="h-5 w-5" />
         </button>
 
         {/* Restaurant Switcher */}
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 px-4 py-2 bg-[#B4D58A]/20 rounded-2xl text-xs font-semibold text-[#252525]">
-            <Building2 className="h-4 w-4 text-[#252525]" />
+        <div className="flex items-center gap-1.5 sm:gap-3 min-w-0">
+          <div className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3.5 py-1.5 sm:py-2 bg-[#B4D58A]/20 rounded-xl sm:rounded-2xl text-xs font-semibold text-[#252525] shrink min-w-0">
+            <Building2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-[#252525] shrink-0" />
             {availableRestaurants.length > 1 ? (
               <select
                 value={activeRestaurant?.id || ''}
@@ -87,7 +88,7 @@ export function Topbar({ onMenuClick }: TopbarProps) {
                   setActiveRestaurant(selected || null);
                   queryClient.invalidateQueries();
                 }}
-                className="bg-transparent font-semibold text-[#252525] outline-none cursor-pointer pr-1"
+                className="bg-transparent font-semibold text-[#252525] outline-none cursor-pointer pr-1 max-w-[90px] sm:max-w-[160px] md:max-w-none truncate"
               >
                 {availableRestaurants.map((r) => (
                   <option key={r.id} value={r.id}>
@@ -96,14 +97,16 @@ export function Topbar({ onMenuClick }: TopbarProps) {
                 ))}
               </select>
             ) : (
-              <span>{activeRestaurant?.name || 'No Active Restaurant'}</span>
+              <span className="truncate max-w-[90px] sm:max-w-[160px] md:max-w-none">
+                {activeRestaurant?.name || 'No Active Restaurant'}
+              </span>
             )}
           </div>
 
           {/* Branch Switcher */}
           {activeRestaurant && availableBranches.length > 0 && (
-            <div className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-[#F3DA8A]/25 rounded-2xl text-xs font-semibold text-[#252525]">
-              <GitBranch className="h-4 w-4 text-[#252525]" />
+            <div className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 bg-[#F3DA8A]/25 rounded-xl sm:rounded-2xl text-xs font-semibold text-[#252525] shrink min-w-0">
+              <GitBranch className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-[#252525] shrink-0" />
               {availableBranches.length > 1 ? (
                 <select
                   value={activeBranch?.id || ''}
@@ -114,7 +117,7 @@ export function Topbar({ onMenuClick }: TopbarProps) {
                     setActiveBranch(selected || null);
                     queryClient.invalidateQueries();
                   }}
-                  className="bg-transparent font-semibold text-[#252525] outline-none cursor-pointer pr-1"
+                  className="bg-transparent font-semibold text-[#252525] outline-none cursor-pointer pr-1 max-w-[75px] sm:max-w-[140px] md:max-w-none truncate"
                 >
                   {availableBranches.map((b) => (
                     <option key={b.id} value={b.id}>
@@ -123,7 +126,9 @@ export function Topbar({ onMenuClick }: TopbarProps) {
                   ))}
                 </select>
               ) : (
-                <span>{activeBranch?.name || 'Main Branch'}</span>
+                <span className="truncate max-w-[75px] sm:max-w-[140px] md:max-w-none">
+                  {activeBranch?.name || 'Main Branch'}
+                </span>
               )}
             </div>
           )}
@@ -131,25 +136,25 @@ export function Topbar({ onMenuClick }: TopbarProps) {
       </div>
 
       {/* Right: Notification Bell, Status Pill & Profile */}
-      <div className="flex items-center gap-3 relative">
+      <div className="flex items-center gap-2 sm:gap-3 relative shrink-0">
         {/* Live Staff Notification Bell (Digital Table Bell Alerts) */}
         <div className="relative">
           <button
             type="button"
             onClick={() => setNotifOpen((prev) => !prev)}
             title="Table Service Notifications"
-            className="relative p-2.5 rounded-2xl bg-[#FAF9F6] hover:bg-[#F3DA8A]/30 border border-black/[0.06] text-[#252525] transition-colors cursor-pointer"
+            className="relative p-2 sm:p-2.5 rounded-xl sm:rounded-2xl bg-[#FAF9F6] hover:bg-[#F3DA8A]/30 border border-black/[0.06] text-[#252525] transition-colors cursor-pointer"
           >
             <Bell className="h-4 w-4" />
             {unreadCount > 0 && (
-              <span className="absolute -top-1 -right-1 min-w-5 h-5 px-1 rounded-full bg-[#F2AFC0] text-[#252525] text-[10px] font-extrabold flex items-center justify-center shadow-xs">
+              <span className="absolute -top-1 -right-1 min-w-4 h-4 sm:min-w-5 sm:h-5 px-1 rounded-full bg-[#F2AFC0] text-[#252525] text-[9px] sm:text-[10px] font-extrabold flex items-center justify-center shadow-xs">
                 {unreadCount > 9 ? '9+' : unreadCount}
               </span>
             )}
           </button>
 
           {notifOpen && (
-            <div className="absolute right-0 mt-2 w-80 bg-white rounded-2xl border border-black/[0.08] shadow-xl z-50 overflow-hidden">
+            <div className="absolute right-0 mt-2 w-[calc(100vw-1.5rem)] sm:w-80 max-w-sm bg-white rounded-2xl border border-black/[0.08] shadow-xl z-50 overflow-hidden">
               <div className="px-4 py-3 border-b border-black/[0.06] flex items-center justify-between bg-[#FAF9F6]">
                 <span className="text-xs font-bold text-[#252525]">
                   Floor Alerts ({unreadCount} unread)
@@ -202,11 +207,11 @@ export function Topbar({ onMenuClick }: TopbarProps) {
 
         {/* User Role Badge */}
         {user?.is_super_admin ? (
-          <Badge variant="mint" className="text-xs uppercase tracking-wider py-1 px-3 font-bold">
+          <Badge variant="mint" className="hidden sm:inline-flex text-xs uppercase tracking-wider py-1 px-3 font-bold">
             Super Admin
           </Badge>
         ) : (
-          <Badge variant="butter" className="text-xs uppercase tracking-wider py-1 px-3 font-bold">
+          <Badge variant="butter" className="hidden sm:inline-flex text-xs uppercase tracking-wider py-1 px-3 font-bold">
             {user?.roles?.[0] || 'Staff'}
           </Badge>
         )}

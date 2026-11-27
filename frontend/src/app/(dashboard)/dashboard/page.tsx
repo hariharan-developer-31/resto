@@ -420,7 +420,7 @@ export default function DashboardPage() {
           </Link>
         </CardHeader>
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
+          <table className="w-full min-w-[600px] text-left text-xs">
             <thead className="bg-[#FAF9F6] border-b border-black/[0.06] text-[#5A5D58] uppercase font-semibold">
               <tr>
                 <th className="py-3 px-5">Restaurant</th>

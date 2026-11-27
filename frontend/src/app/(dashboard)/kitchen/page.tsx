@@ -220,21 +220,21 @@ export default function KitchenPage() {
 
         {/* Center: Live Station Metrics */}
         {summaryData && (
-          <div className="hidden lg:flex items-center gap-2 bg-[#FAF9F6] p-1.5 rounded-xl border border-black/[0.06] text-xs">
-            <div className="px-3 py-1 border-r border-black/[0.06] text-center">
+          <div className="hidden sm:flex items-center gap-1.5 sm:gap-2 bg-[#FAF9F6] p-1 sm:p-1.5 rounded-xl border border-black/[0.06] text-[11px] sm:text-xs">
+            <div className="px-2.5 sm:px-3 py-1 border-r border-black/[0.06] text-center">
               <span className="text-[#5A5D58] block">Pending</span>
               <span className="font-bold text-[#F3DA8A]">{summaryData.pending_items || 0}</span>
             </div>
-            <div className="px-3 py-1 border-r border-black/[0.06] text-center">
+            <div className="px-2.5 sm:px-3 py-1 border-r border-black/[0.06] text-center">
               <span className="text-[#5A5D58] block">Cooking</span>
               <span className="font-bold text-[#B4D58A]">{summaryData.preparing_items || 0}</span>
             </div>
-            <div className="px-3 py-1 border-r border-black/[0.06] text-center">
+            <div className="px-2.5 sm:px-3 py-1 border-r border-black/[0.06] text-center">
               <span className="text-[#5A5D58] block">Ready</span>
               <span className="font-bold text-[#B4D58A]">{summaryData.ready_items || 0}</span>
             </div>
             {summaryData.overdue_tickets > 0 && (
-              <div className="px-3 py-1 text-center bg-[#F2AFC0]/20 rounded-lg">
+              <div className="px-2.5 sm:px-3 py-1 text-center bg-[#F2AFC0]/20 rounded-lg">
                 <span className="text-[#F2AFC0] block font-semibold">Overdue</span>
                 <span className="font-bold text-[#F2AFC0]">{summaryData.overdue_tickets}</span>
               </div>
@@ -320,7 +320,7 @@ export default function KitchenPage() {
       {/* TICKETS DISPLAY GRID */}
       <div className="flex-1 overflow-y-auto">
         {ticketsLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-3.5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-3 sm:gap-3.5">
             {[...Array(6)].map((_, i) => (
               <div key={i} className="h-64 rounded-2xl bg-white border border-black/[0.06] animate-pulse" />
             ))}
@@ -336,7 +336,7 @@ export default function KitchenPage() {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-3.5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-3 sm:gap-3.5">
             {tickets.map((ticket) => {
               const isCritical = ticket.urgency === 'critical';
               const isWarning = ticket.urgency === 'warning';

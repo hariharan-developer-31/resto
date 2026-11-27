@@ -40,8 +40,21 @@ class TableController extends Controller
         }
 
         $branch = Branch::with('restaurant')->find($branchId);
+        if (!$branch && $restaurantId) {
+            $branch = Branch::with('restaurant')->where('restaurant_id', $restaurantId)->first();
+            $branchId = $branch?->id;
+        }
+        if (!$branch && $user) {
+            $branch = $user->branches()->with('restaurant')->first();
+            $branchId = $branch?->id;
+        }
+
         if (!$branch) {
-            return $this->errorResponse('Branch not found.', 404);
+            return $this->successResponse([
+                'tables' => [],
+                'branch' => null,
+                'locations' => [],
+            ], 'No active branch found.');
         }
 
         $query = DiningTable::where('branch_id', $branchId)
@@ -129,8 +142,21 @@ class TableController extends Controller
         }
 
         $branch = Branch::with('restaurant')->find($branchId);
+        if (!$branch && $restaurantId) {
+            $branch = Branch::with('restaurant')->where('restaurant_id', $restaurantId)->first();
+            $branchId = $branch?->id;
+        }
+        if (!$branch && $user) {
+            $branch = $user->branches()->with('restaurant')->first();
+            $branchId = $branch?->id;
+        }
+
         if (!$branch) {
-            return $this->errorResponse('Branch not found.', 404);
+            return $this->successResponse([
+                'tables' => [],
+                'branch' => null,
+                'locations' => [],
+            ], 'No active branch found.');
         }
 
         if (!$user->hasRestaurantAccess($branch->restaurant_id)) {

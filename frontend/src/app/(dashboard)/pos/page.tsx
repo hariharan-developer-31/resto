@@ -33,6 +33,8 @@ import {
   X,
   Send,
   Coffee,
+  ArrowLeft,
+  ArrowRight,
 } from 'lucide-react';
 
 interface MenuVariant {
@@ -106,6 +108,7 @@ export default function PosPage() {
   const [discountAmount, setDiscountAmount] = useState<number>(0);
   const [packagingCharge, setPackagingCharge] = useState<number>(0);
   const [serviceCharge, setServiceCharge] = useState<number>(0);
+  const [mobileTab, setMobileTab] = useState<'catalog' | 'cart'>('catalog');
 
   // Reset table and cart when switching branch or restaurant
   useEffect(() => {
@@ -373,9 +376,41 @@ export default function PosPage() {
 
   return (
     <TenantGuard requireBranch stationName="POS Station">
-      <div className="flex flex-col lg:flex-row gap-4 h-[calc(100vh-5.5rem)] -m-4 sm:-m-6 p-4 overflow-hidden bg-[#FAF9F6]">
-      {/* LEFT PANE: Tables, Categories & Item Catalog */}
-      <div className="flex-1 flex flex-col min-w-0 bg-white rounded-xl border border-black/[0.06] shadow-xs overflow-hidden">
+      <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 h-[calc(100vh-4.25rem)] sm:h-[calc(100vh-5.5rem)] -m-3 sm:-m-6 p-2 sm:p-4 overflow-hidden bg-[#FAF9F6]">
+        {/* Mobile/Tablet Segmented View Switcher (< lg) */}
+        <div className="flex lg:hidden items-center bg-[#F3DA8A]/25 p-1 rounded-xl shrink-0 gap-1 w-full">
+          <button
+            type="button"
+            onClick={() => setMobileTab('catalog')}
+            className={`flex-1 py-1.5 px-3 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 ${
+              mobileTab === 'catalog'
+                ? 'bg-white text-[#252525] shadow-xs'
+                : 'text-[#5A5D58] hover:text-[#252525]'
+            }`}
+          >
+            <UtensilsCrossed className="h-3.5 w-3.5 text-[#B4D58A]" />
+            <span>Menu & Tables</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setMobileTab('cart')}
+            className={`flex-1 py-1.5 px-3 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 ${
+              mobileTab === 'cart'
+                ? 'bg-[#B4D58A] text-white shadow-xs'
+                : 'text-[#5A5D58] hover:text-[#252525]'
+            }`}
+          >
+            <Receipt className="h-3.5 w-3.5" />
+            <span>
+              Cart ({cart.reduce((s, i) => s + i.quantity, 0)}) · {currencySymbol}{grandTotal.toFixed(2)}
+            </span>
+          </button>
+        </div>
+
+        {/* LEFT PANE: Tables, Categories & Item Catalog */}
+        <div className={`flex-1 flex-col min-w-0 bg-white rounded-xl border border-black/[0.06] shadow-xs overflow-hidden ${
+          mobileTab === 'catalog' ? 'flex' : 'hidden lg:flex'
+        }`}>
         {/* TOP BAR: Mode Selector & Table Strip */}
         <div className="p-3 border-b border-black/[0.06] bg-[#FAF9F6]/50 flex flex-wrap items-center justify-between gap-3 shrink-0">
           {/* Order Type Switcher */}
@@ -670,25 +705,37 @@ export default function PosPage() {
       </div>
 
       {/* RIGHT PANE: Order Cart, KOT Dispatch & Bill Settlement */}
-      <div className="w-full lg:w-96 flex flex-col bg-white rounded-xl border border-black/[0.06] shadow-xs overflow-hidden shrink-0">
+      <div className={`w-full lg:w-96 flex-col bg-white rounded-xl border border-black/[0.06] shadow-xs overflow-hidden shrink-0 ${
+        mobileTab === 'cart' ? 'flex' : 'hidden lg:flex'
+      }`}>
         {/* Cart Header */}
-        <div className="p-3.5 border-b border-black/[0.06] bg-[#FAF9F6]/80 flex items-center justify-between shrink-0">
-          <div>
-            <div className="flex items-center gap-1.5">
-              <h3 className="font-bold text-sm text-[#252525]">Order Cart</h3>
-              <Badge variant="outline" className="text-[10px] uppercase font-semibold">
-                {orderType.replace('_', ' ')}
-              </Badge>
+        <div className="p-3 sm:p-3.5 border-b border-black/[0.06] bg-[#FAF9F6]/80 flex items-center justify-between shrink-0">
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setMobileTab('catalog')}
+              className="lg:hidden p-1.5 rounded-lg border border-black/[0.06] bg-white text-[#252525] hover:bg-[#FAF9F6] shrink-0"
+              title="Back to Catalog"
+            >
+              <ArrowLeft className="h-4 w-4" />
+            </button>
+            <div>
+              <div className="flex items-center gap-1.5">
+                <h3 className="font-bold text-sm text-[#252525]">Order Cart</h3>
+                <Badge variant="outline" className="text-[10px] uppercase font-semibold">
+                  {orderType.replace('_', ' ')}
+                </Badge>
+              </div>
+              <p className="text-[11px] text-[#5A5D58] mt-0.5 truncate max-w-[190px] sm:max-w-none">
+                {orderType === 'dine_in'
+                  ? selectedTable
+                    ? `Table ${selectedTable.table_number} · ${selectedTable.location}`
+                    : 'Select Table to proceed'
+                  : customerName
+                  ? `${customerName} (${customerPhone || 'Counter'})`
+                  : 'Direct Counter Sale'}
+              </p>
             </div>
-            <p className="text-[11px] text-[#5A5D58] mt-0.5">
-              {orderType === 'dine_in'
-                ? selectedTable
-                  ? `Table ${selectedTable.table_number} · ${selectedTable.location}`
-                  : 'Select Table to proceed'
-                : customerName
-                ? `${customerName} (${customerPhone || 'Counter'})`
-                : 'Direct Counter Sale'}
-            </p>
           </div>
 
           {cart.length > 0 && (
@@ -890,6 +937,28 @@ export default function PosPage() {
         </div>
       </div>
 
+      {/* Mobile Floating Cart Summary Button (< lg) */}
+      {mobileTab === 'catalog' && cart.length > 0 && (
+        <div className="lg:hidden fixed bottom-4 left-4 right-4 z-40 animate-in slide-in-from-bottom duration-200">
+          <button
+            type="button"
+            onClick={() => setMobileTab('cart')}
+            className="w-full py-3.5 px-5 bg-[#B4D58A] hover:bg-[#9EC271] text-white rounded-2xl shadow-xl flex items-center justify-between font-bold text-sm transition-transform active:scale-[0.98]"
+          >
+            <div className="flex items-center gap-2">
+              <span className="bg-white/25 px-2 py-0.5 rounded-lg text-xs">
+                {cart.reduce((sum, item) => sum + item.quantity, 0)} items
+              </span>
+              <span>Review & Pay</span>
+            </div>
+            <div className="flex items-center gap-1.5 font-bold">
+              <span>{currencySymbol}{grandTotal.toFixed(2)}</span>
+              <ArrowRight className="h-4 w-4" />
+            </div>
+          </button>
+        </div>
+      )}
+
       {/* MODAL 1: Item Customization (Variants & Addons) */}
       {customizingItem && (
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
@@ -1085,8 +1154,8 @@ export default function PosPage() {
 
       {/* MODAL 3: Bill Settlement & Payment Collection */}
       {settlementOrder && (
-        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full border border-black/[0.06] shadow-2xl p-5 space-y-4">
+        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full border border-black/[0.06] shadow-2xl p-4 sm:p-5 space-y-4 max-h-[92vh] overflow-y-auto">
             <div className="flex items-center justify-between pb-3 border-b border-black/[0.06]">
               <div>
                 <h3 className="font-bold text-base text-[#252525]">Settle Table Bill</h3>
@@ -1274,8 +1343,8 @@ export default function PosPage() {
 
       {/* MODAL 4: Final Tax Invoice Receipt */}
       {invoiceData && (
-        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="print-area bg-white rounded-2xl max-w-sm w-full border border-black/[0.06] shadow-2xl p-6 space-y-4">
+        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
+          <div className="print-area bg-white rounded-2xl max-w-sm w-full border border-black/[0.06] shadow-2xl p-4 sm:p-6 space-y-4 max-h-[92vh] overflow-y-auto">
             <div className="text-center pb-3 border-b border-dashed border-black/[0.06]">
               <h3 className="font-bold text-lg text-[#252525] uppercase">
                 {activeRestaurant?.name || 'Restaurant OS'}

@@ -264,7 +264,7 @@ export default function TablesManagementPage() {
       </div>
 
       {/* Status Counters Strip */}
-      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 sm:gap-3">
         <div
           onClick={() => setStatusFilter(statusFilter === 'available' ? 'All' : 'available')}
           className={`p-3 rounded-xl border text-xs cursor-pointer transition-all ${
@@ -377,7 +377,7 @@ export default function TablesManagementPage() {
           </Button>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
           {filteredTables.map((table) => {
             const style = getStatusColor(table.status);
 
@@ -480,8 +480,8 @@ export default function TablesManagementPage() {
 
       {/* Modal: Create / Edit Table */}
       {isTableModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#252525]/40 backdrop-blur-xs p-4">
-          <div className="w-full max-w-sm rounded-2xl bg-white border border-black/[0.06] shadow-xl p-6 space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#252525]/40 backdrop-blur-xs p-3 sm:p-4">
+          <div className="w-full max-w-sm rounded-2xl bg-white border border-black/[0.06] shadow-xl p-4 sm:p-6 space-y-4 max-h-[92vh] overflow-y-auto">
             <div className="flex items-center justify-between pb-2 border-b border-black/[0.06]">
               <h2 className="font-bold text-lg font-semibold text-[#252525]">
                 {selectedTable ? 'Edit Table' : 'Add Dining Table'}
@@ -561,8 +561,8 @@ export default function TablesManagementPage() {
 
       {/* Modal: QR Code Standee & Generator */}
       {isQrModalOpen && selectedTable && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#252525]/50 backdrop-blur-xs p-4">
-          <div className="w-full max-w-md rounded-2xl bg-white border border-black/[0.06] shadow-2xl p-6 space-y-5">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#252525]/50 backdrop-blur-xs p-3 sm:p-4">
+          <div className="w-full max-w-md rounded-2xl bg-white border border-black/[0.06] shadow-2xl p-4 sm:p-6 space-y-4 sm:space-y-5 max-h-[92vh] overflow-y-auto">
             <div className="flex items-center justify-between pb-3 border-b border-black/[0.06]">
               <div className="flex items-center gap-2">
                 <QrCode className="h-5 w-5 text-[#B4D58A]" />

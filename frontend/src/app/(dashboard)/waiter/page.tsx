@@ -351,7 +351,7 @@ export default function WaiterPage() {
       </div>
 
       {/* Tables Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-3.5">
         {filteredTables.map((tbl: any) => {
           const isOccupied = tbl.status === 'occupied';
           const isMyTable = (tbl.waiter_id ?? tbl.waiter?.id) === user?.id;

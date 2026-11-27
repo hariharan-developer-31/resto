@@ -485,7 +485,7 @@ export default function ReportsAndAnalyticsPage() {
               </CardDescription>
             </CardHeader>
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm text-[#252525]">
+              <table className="w-full min-w-[550px] text-left text-sm text-[#252525]">
                 <thead className="bg-[#FAF9F6] text-xs font-semibold text-[#5A5D58] uppercase tracking-wider border-b border-black/[0.06]">
                   <tr>
                     <th className="px-6 py-3.5">Rank & Dish</th>
