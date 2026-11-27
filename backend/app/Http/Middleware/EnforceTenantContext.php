@@ -38,6 +38,12 @@ class EnforceTenantContext
             }
 
             if (!$restaurant) {
+                // If the candidate was merely a client request header (e.g. stale localStorage),
+                // do not crash the entire request with 404; ignore the invalid header context.
+                if ($idx === 0 && $headerRestaurantId !== null && $headerRestaurantId !== '') {
+                    continue;
+                }
+
                 return response()->json([
                     'success' => false,
                     'message' => 'Restaurant not found.',
@@ -79,6 +85,12 @@ class EnforceTenantContext
             $branch = $branchId instanceof Branch ? $branchId : Branch::find($branchId);
 
             if (!$branch) {
+                // If the candidate was merely a client request header (e.g. stale localStorage),
+                // do not crash the entire request with 404; ignore the invalid header context.
+                if ($idx === 0 && $headerBranchId !== null && $headerBranchId !== '') {
+                    continue;
+                }
+
                 return response()->json([
                     'success' => false,
                     'message' => 'Branch not found.',

@@ -201,15 +201,15 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       if (token && userStr) {
         const user: AuthUser = JSON.parse(userStr);
         const activeRestaurant = restaurantId 
-          ? user.restaurants?.find(r => r.id === Number(restaurantId)) || user.restaurants?.[0] || null
+          ? user.restaurants?.find(r => r.id === Number(restaurantId)) || null
           : user.restaurants?.[0] || null;
 
         const matchingBranches = activeRestaurant
           ? (user.branches || []).filter(b => b.restaurant_id === activeRestaurant.id)
-          : (user.branches || []);
+          : [];
 
         const activeBranch = branchId
-          ? matchingBranches.find(b => b.id === Number(branchId)) || matchingBranches[0] || null
+          ? matchingBranches.find(b => b.id === Number(branchId)) || null
           : matchingBranches[0] || null;
 
         if (activeRestaurant) {
