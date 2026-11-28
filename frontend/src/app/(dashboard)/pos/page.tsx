@@ -688,7 +688,7 @@ export default function PosPage() {
                       </span>
 
                       {hasVariants || hasAddons ? (
-                        <span className="text-[10px] text-[#5A5D58] bg-[#FAF9F6] px-1.5 py-0.5 rounded border border-black/[0.06]">
+                        <span className="text-[10px] text-[#5A5D58] bg-[#FAF9F6] px-1.5 py-0.5 rounded border border-black/[0.06] whitespace-nowrap shrink-0 inline-flex items-center gap-0.5">
                           Customize +
                         </span>
                       ) : (
