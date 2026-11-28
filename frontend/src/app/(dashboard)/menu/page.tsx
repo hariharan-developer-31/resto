@@ -29,7 +29,21 @@ import {
   Tag,
   CircleDot,
   Flame,
+  Image as ImageIcon,
 } from 'lucide-react';
+
+const FOOD_IMAGE_PRESETS = [
+  { label: 'Biryani', url: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=600&auto=format&fit=crop&q=80', icon: '🍛' },
+  { label: 'Grill / Tandoor', url: 'https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?w=600&auto=format&fit=crop&q=80', icon: '🍗' },
+  { label: 'Burger', url: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&auto=format&fit=crop&q=80', icon: '🍔' },
+  { label: 'Pizza', url: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=600&auto=format&fit=crop&q=80', icon: '🍕' },
+  { label: 'Noodles', url: 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=600&auto=format&fit=crop&q=80', icon: '🍜' },
+  { label: 'Curry / Gravy', url: 'https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=600&auto=format&fit=crop&q=80', icon: '🍲' },
+  { label: 'Salad', url: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600&auto=format&fit=crop&q=80', icon: '🥗' },
+  { label: 'Juice / Drink', url: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=600&auto=format&fit=crop&q=80', icon: '🍹' },
+  { label: 'Coffee', url: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=600&auto=format&fit=crop&q=80', icon: '☕' },
+  { label: 'Dessert / Cake', url: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=600&auto=format&fit=crop&q=80', icon: '🍰' },
+];
 
 export default function MenuCatalogPage() {
   const queryClient = useQueryClient();
@@ -60,6 +74,7 @@ export default function MenuCatalogPage() {
   const [itemCategoryId, setItemCategoryId] = useState<number | ''>('');
   const [itemPrice, setItemPrice] = useState('');
   const [itemType, setItemType] = useState('non_veg');
+  const [itemImage, setItemImage] = useState('');
   const [itemPrepTime, setItemPrepTime] = useState('15');
   const [itemStation, setItemStation] = useState('main');
   const [itemDescription, setItemDescription] = useState('');
@@ -126,6 +141,7 @@ export default function MenuCatalogPage() {
     setItemCategoryId(selectedCategoryId || categories[0]?.id || '');
     setItemPrice('200.00');
     setItemType('non_veg');
+    setItemImage('');
     setItemPrepTime('15');
     setItemStation('main');
     setItemDescription('');
@@ -143,6 +159,7 @@ export default function MenuCatalogPage() {
     setItemCategoryId(item.category_id || '');
     setItemPrice(String(item.base_price || ''));
     setItemType(item.type || 'veg');
+    setItemImage(item.image || '');
     setItemPrepTime(String(item.preparation_time || 15));
     setItemStation(item.kitchen_station || 'main');
     setItemDescription(item.description || '');
@@ -166,6 +183,7 @@ export default function MenuCatalogPage() {
         category_id: itemCategoryId,
         base_price: Number(itemPrice),
         type: itemType,
+        image: itemImage.trim() || null,
         preparation_time: Number(itemPrepTime),
         kitchen_station: itemStation,
         description: itemDescription,
@@ -422,12 +440,38 @@ export default function MenuCatalogPage() {
             return (
               <Card
                 key={item.id}
-                className={`border-black/[0.06] hover:border-[#D8D4CA] transition-all flex flex-col justify-between ${
+                className={`border-black/[0.06] hover:border-[#D8D4CA] transition-all flex flex-col justify-between overflow-hidden ${
                   !item.is_available ? 'opacity-70 bg-[#FAF9F6]/40' : ''
                 }`}
               >
                 <div>
-                  <CardHeader className="p-5 pb-3">
+                  {item.image && (
+                    <div className="relative h-44 w-full overflow-hidden bg-[#FAF9F6] border-b border-black/[0.04]">
+                      <img
+                        src={item.image}
+                        alt={item.name}
+                        className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
+                        onError={(e) => {
+                          (e.currentTarget as HTMLElement).style.display = 'none';
+                        }}
+                      />
+                      <div className="absolute top-2.5 right-2.5 flex items-center gap-1">
+                        <Badge
+                          variant={item.is_available ? 'success' : 'danger'}
+                          className="text-[10px] shadow-sm backdrop-blur-md bg-white/95"
+                        >
+                          {item.is_available ? 'In Stock' : 'Out of Stock'}
+                        </Badge>
+                      </div>
+                      {item.is_featured && (
+                        <div className="absolute top-2.5 left-2.5 bg-[#252525]/80 backdrop-blur-md text-[#F3DA8A] px-2 py-0.5 rounded-full text-[10px] font-semibold flex items-center gap-1 shadow-sm">
+                          <Sparkles className="h-3 w-3" /> Chef&apos;s Special
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  <CardHeader className={`p-5 pb-3 ${item.image ? 'pt-4' : ''}`}>
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-start gap-2.5">
                         {/* Veg / Non-Veg Indicator Icon */}
@@ -453,7 +497,7 @@ export default function MenuCatalogPage() {
                             <CardTitle className="text-base font-semibold leading-tight">
                               {item.name}
                             </CardTitle>
-                            {item.is_featured && (
+                            {item.is_featured && !item.image && (
                               <span title="Featured">
                                 <Sparkles className="h-3.5 w-3.5 text-[#F3DA8A] shrink-0" />
                               </span>
@@ -469,12 +513,14 @@ export default function MenuCatalogPage() {
                         <span className="font-bold text-base text-[#252525] block">
                           ₹{Number(item.base_price).toFixed(2)}
                         </span>
-                        <Badge
-                          variant={item.is_available ? 'success' : 'danger'}
-                          className="text-[10px]"
-                        >
-                          {item.is_available ? 'In Stock' : 'Out of Stock'}
-                        </Badge>
+                        {!item.image && (
+                          <Badge
+                            variant={item.is_available ? 'success' : 'danger'}
+                            className="text-[10px]"
+                          >
+                            {item.is_available ? 'In Stock' : 'Out of Stock'}
+                          </Badge>
+                        )}
                       </div>
                     </div>
 
@@ -720,6 +766,77 @@ export default function MenuCatalogPage() {
                   placeholder="Appetizing description of ingredients and preparation method..."
                   className="w-full rounded-[10px] border border-black/[0.06] p-3 text-sm text-[#252525] placeholder:text-[#8E928B] outline-none focus:border-[#B4D58A]"
                 />
+              </div>
+
+              {/* Food Image URL, Presets & Preview */}
+              <div className="space-y-2 pt-2 border-t border-black/[0.04]">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-semibold uppercase tracking-wider text-[#5A5D58] flex items-center gap-1.5">
+                    <ImageIcon className="h-3.5 w-3.5 text-[#B4D58A]" />
+                    Dish Photo (Image URL or 1-Click Preset)
+                  </label>
+                  {itemImage && (
+                    <button
+                      type="button"
+                      onClick={() => setItemImage('')}
+                      className="text-[11px] text-[#F2AFC0] hover:underline font-semibold"
+                    >
+                      Clear Image
+                    </button>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <div className="flex-1">
+                    <Input
+                      type="url"
+                      placeholder="Paste image link (e.g. https://...)"
+                      value={itemImage}
+                      onChange={(e) => setItemImage(e.target.value)}
+                    />
+                  </div>
+
+                  {itemImage ? (
+                    <div className="relative h-11 w-14 rounded-lg overflow-hidden border border-black/[0.08] shrink-0 bg-[#FAF9F6]">
+                      <img
+                        src={itemImage}
+                        alt="Preview"
+                        className="h-full w-full object-cover"
+                        onError={(e) => {
+                          (e.currentTarget as HTMLElement).style.display = 'none';
+                        }}
+                      />
+                    </div>
+                  ) : (
+                    <div className="h-11 w-14 rounded-lg border border-dashed border-black/[0.12] flex items-center justify-center text-[#8E928B] text-[10px] shrink-0 bg-[#FAF9F6]">
+                      No photo
+                    </div>
+                  )}
+                </div>
+
+                {/* Quick 1-Click Presets */}
+                <div className="space-y-1">
+                  <span className="text-[10px] uppercase font-bold text-[#8E928B]">
+                    ⚡ Quick 1-Click Photo Presets:
+                  </span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {FOOD_IMAGE_PRESETS.map((preset) => (
+                      <button
+                        key={preset.label}
+                        type="button"
+                        onClick={() => setItemImage(preset.url)}
+                        className={`px-2 py-1 rounded-md text-[11px] font-medium border flex items-center gap-1 transition-all ${
+                          itemImage === preset.url
+                            ? 'bg-[#B4D58A]/20 border-[#B4D58A] text-[#252525] font-bold shadow-xs'
+                            : 'bg-[#FAF9F6] border-black/[0.06] text-[#5A5D58] hover:bg-white hover:border-[#B4D58A]'
+                        }`}
+                      >
+                        <span>{preset.icon}</span>
+                        <span>{preset.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
 
               <label className="flex items-center gap-2 pt-1 cursor-pointer">

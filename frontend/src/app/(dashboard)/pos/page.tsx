@@ -58,6 +58,7 @@ interface MenuItem {
   category_id: number;
   category?: { id: number; name: string };
   type: 'veg' | 'non_veg' | 'egg' | 'vegan';
+  image?: string | null;
   base_price: number;
   tax_rate: number;
   preparation_time: number;
@@ -657,6 +658,20 @@ export default function PosPage() {
                     }`}
                   >
                     <div>
+                      {/* Dish Photo if present */}
+                      {item.image && (
+                        <div className="h-20 w-full rounded-lg overflow-hidden mb-2 bg-[#FAF9F6] border border-black/[0.04]">
+                          <img
+                            src={item.image}
+                            alt={item.name}
+                            className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-200"
+                            onError={(e) => {
+                              (e.currentTarget as HTMLElement).style.display = 'none';
+                            }}
+                          />
+                        </div>
+                      )}
+
                       {/* Top indicator & station */}
                       <div className="flex items-center justify-between mb-1.5">
                         <div

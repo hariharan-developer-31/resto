@@ -60,6 +60,7 @@ interface MenuItem {
   name: string;
   category_id: number;
   type: string;
+  image?: string | null;
   base_price: number;
   is_available: boolean;
   kitchen_station: string;
@@ -626,19 +627,33 @@ export default function WaiterPage() {
                       key={item.id}
                       className="py-2 flex items-center justify-between gap-2"
                     >
-                      <div>
-                        <span className="text-xs font-semibold text-[#252525] block">
-                          {item.name}
-                          {totalItemQty > 0 && hasOptions && (
-                            <span className="ml-1.5 text-[10px] bg-[#B4D58A]/25 text-[#252525] px-1.5 py-0.5 rounded-full font-bold">
-                              {totalItemQty} in pad
-                            </span>
-                          )}
-                        </span>
-                        <span className="text-[11px] font-bold text-[#B4D58A]">
-                          ₹{Number(item.base_price).toFixed(2)}
-                          {hasOptions && <span className="text-[10px] text-[#5A5D58] font-normal ml-1">· Customizable</span>}
-                        </span>
+                      <div className="flex items-center gap-2.5">
+                        {item.image && (
+                          <div className="h-10 w-10 rounded-lg overflow-hidden shrink-0 bg-[#FAF9F6] border border-black/[0.06]">
+                            <img
+                              src={item.image}
+                              alt={item.name}
+                              className="h-full w-full object-cover"
+                              onError={(e) => {
+                                (e.currentTarget as HTMLElement).style.display = 'none';
+                              }}
+                            />
+                          </div>
+                        )}
+                        <div>
+                          <span className="text-xs font-semibold text-[#252525] block">
+                            {item.name}
+                            {totalItemQty > 0 && hasOptions && (
+                              <span className="ml-1.5 text-[10px] bg-[#B4D58A]/25 text-[#252525] px-1.5 py-0.5 rounded-full font-bold">
+                                {totalItemQty} in pad
+                              </span>
+                            )}
+                          </span>
+                          <span className="text-[11px] font-bold text-[#B4D58A]">
+                            ₹{Number(item.base_price).toFixed(2)}
+                            {hasOptions && <span className="text-[10px] text-[#5A5D58] font-normal ml-1">· Customizable</span>}
+                          </span>
+                        </div>
                       </div>
 
                       {inPadCart ? (

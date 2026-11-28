@@ -51,6 +51,7 @@ interface MenuItem {
   category_id: number;
   description?: string;
   type: string;
+  image?: string | null;
   base_price: number;
   preparation_time: number;
   is_available: boolean;
@@ -566,10 +567,23 @@ function TableQrOrderContent() {
                   key={item.id}
                   className="bg-white rounded-2xl border border-black/[0.06] p-3.5 flex items-start justify-between gap-3 shadow-xs"
                 >
-                  <div className="flex-1 space-y-1">
+                  {item.image && (
+                    <div className="h-16 w-16 sm:h-20 sm:w-20 rounded-xl overflow-hidden shrink-0 bg-[#FAF9F6] border border-black/[0.06]">
+                      <img
+                        src={item.image}
+                        alt={item.name}
+                        className="h-full w-full object-cover"
+                        onError={(e) => {
+                          (e.currentTarget as HTMLElement).style.display = 'none';
+                        }}
+                      />
+                    </div>
+                  )}
+
+                  <div className="flex-1 space-y-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <div
-                        className={`h-3 w-3 rounded-sm border flex items-center justify-center p-0.5 ${
+                        className={`h-3 w-3 rounded-sm border flex items-center justify-center p-0.5 shrink-0 ${
                           isVeg ? 'border-[#B4D58A]' : 'border-[#F2AFC0]'
                         }`}
                       >
@@ -766,12 +780,33 @@ function TableQrOrderContent() {
       {/* 7. CUSTOMIZATION MODAL */}
       {customizingItem && (
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-sm w-full border border-black/[0.06] shadow-xl p-5 space-y-4">
+          <div className="bg-white rounded-2xl max-w-sm w-full border border-black/[0.06] shadow-xl p-5 space-y-4 overflow-hidden">
+            {customizingItem.image && (
+              <div className="h-28 -mx-5 -mt-5 mb-1 overflow-hidden bg-[#FAF9F6] border-b border-black/[0.04] relative">
+                <img
+                  src={customizingItem.image}
+                  alt={customizingItem.name}
+                  className="h-full w-full object-cover"
+                  onError={(e) => {
+                    (e.currentTarget as HTMLElement).style.display = 'none';
+                  }}
+                />
+                <button
+                  onClick={() => setCustomizingItem(null)}
+                  className="absolute top-2.5 right-2.5 bg-black/60 hover:bg-black/80 text-white rounded-full p-1 transition-colors"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+            )}
+
             <div className="flex items-center justify-between pb-2 border-b border-black/[0.06]">
               <h3 className="font-bold text-sm text-[#252525]">{customizingItem.name}</h3>
-              <button onClick={() => setCustomizingItem(null)}>
-                <X className="h-4 w-4" />
-              </button>
+              {!customizingItem.image && (
+                <button onClick={() => setCustomizingItem(null)}>
+                  <X className="h-4 w-4" />
+                </button>
+              )}
             </div>
 
             {/* Variants */}
