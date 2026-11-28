@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { formatCurrency } from '@/lib/utils';
 import { toast } from 'sonner';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   Store,
   GitBranch,
@@ -46,12 +47,30 @@ import {
 } from 'recharts';
 
 export default function DashboardPage() {
+  const router = useRouter();
   const [mounted, setMounted] = React.useState(false);
+  const user = useAuthStore((s) => s.user);
+  const hasPermission = useAuthStore((s) => s.hasPermission);
+
   React.useEffect(() => {
     setMounted(true);
   }, []);
 
-  const user = useAuthStore((s) => s.user);
+  // Automatic station redirection for operational staff without dashboard.view permission
+  React.useEffect(() => {
+    if (user && !user.is_super_admin && !hasPermission('dashboard.view')) {
+      const userRoles = (user.roles || []).map((r: any) =>
+        typeof r === 'string' ? r : r.name
+      );
+      if (userRoles.includes('Waiter')) {
+        router.replace('/waiter');
+      } else if (userRoles.includes('Kitchen Staff')) {
+        router.replace('/kitchen');
+      } else if (userRoles.includes('Cashier')) {
+        router.replace('/pos');
+      }
+    }
+  }, [user, hasPermission, router]);
   const activeRestaurant = useAuthStore((s) => s.activeRestaurant);
   const activeBranch = useAuthStore((s) => s.activeBranch);
   const logout = useAuthStore((s) => s.logout);

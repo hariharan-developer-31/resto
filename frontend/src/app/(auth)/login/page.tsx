@@ -47,7 +47,27 @@ export default function LoginPage() {
       if (response.success && response.data) {
         setAuth(response.data.user, response.data.token);
         toast.success(`Welcome back, ${response.data.user.name}!`);
-        router.push('/dashboard');
+
+        // Smart Role-Based Station Redirection
+        const userRoles = (response.data.user.roles || []).map((r: any) =>
+          typeof r === 'string' ? r : r.name
+        );
+        if (
+          response.data.user.is_super_admin ||
+          userRoles.includes('Super Admin') ||
+          userRoles.includes('Restaurant Admin') ||
+          userRoles.includes('Branch Manager')
+        ) {
+          router.push('/dashboard');
+        } else if (userRoles.includes('Waiter')) {
+          router.push('/waiter');
+        } else if (userRoles.includes('Kitchen Staff')) {
+          router.push('/kitchen');
+        } else if (userRoles.includes('Cashier')) {
+          router.push('/pos');
+        } else {
+          router.push('/dashboard');
+        }
       }
     } catch (err: any) {
       if (err instanceof ApiError) {
@@ -60,9 +80,9 @@ export default function LoginPage() {
     }
   };
 
-  const selectDemoAccount = (email: string) => {
+  const selectDemoAccount = (email: string, pass = 'password123') => {
     setLogin(email);
-    setPassword('password123');
+    setPassword(pass);
   };
 
   return (
@@ -139,36 +159,55 @@ export default function LoginPage() {
             </form>
 
             {/* Quick Demo Access Switcher */}
-            <div className="pt-4 border-t border-black/[0.06] space-y-3">
+            <div className="pt-4 border-t border-black/[0.06] space-y-2.5">
               <div className="flex items-center justify-between">
                 <span className="text-[11px] font-bold uppercase tracking-wider text-[#8E928B]">
-                  Administrator Station Access
+                  Station Login Profiles
                 </span>
                 <span className="text-[10px] text-[#5A5D58] font-medium">Click to fill</span>
               </div>
 
-              <div>
+              <div className="space-y-2">
                 <button
                   type="button"
                   onClick={() => selectDemoAccount('superadmin@resto.com')}
-                  className={`w-full text-left p-3.5 rounded-2xl border transition-all text-xs cursor-pointer ${
+                  className={`w-full text-left p-3 rounded-2xl border transition-all text-xs cursor-pointer ${
                     login === 'superadmin@resto.com'
                       ? 'border-[#B4D58A] bg-[#B4D58A]/25 shadow-xs font-bold'
                       : 'border-black/[0.06] bg-black/[0.02] hover:bg-black/[0.04]'
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-[#252525]">Super Administrator</span>
+                    <span className="font-bold text-[#252525]">👑 Super Administrator (HQ Admin)</span>
                     {login === 'superadmin@resto.com' && <Check className="h-4 w-4 text-[#252525]" />}
                   </div>
                   <span className="text-[11px] text-[#5A5D58] block mt-0.5 font-medium">
-                    superadmin@resto.com • Universal multi-tenant control
+                    superadmin@resto.com • Full Admin Panel & Multi-Branch Control
                   </span>
                 </button>
-                <p className="text-[11px] text-[#8E928B] mt-2 px-1 text-center">
-                  Tenant and station staff accounts are provisioned via Staff Management once you create your restaurant.
-                </p>
+
+                <button
+                  type="button"
+                  onClick={() => selectDemoAccount('hthai@gmail.com')}
+                  className={`w-full text-left p-3 rounded-2xl border transition-all text-xs cursor-pointer ${
+                    login === 'hthai@gmail.com'
+                      ? 'border-[#B4D58A] bg-[#B4D58A]/25 shadow-xs font-bold'
+                      : 'border-black/[0.06] bg-black/[0.02] hover:bg-black/[0.04]'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-[#252525]">🍽️ Waiter Floor Staff (Staff Portal)</span>
+                    {login === 'hthai@gmail.com' && <Check className="h-4 w-4 text-[#252525]" />}
+                  </div>
+                  <span className="text-[11px] text-[#5A5D58] block mt-0.5 font-medium">
+                    hthai@gmail.com • Direct Mobile Waiter Station & Table Shifts
+                  </span>
+                </button>
               </div>
+
+              <p className="text-[10px] text-[#8E928B] text-center pt-1">
+                Notice: Waiters automatically land on the Waiter Station with admin menus locked.
+              </p>
             </div>
 
             <div className="text-center pt-2">
