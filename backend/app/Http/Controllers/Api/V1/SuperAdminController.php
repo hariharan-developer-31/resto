@@ -226,7 +226,7 @@ class SuperAdminController extends Controller
 
         $usersQuery = User::whereHas('restaurants', fn($q) => $q->where('restaurants.id', $restaurantId));
 
-        $totalBranches = (clone $branchQuery)->count();
+        $totalBranches = Branch::where('restaurant_id', $restaurantId)->count();
         $totalUsers = (clone $usersQuery)->count();
         $totalStaff = (clone $usersQuery)->whereHas('roles', fn($q) => $q->whereIn('name', ['Restaurant Admin', 'Branch Manager', 'Cashier', 'Kitchen Staff']))->count();
         $totalWaiters = (clone $usersQuery)->whereHas('roles', fn($q) => $q->where('name', 'Waiter'))->count();
